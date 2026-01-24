@@ -1,13 +1,20 @@
 const { app, BrowserWindow } = require("electron");
+const { startRpcServer } = require("./backend");
 
-function createWindow() {
+let rpcPort = 38741;
+
+async function createWindow() {
+  // Start JSON-RPC server first
+  const { port } = await startRpcServer({ port: rpcPort });
+  rpcPort = port;
+
   const win = new BrowserWindow({
     width: 1280,
     height: 800,
   });
 
-  // Dev: load Vite dev server
-  win.loadURL("http://localhost:5173");
+  // Pass port to renderer via query param (dev)
+  win.loadURL(`http://localhost:5173/?rpcPort=${rpcPort}`);
 }
 
 app.whenReady().then(() => {
@@ -19,6 +26,6 @@ app.whenReady().then(() => {
 });
 
 app.on("window-all-closed", () => {
-  // On macOS apps often stay open; on Linux/Windows we quit.
   if (process.platform !== "darwin") app.quit();
 });
+

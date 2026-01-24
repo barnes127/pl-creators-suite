@@ -1,4 +1,5 @@
 import { useMemo, useState } from "react";
+import { rpc } from "./rpc";
 import "./app.css";
 
 type AppId = "code" | "game" | "movie" | "docs" | "sheets" | "modeler";
@@ -24,6 +25,9 @@ export default function App() {
 
   const [active, setActive] = useState<AppId>("code");
   const activeItem = navItems.find((n) => n.id === active)!;
+  const [projectRoot, setProjectRoot] = useState<string>("");
+  const [status, setStatus] = useState<string>("idle");
+
 
   return (
     <div className="shell">
@@ -51,7 +55,7 @@ export default function App() {
         </nav>
 
         <div className="sidebarFooter">
-          <div className="tiny">Project: (none)</div>
+          <div className="tiny">Project: {projectRoot ? projectRoot : "none"}</div>
           <div className="tiny">Workspace: single-window</div>
         </div>
       </aside>
@@ -63,25 +67,72 @@ export default function App() {
             <div className="activeSub">Project workflows will live here.</div>
           </div>
 
-          <div className="topbarRight">
-            <button className="btn" type="button">
-              New Project
-            </button>
-            <button className="btn" type="button">
-              Open Project
-            </button>
-            <button className="btn" type="button">
-              Settings
-            </button>
-          </div>
-        </header>
+<div className="topbarRight">
+  <button
+    className="btn"
+    type="button"
+    onClick={async () => {
+      try {
+        setStatus("Creating project...");
+        const result = await rpc<{ projectRoot: string; manifestPath: string; manifest: any }>("project.create", {
+          name: "TestProject",
+        });
+        setProjectRoot(result.projectRoot);
+        setStatus(`Created: ${result.projectRoot}`);
+      } catch (e: any) {
+        setStatus(`Error: ${e.message}`);
+      }
+    }}
+  >
+    New Project
+  </button>
+
+  <button
+    className="btn"
+    type="button"
+    onClick={async () => {
+      try {
+        const root = prompt("Enter project folder path to open:", projectRoot || "");
+        if (!root) return;
+        setStatus("Opening project...");
+        const result = await rpc<{ projectRoot: string; manifestPath: string; manifest: any }>("project.open", {
+          projectRoot: root,
+        });
+        setProjectRoot(result.projectRoot);
+        setStatus(`Opened: ${result.projectRoot}`);
+      } catch (e: any) {
+        setStatus(`Error: ${e.message}`);
+      }
+    }}
+  >
+    Open Project
+  </button>
+
+  <button
+    className="btn"
+    type="button"
+    onClick={async () => {
+      try {
+        if (!projectRoot) return setStatus("No project open");
+        setStatus("Exporting logs...");
+        const result = await rpc<{ logPath: string }>("logs.export", { projectRoot });
+        setStatus(`Logs: ${result.logPath}`);
+      } catch (e: any) {
+        setStatus(`Error: ${e.message}`);
+      }
+    }}
+  >
+    Export Logs
+  </button>
+</div>
+</header>
 
         <section className="workspace">
           <Workspace active={active} />
         </section>
 
         <footer className="statusbar">
-          <div className="statusLeft">Status: idle</div>
+          <div className="statusLeft">Status: {status}</div>
           <div className="statusRight">Renderer → Electron dev loop</div>
         </footer>
       </main>
