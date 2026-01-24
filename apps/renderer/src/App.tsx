@@ -1,6 +1,8 @@
 import { useMemo, useState } from "react";
 import { rpc } from "./rpc";
 import "./app.css";
+import { Modal } from "./components/Modal";
+
 
 type AppId = "code" | "game" | "movie" | "docs" | "sheets" | "modeler";
 
@@ -27,6 +29,11 @@ export default function App() {
   const activeItem = navItems.find((n) => n.id === active)!;
   const [projectRoot, setProjectRoot] = useState<string>("");
   const [status, setStatus] = useState<string>("idle");
+  const [showNew, setShowNew] = useState(false);
+  const [newName, setNewName] = useState("TestProject");
+  const [newBaseDir, setNewBaseDir] = useState("");
+  const [uiError, setUiError] = useState("");
+
 
 
   return (
@@ -69,23 +76,16 @@ export default function App() {
 
 <div className="topbarRight">
   <button
-    className="btn"
-    type="button"
-    onClick={async () => {
-      try {
-        setStatus("Creating project...");
-        const result = await rpc<{ projectRoot: string; manifestPath: string; manifest: any }>("project.create", {
-          name: "TestProject",
-        });
-        setProjectRoot(result.projectRoot);
-        setStatus(`Created: ${result.projectRoot}`);
-      } catch (e: any) {
-        setStatus(`Error: ${e.message}`);
-      }
-    }}
-  >
-    New Project
-  </button>
+  className="btn"
+  type="button"
+  onClick={() => {
+    setUiError("");
+    setShowNew(true);
+  }}
+>
+  New Project
+</button>
+
 
   <button
     className="btn"
@@ -136,6 +136,64 @@ export default function App() {
           <div className="statusRight">Renderer → Electron dev loop</div>
         </footer>
       </main>
+{showNew && (
+  <Modal
+    title="Create New Project"
+    onClose={() => setShowNew(false)}
+  >
+    <div className="fieldRow">
+      <div className="label">Project name</div>
+      <input
+        className="input"
+        value={newName}
+        onChange={(e) => setNewName(e.target.value)}
+        placeholder="My Project"
+      />
+    </div>
+
+    <div className="fieldRow">
+      <div className="label">Base directory (optional)</div>
+      <input
+        className="input"
+        value={newBaseDir}
+        onChange={(e) => setNewBaseDir(e.target.value)}
+        placeholder="Defaults to ~/PLProjects"
+      />
+    </div>
+
+    <div className="row">
+      <button
+        className="btn"
+        type="button"
+        onClick={async () => {
+          try {
+            setUiError("");
+            setStatus("Creating project...");
+            const result = await rpc<{ projectRoot: string }>("project.create", {
+              name: newName,
+              baseDir: newBaseDir || undefined,
+            });
+            setProjectRoot(result.projectRoot);
+            setStatus(`Created: ${result.projectRoot}`);
+            setShowNew(false);
+          } catch (e: any) {
+            setUiError(e.message || String(e));
+            setStatus("idle");
+          }
+        }}
+      >
+        Create
+      </button>
+
+      <button className="btn" type="button" onClick={() => setShowNew(false)}>
+        Cancel
+      </button>
+    </div>
+
+    {uiError && <div className="errorBox">{uiError}</div>}
+  </Modal>
+)}
+
     </div>
   );
 }

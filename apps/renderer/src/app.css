@@ -172,3 +172,79 @@ html, body, #root {
   font-size: 12px;
   color: #a8a8b3;
 }
+/* Modal */
+.modalOverlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.55);
+  display: grid;
+  place-items: center;
+  padding: 18px;
+}
+
+.modalPanel {
+  width: min(720px, 100%);
+  border: 1px solid #242429;
+  background: #121216;
+  border-radius: 16px;
+  overflow: hidden;
+}
+
+.modalHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 14px;
+  border-bottom: 1px solid #232327;
+  background: #0f0f11;
+}
+
+.modalTitle {
+  font-size: 15px;
+  font-weight: 800;
+}
+
+.modalBody {
+  padding: 14px;
+}
+
+.fieldRow {
+  display: grid;
+  gap: 6px;
+  margin-bottom: 12px;
+}
+
+.label {
+  font-size: 12px;
+  color: #a8a8b3;
+}
+
+.input {
+  border: 1px solid #2b2b35;
+  background: #0f0f11;
+  color: inherit;
+  padding: 10px 10px;
+  border-radius: 10px;
+  outline: none;
+}
+
+.input:focus {
+  border-color: #6a6a85;
+}
+
+.row {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.errorBox {
+  border: 1px solid #5a2b2b;
+  background: #1a1010;
+  color: #ffb0b0;
+  padding: 10px;
+  border-radius: 12px;
+  margin-top: 10px;
+}
