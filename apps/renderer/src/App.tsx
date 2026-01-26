@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect,  useMemo, useState } from "react";
 import { rpc } from "./rpc";
 import "./app.css";
 import { Modal } from "./components/Modal";
@@ -33,170 +33,260 @@ export default function App() {
   const [newName, setNewName] = useState("TestProject");
   const [newBaseDir, setNewBaseDir] = useState("");
   const [uiError, setUiError] = useState("");
+  const [recents, setRecents] = useState<Array<{ projectRoot: string; name: string; lastOpenedAt: string }>>([]);
+  const [openPath, setOpenPath] = useState("");
+  const [openError, setOpenError] = useState("");
+  const [showOpen, setShowOpen] = useState(false);
 
+
+
+
+async function refreshRecents() {
+  try {
+    const result = await rpc<{ items: any[] }>("recent.list");
+    setRecents(result.items || []);
+  } catch {
+    // ignore
+  }
+}
+
+useEffect(() => {
+  refreshRecents();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+}, []);
 
 
   return (
-    <div className="shell">
-      <aside className="sidebar">
-        <div className="brand">
-          <div className="brandTitle">PL Creators Suite</div>
-          <div className="brandSub">v0.0.1 • offline-first</div>
-        </div>
+  <div className="shell">
+    <aside className="sidebar">
+      <div className="brand">
+        <div className="brandTitle">PL Creators Suite</div>
+        <div className="brandSub">v0.0.1 • offline-first</div>
+      </div>
 
-        <nav className="nav">
-          {navItems.map((item) => {
-            const isActive = item.id === active;
-            return (
+      <nav className="nav">
+        {navItems.map((item) => {
+          const isActive = item.id === active;
+          return (
+            <button
+              key={item.id}
+              className={`navItem ${isActive ? "active" : ""}`}
+              onClick={() => setActive(item.id)}
+              type="button"
+            >
+              <div className="navLabel">{item.label}</div>
+              <div className="navHint">{item.hint}</div>
+            </button>
+          );
+        })}
+      </nav>
+
+      <div className="sidebarFooter">
+        <div className="tiny">Project: {projectRoot ? projectRoot : "(none)"}</div>
+        <div className="tiny">Recent:</div>
+
+        {recents.length === 0 ? (
+          <div className="tiny">(none)</div>
+        ) : (
+          <div className="recentList">
+            {recents.slice(0, 5).map((r) => (
               <button
-                key={item.id}
-                className={`navItem ${isActive ? "active" : ""}`}
-                onClick={() => setActive(item.id)}
+                key={r.projectRoot}
+                className="recentItem"
                 type="button"
+                onClick={async () => {
+                  try {
+                    setStatus("Opening project...");
+                    const result = await rpc<{ projectRoot: string; manifest: any }>("project.open", {
+                      projectRoot: r.projectRoot,
+                    });
+                    setProjectRoot(result.projectRoot);
+                    setStatus(`Opened: ${result.projectRoot}`);
+                    await refreshRecents();
+                  } catch (e: any) {
+                    setStatus(`Error: ${e.message}`);
+                  }
+                }}
+                title={r.projectRoot}
               >
-                <div className="navLabel">{item.label}</div>
-                <div className="navHint">{item.hint}</div>
+                {r.name}
               </button>
-            );
-          })}
-        </nav>
+            ))}
+          </div>
+        )}
+      </div>
+    </aside>
 
-        <div className="sidebarFooter">
-          <div className="tiny">Project: {projectRoot ? projectRoot : "none"}</div>
-          <div className="tiny">Workspace: single-window</div>
+    <main className="main">
+      <header className="topbar">
+        <div className="topbarRight">
+          <button
+            className="btn"
+            type="button"
+            onClick={() => {
+              setUiError("");
+              setShowNew(true);
+            }}
+          >
+            New Project
+          </button>
+
+          <button
+            className="btn"
+            type="button"
+            onClick={() => {
+              setOpenError("");
+              setOpenPath(projectRoot || "");
+              setShowOpen(true);
+            }}
+          >
+            Open Project
+          </button>
+
+          <button
+            className="btn"
+            type="button"
+            onClick={async () => {
+              try {
+                if (!projectRoot) return setStatus("No project open");
+                setStatus("Exporting logs...");
+                const result = await rpc<{ logPath: string }>("logs.export", { projectRoot });
+                setStatus(`Logs: ${result.logPath}`);
+                await refreshRecents();
+              } catch (e: any) {
+                setStatus(`Error: ${e.message}`);
+              }
+            }}
+          >
+            Export Logs
+          </button>
         </div>
-      </aside>
+      </header>
 
-      <main className="main">
-        <header className="topbar">
-          <div className="topbarLeft">
-            <div className="activeTitle">{activeItem.label}</div>
-            <div className="activeSub">Project workflows will live here.</div>
+      <section className="workspace">
+        <Workspace active={active} />
+      </section>
+
+      <footer className="statusbar">
+        <div className="statusLeft">Status: {status}</div>
+        <div className="statusRight">Renderer → Electron dev loop</div>
+      </footer>
+
+      {showNew && (
+        <Modal title="Create New Project" onClose={() => setShowNew(false)}>
+          <div className="fieldRow">
+            <div className="label">Project name</div>
+            <input
+              className="input"
+              value={newName}
+              onChange={(e) => setNewName(e.target.value)}
+              placeholder="My Project"
+            />
           </div>
 
-<div className="topbarRight">
-  <button
-  className="btn"
-  type="button"
-  onClick={() => {
-    setUiError("");
-    setShowNew(true);
-  }}
->
-  New Project
-</button>
+          <div className="fieldRow">
+            <div className="label">Base directory (optional)</div>
+            <input
+              className="input"
+              value={newBaseDir}
+              onChange={(e) => setNewBaseDir(e.target.value)}
+              placeholder="Defaults to ~/PLProjects"
+            />
+          </div>
 
+          <div className="row">
+            <button
+              className="btn"
+              type="button"
+              onClick={async () => {
+                try {
+                  setUiError("");
+                  setStatus("Creating project...");
+                  const result = await rpc<{ projectRoot: string }>("project.create", {
+                    name: newName,
+                    baseDir: newBaseDir || undefined,
+                  });
+                  setProjectRoot(result.projectRoot);
+                  setStatus(`Created: ${result.projectRoot}`);
+                  await refreshRecents();
+                  setShowNew(false);
+                } catch (e: any) {
+                  setUiError(e.message || String(e));
+                  setStatus("idle");
+                }
+              }}
+            >
+              Create
+            </button>
 
-  <button
-    className="btn"
-    type="button"
-    onClick={async () => {
-      try {
-        const root = prompt("Enter project folder path to open:", projectRoot || "");
-        if (!root) return;
-        setStatus("Opening project...");
-        const result = await rpc<{ projectRoot: string; manifestPath: string; manifest: any }>("project.open", {
-          projectRoot: root,
-        });
-        setProjectRoot(result.projectRoot);
-        setStatus(`Opened: ${result.projectRoot}`);
-      } catch (e: any) {
-        setStatus(`Error: ${e.message}`);
-      }
-    }}
-  >
-    Open Project
-  </button>
+            <button className="btn" type="button" onClick={() => setShowNew(false)}>
+              Cancel
+            </button>
+          </div>
 
-  <button
-    className="btn"
-    type="button"
-    onClick={async () => {
-      try {
-        if (!projectRoot) return setStatus("No project open");
-        setStatus("Exporting logs...");
-        const result = await rpc<{ logPath: string }>("logs.export", { projectRoot });
-        setStatus(`Logs: ${result.logPath}`);
-      } catch (e: any) {
-        setStatus(`Error: ${e.message}`);
-      }
-    }}
-  >
-    Export Logs
-  </button>
-</div>
-</header>
+          {uiError && <div className="errorBox">{uiError}</div>}
+        </Modal>
+      )}
 
-        <section className="workspace">
-          <Workspace active={active} />
-        </section>
+      {showOpen && (
+        <Modal title="Open Project" onClose={() => setShowOpen(false)}>
+          <div className="fieldRow">
+            <div className="label">Project folder path</div>
+            <input
+              className="input"
+              value={openPath}
+              onChange={(e) => setOpenPath(e.target.value)}
+              placeholder="/home/brandenbarnes/PLProjects/MyProject"
+            />
+          </div>
 
-        <footer className="statusbar">
-          <div className="statusLeft">Status: {status}</div>
-          <div className="statusRight">Renderer → Electron dev loop</div>
-        </footer>
-      </main>
-{showNew && (
-  <Modal
-    title="Create New Project"
-    onClose={() => setShowNew(false)}
-  >
-    <div className="fieldRow">
-      <div className="label">Project name</div>
-      <input
-        className="input"
-        value={newName}
-        onChange={(e) => setNewName(e.target.value)}
-        placeholder="My Project"
-      />
-    </div>
+          <div className="row">
+            <button
+              className="btn"
+              type="button"
+              onClick={async () => {
+                try {
+                  setOpenError("");
+                  const root = openPath.trim();
+                  if (!root) {
+                    setOpenError("Please enter a project folder path.");
+                    return;
+                  }
 
-    <div className="fieldRow">
-      <div className="label">Base directory (optional)</div>
-      <input
-        className="input"
-        value={newBaseDir}
-        onChange={(e) => setNewBaseDir(e.target.value)}
-        placeholder="Defaults to ~/PLProjects"
-      />
-    </div>
+                  setStatus("Opening project...");
+                  const result = await rpc<{ projectRoot: string; manifestPath: string; manifest: any }>(
+                    "project.open",
+                    { projectRoot: root }
+                  );
 
-    <div className="row">
-      <button
-        className="btn"
-        type="button"
-        onClick={async () => {
-          try {
-            setUiError("");
-            setStatus("Creating project...");
-            const result = await rpc<{ projectRoot: string }>("project.create", {
-              name: newName,
-              baseDir: newBaseDir || undefined,
-            });
-            setProjectRoot(result.projectRoot);
-            setStatus(`Created: ${result.projectRoot}`);
-            setShowNew(false);
-          } catch (e: any) {
-            setUiError(e.message || String(e));
-            setStatus("idle");
-          }
-        }}
-      >
-        Create
-      </button>
+                  setProjectRoot(result.projectRoot);
+                  setStatus(`Opened: ${result.projectRoot}`);
+                  await refreshRecents();
+                  setShowOpen(false);
+                } catch (e: any) {
+                  setOpenError(e.message || String(e));
+                  setStatus("idle");
+                }
+              }}
+            >
+              Open
+            </button>
 
-      <button className="btn" type="button" onClick={() => setShowNew(false)}>
-        Cancel
-      </button>
-    </div>
+            <button className="btn" type="button" onClick={() => setShowOpen(false)}>
+              Cancel
+            </button>
+          </div>
 
-    {uiError && <div className="errorBox">{uiError}</div>}
-  </Modal>
-)}
-
-    </div>
-  );
+          {openError && <div className="errorBox">{openError}</div>}
+        </Modal>
+      )}
+    </main>
+  </div>
+);
 }
+
+    
+
 
 function Workspace({ active }: { active: AppId }) {
   switch (active) {
