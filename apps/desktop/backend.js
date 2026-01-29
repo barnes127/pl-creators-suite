@@ -2,8 +2,40 @@ const http = require("http");
 const os = require("os");
 const path = require("path");
 const fs = require("fs/promises");
-
 const DEFAULT_PROJECTS_DIR = path.join(os.homedir(), "PLProjects");
+const RECENTS_DIR = path.join(os.homedir(), ".plcs");
+const RECENTS_PATH = path.join(RECENTS_DIR, "recent-projects.json");
+const { spawn } = require("child_process");
+const { app, dialog } = require("electron");
+
+async function readRecents() {
+  try {
+    const txt = await fs.readFile(RECENTS_PATH, "utf8");
+    const data = JSON.parse(txt);
+    return Array.isArray(data) ? data : [];
+  } catch {
+    return [];
+  }
+}
+
+async function writeRecents(list) {
+  await ensureDir(RECENTS_DIR);
+  await fs.writeFile(RECENTS_PATH, JSON.stringify(list, null, 2), "utf8");
+}
+
+async function addRecent(projectRoot, manifest) {
+  const name = manifest?.name || path.basename(projectRoot);
+  const now = nowIso();
+  const list = await readRecents();
+
+  const next = [
+    { projectRoot, name, lastOpenedAt: now },
+    ...list.filter((x) => x?.projectRoot !== projectRoot),
+  ].slice(0, 10);
+
+  await writeRecents(next);
+  return next;
+}
 
 async function ensureDir(p) {
   await fs.mkdir(p, { recursive: true });
@@ -20,6 +52,20 @@ async function fileExists(p) {
 
 function nowIso() {
   return new Date().toISOString();
+}
+
+function runCmd(cmd, args, cwd) {
+  return new Promise((resolve, reject) => {
+    const p = spawn(cmd, args, { cwd, stdio: "pipe" });
+    let out = "";
+    let err = "";
+    p.stdout.on("data", (d) => (out += d.toString()));
+    p.stderr.on("data", (d) => (err += d.toString()));
+    p.on("close", (code) => {
+      if (code === 0) return resolve({ out, err });
+      reject(new Error(`${cmd} ${args.join(" ")} failed (${code}): ${err || out}`));
+    });
+  });
 }
 
 async function appendLog(projectRoot, line) {
@@ -70,6 +116,7 @@ async function project_create(params) {
   };
 
   const manifestPath = await writeManifest(projectRoot, manifest);
+  await addRecent(projectRoot, manifest);
   await appendLog(projectRoot, `Created project "${name}"`);
 
   return { projectRoot, manifestPath, manifest };
@@ -85,9 +132,71 @@ async function project_open(params) {
   }
 
   const manifest = await readManifest(projectRoot);
+  await addRecent(projectRoot, manifest);
   await appendLog(projectRoot, `Opened project "${manifest?.name || "Unknown"}"`);
 
   return { projectRoot, manifestPath, manifest };
+}
+async function project_export(params) {
+  const projectRoot = (params?.projectRoot || "").toString();
+  let outPath = (params?.outPath || "").toString();
+
+  if (!projectRoot) throw new Error("projectRoot is required");
+
+  const manifestPath = path.join(projectRoot, "pl-project.json");
+  if (!(await fileExists(manifestPath))) {
+    throw new Error(`Manifest not found: ${manifestPath}`);
+  }
+
+  if (!outPath) {
+    const folderName = path.basename(projectRoot);
+    outPath = path.join(path.dirname(projectRoot), `${folderName}.plproj`);
+  }
+
+  if (!outPath.endsWith(".plproj")) outPath += ".plproj";
+
+  // Zip project root contents so pl-project.json sits at archive root
+  await runCmd("zip", ["-r", outPath, "."], projectRoot);
+
+  await appendLog(projectRoot, `Exported project to "${outPath}"`);
+  return { outPath };
+}
+async function project_import(params) {
+  const filePath = (params?.filePath || "").toString();
+  const baseDir = (params?.baseDir || DEFAULT_PROJECTS_DIR).toString();
+
+  if (!filePath) throw new Error("filePath is required");
+  if (!filePath.endsWith(".plproj")) throw new Error("Expected a .plproj file");
+
+  await ensureDir(baseDir);
+
+  const baseName = path.basename(filePath).replace(/\.plproj$/i, "");
+  const folderName =
+    baseName.replace(/[<>:"/\\|?*\x00-\x1F]/g, "").slice(0, 64) || "ImportedProject";
+
+  const projectRoot = path.join(baseDir, folderName);
+
+  if (await fileExists(projectRoot)) {
+    throw new Error(`Project folder already exists: ${projectRoot}`);
+  }
+
+  await ensureDir(projectRoot);
+
+  // Unzip archive into projectRoot
+  await runCmd("unzip", [filePath, "-d", projectRoot], process.cwd());
+
+  const manifestPath = path.join(projectRoot, "pl-project.json");
+  if (!(await fileExists(manifestPath))) {
+    throw new Error(`Imported project missing manifest: ${manifestPath}`);
+  }
+
+  const manifestRaw = await fs.promises.readFile(manifestPath, "utf-8");
+  const manifest = JSON.parse(manifestRaw);
+
+  await addRecent(projectRoot, manifest);
+  await appendLog(projectRoot, `Imported project from "${filePath}"`);
+
+  return { projectRoot, manifest };
 }
 
 async function logs_export(params) {
@@ -103,10 +212,45 @@ async function logs_export(params) {
   return { logPath };
 }
 
+async function recent_list() {
+  const list = await readRecents();
+  return { items: list };
+}
+
+async function recent_add(params) {
+  const projectRoot = (params?.projectRoot || "").toString();
+  const manifest = params?.manifest || null;
+  if (!projectRoot) throw new Error("projectRoot is required");
+  const items = await addRecent(projectRoot, manifest);
+  return { items };
+}
+
+async function dialog_open_plproj() {
+  const result = await dialog.showOpenDialog({
+    title: "Import Project (.plproj)",
+    properties: ["openFile"],
+    filters: [{ name: "PL Project", extensions: ["plproj"] }],
+  });
+
+  if (result.canceled || !result.filePaths?.length) {
+    return { canceled: true };
+  }
+
+  return { canceled: false, filePath: result.filePaths[0] };
+}
+
 const METHODS = {
   "project.create": project_create,
   "project.open": project_open,
   "logs.export": logs_export,
+  "recent.list": recent_list,
+  "recent.add": recent_add,
+  "project.export": project_export,
+  "project.import": project_import,
+  "dialog.openPlproj": dialog_open_plproj,
+
+
+
 };
 
 function makeJsonRpcResponse(id, result, error) {

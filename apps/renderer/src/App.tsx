@@ -160,6 +160,47 @@ useEffect(() => {
           >
             Export Logs
           </button>
+<button
+  className="btn"
+  type="button"
+  onClick={async () => {
+    try {
+      if (!projectRoot) return setStatus("No project open");
+      setStatus("Exporting project...");
+      const result = await rpc<{ outPath: string }>("project.export", { projectRoot });
+      setStatus(`Exported: ${result.outPath}`);
+      await refreshRecents();
+    } catch (e: any) {
+      setStatus(`Error: ${e.message || String(e)}`);
+    }
+  }}
+>
+  Export Project
+</button>
+<button
+  className="btn"
+  type="button"
+  onClick={async () => {
+    try {
+      setStatus("Choose .plproj file...");
+      const pick = await rpc<{ canceled: boolean; filePath?: string }>("dialog.openPlproj");
+      if (pick.canceled || !pick.filePath) {
+        setStatus("Import canceled");
+        return;
+      }
+
+      setStatus("Importing project...");
+      const result = await rpc<{ projectRoot: string }>("project.import", { filePath: pick.filePath });
+      setProjectRoot(result.projectRoot);
+      setStatus(`Imported: ${result.projectRoot}`);
+      await refreshRecents();
+    } catch (e: any) {
+      setStatus(`Error: ${e.message || String(e)}`);
+    }
+  }}
+>
+  Import Project
+</button>
         </div>
       </header>
 
