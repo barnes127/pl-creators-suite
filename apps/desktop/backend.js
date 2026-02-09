@@ -37,6 +37,27 @@ async function addRecent(projectRoot, manifest) {
   return next;
 }
 
+async function readJsonFileSafe(filePath, fallback) {
+  try {
+    const raw = await fs.readFile(filePath, "utf-8");
+    return JSON.parse(raw);
+  } catch {
+    return fallback;
+  }
+}
+
+async function writeJsonFileAtomic(filePath, data) {
+  const dir = path.dirname(filePath);
+  await ensureDir(dir);
+
+  const tmpPath = `${filePath}.tmp`;
+  const payload = JSON.stringify(data, null, 2);
+
+  await fs.writeFile(tmpPath, payload, "utf-8");
+  // rename is atomic on same filesystem
+  await fs.rename(tmpPath, filePath);
+}
+
 async function ensureDir(p) {
   await fs.mkdir(p, { recursive: true });
 }
@@ -190,7 +211,7 @@ async function project_import(params) {
     throw new Error(`Imported project missing manifest: ${manifestPath}`);
   }
 
-  const manifestRaw = await fs.promises.readFile(manifestPath, "utf-8");
+  const manifestRaw = await fs.readFile(manifestPath, "utf-8");
   const manifest = JSON.parse(manifestRaw);
 
   await addRecent(projectRoot, manifest);
@@ -210,6 +231,96 @@ async function logs_export(params) {
   }
 
   return { logPath };
+}
+
+function normalizeRecentItem(it) {
+  if (!it || typeof it !== "object") return null;
+
+  const projectRoot = typeof it.projectRoot === "string" ? it.projectRoot : "";
+  if (!projectRoot) return null;
+
+  const name = typeof it.name === "string" && it.name.trim() ? it.name.trim() : path.basename(projectRoot) || "Untitled";
+  const lastOpenedAt =
+    typeof it.lastOpenedAt === "string" && it.lastOpenedAt.trim() ? it.lastOpenedAt.trim() : nowIso();
+
+  return { projectRoot, name, lastOpenedAt };
+}
+
+function migrateRecentsToV1(maybeOld) {
+  // v1 shape:
+  // { schemaVersion: 1, items: [ {projectRoot, name, lastOpenedAt} ] }
+
+  if (!maybeOld) return { schemaVersion: 1, items: [] };
+
+  // Already v1?
+  if (maybeOld.schemaVersion === 1 && Array.isArray(maybeOld.items)) {
+    const items = maybeOld.items.map(normalizeRecentItem).filter(Boolean);
+    return { schemaVersion: 1, items };
+  }
+
+  // Older/loose shapes:
+  // - array directly
+  // - { items: [...] } but no schemaVersion
+  // - anything else => reset
+  const arr = Array.isArray(maybeOld)
+    ? maybeOld
+    : Array.isArray(maybeOld.items)
+      ? maybeOld.items
+      : [];
+
+  const items = arr.map(normalizeRecentItem).filter(Boolean);
+  return { schemaVersion: 1, items };
+}
+
+async function readRecentsDb() {
+  const fallback = { schemaVersion: 1, items: [] };
+  const raw = await readJsonFileSafe(RECENTS_PATH, fallback);
+  const db = migrateRecentsToV1(raw);
+
+  // If migration changed shape, persist it (heals old/corrupt files)
+  if (!raw || raw.schemaVersion !== 1) {
+    await writeJsonFileAtomic(RECENTS_PATH, db);
+  }
+
+  return db;
+}
+
+async function writeRecentsDb(db) {
+  await writeJsonFileAtomic(RECENTS_PATH, db);
+}
+
+async function readRecents() {
+  const db = await readRecentsDb();
+
+  // newest first
+  const sorted = [...db.items].sort((a, b) => (a.lastOpenedAt < b.lastOpenedAt ? 1 : -1));
+  return sorted;
+}
+
+async function addRecent(projectRoot, manifest) {
+  const db = await readRecentsDb();
+
+  const name =
+    (manifest && typeof manifest.name === "string" && manifest.name.trim()) ||
+    path.basename(projectRoot) ||
+    "Untitled";
+
+  const now = nowIso();
+
+  // remove existing item
+  const filtered = db.items.filter((it) => it.projectRoot !== projectRoot);
+
+  filtered.unshift({
+    projectRoot,
+    name: name.toString(),
+    lastOpenedAt: now,
+  });
+
+  // cap list size (adjust if you want)
+  db.items = filtered.slice(0, 50);
+
+  await writeRecentsDb(db);
+  return db.items;
 }
 
 async function recent_list() {
