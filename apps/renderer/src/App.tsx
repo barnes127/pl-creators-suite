@@ -134,10 +134,32 @@ useEffect(() => {
           <button
             className="btn"
             type="button"
-            onClick={() => {
-              setOpenError("");
-              setOpenPath(projectRoot || "");
-              setShowOpen(true);
+            onClick={async () => {
+              try {
+                setStatus("Choosing project folder...");
+
+                const pick = await rpc<{ canceled: boolean; projectRoot?: string }>(
+                  "dialog.openProjectFolder"
+                );
+
+                if (pick.canceled || !pick.projectRoot) {
+                  setStatus("Open canceled");
+                  return;
+                }
+
+                setStatus("Opening project...");
+
+                const result = await rpc<{ projectRoot: string; manifestPath: string; manifest: any }>(
+                  "project.open",
+                  { projectRoot: pick.projectRoot }
+                );
+
+                setProjectRoot(result.projectRoot);
+                setStatus(`Opened: ${result.projectRoot}`);
+                await refreshRecents();
+              } catch (e: any) {
+                setStatus(`Error: ${e.message || String(e)}`);
+              }
             }}
           >
             Open Project
@@ -166,8 +188,27 @@ useEffect(() => {
   onClick={async () => {
     try {
       if (!projectRoot) return setStatus("No project open");
+
+      const suggestedName =
+        projectRoot.split("/").pop() || "project";
+
+      setStatus("Choose export location...");
+      const pick = await rpc<{ canceled: boolean; filePath?: string }>(
+        "dialog.savePlproj",
+        { defaultName: `${suggestedName}.plproj` }
+      );
+
+      if (pick.canceled || !pick.filePath) {
+        setStatus("Export canceled");
+        return;
+      }
+
       setStatus("Exporting project...");
-      const result = await rpc<{ outPath: string }>("project.export", { projectRoot });
+      const result = await rpc<{ outPath: string }>("project.export", {
+        projectRoot,
+        outPath: pick.filePath,
+      });
+
       setStatus(`Exported: ${result.outPath}`);
       await refreshRecents();
     } catch (e: any) {

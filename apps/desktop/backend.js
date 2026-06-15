@@ -7,6 +7,9 @@ const RECENTS_DIR = path.join(os.homedir(), ".plcs");
 const RECENTS_PATH = path.join(RECENTS_DIR, "recent-projects.json");
 const { spawn } = require("child_process");
 const { app, dialog } = require("electron");
+const projects = require("./services/projects");
+const dialogs = require("./services/dialogs");
+
 
 async function readRecents() {
   try {
@@ -351,15 +354,31 @@ async function dialog_open_plproj() {
 }
 
 const METHODS = {
-  "project.create": project_create,
-  "project.open": project_open,
+  "project.create": projects.projectCreate,
+  "project.open": projects.projectOpen,
   "logs.export": logs_export,
   "recent.list": recent_list,
   "recent.add": recent_add,
-  "project.export": project_export,
-  "project.import": project_import,
-  "dialog.openPlproj": dialog_open_plproj,
+  "project.export": projects.projectExport,
+  "project.import": projects.projectImport,
+  "dialog.openProjectFolder": async () => {
+  const folder = await dialogs.openProjectFolder();
+  if (!folder) return { canceled: true };
+  return { canceled: false, projectRoot: folder };
+},
 
+"dialog.openPlproj": async () => {
+  const file = await dialogs.openPlprojFile();
+  if (!file) return { canceled: true };
+  return { canceled: false, filePath: file };
+},
+
+"dialog.savePlproj": async (params) => {
+  const name = params?.defaultName || "project.plproj";
+  const file = await dialogs.savePlprojFile(name);
+  if (!file) return { canceled: true };
+  return { canceled: false, filePath: file };
+},
 
 
 };
