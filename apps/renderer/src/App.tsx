@@ -3,6 +3,13 @@ import { rpc } from "./rpc";
 import "./app.css";
 import { Modal } from "./components/Modal";
 
+declare global {
+  interface Window {
+    plMenu?: {
+      onMenuAction?: (callback: (channel: string) => void) => void | (() => void);
+    };
+  }
+}
 
 type AppId = "code" | "game" | "movie" | "docs" | "sheets" | "modeler";
 
@@ -26,7 +33,7 @@ export default function App() {
   );
 
   const [active, setActive] = useState<AppId>("code");
-  const activeItem = navItems.find((n) => n.id === active)!;
+//  const activeItem = navItems.find((n) => n.id === active)!;
   const [projectRoot, setProjectRoot] = useState<string>("");
   const [status, setStatus] = useState<string>("idle");
   const [showNew, setShowNew] = useState(false);
@@ -39,7 +46,91 @@ export default function App() {
   const [showOpen, setShowOpen] = useState(false);
 
 
+async function handleOpenProject() {
+  try {
+    setStatus("Choosing project folder...");
 
+    const pick = await rpc<{ canceled: boolean; projectRoot?: string }>(
+      "dialog.openProjectFolder"
+    );
+
+    if (pick.canceled || !pick.projectRoot) {
+      setStatus("Open canceled");
+      return;
+    }
+
+    setStatus("Opening project...");
+
+    const result = await rpc<{ projectRoot: string; manifestPath: string; manifest: any }>(
+      "project.open",
+      { projectRoot: pick.projectRoot }
+    );
+
+    setProjectRoot(result.projectRoot);
+    setStatus(`Opened: ${result.projectRoot}`);
+    await refreshRecents();
+  } catch (e: any) {
+    setStatus(`Error: ${e.message || String(e)}`);
+  }
+}
+
+async function handleImportProject() {
+  try {
+    setStatus("Choose .plproj file...");
+    const pick = await rpc<{ canceled: boolean; filePath?: string }>("dialog.openPlproj");
+
+    if (pick.canceled || !pick.filePath) {
+      setStatus("Import canceled");
+      return;
+    }
+
+    setStatus("Importing project...");
+    const result = await rpc<{ projectRoot: string }>("project.import", {
+      filePath: pick.filePath,
+    });
+
+    setProjectRoot(result.projectRoot);
+    setStatus(`Imported: ${result.projectRoot}`);
+    await refreshRecents();
+  } catch (e: any) {
+    setStatus(`Error: ${e.message || String(e)}`);
+  }
+}
+
+async function handleExportProject() {
+  try {
+    if (!projectRoot) return setStatus("No project open");
+
+    const suggestedName = projectRoot.split("/").pop() || "project";
+
+    setStatus("Choose export location...");
+    const pick = await rpc<{ canceled: boolean; filePath?: string }>(
+      "dialog.savePlproj",
+      { defaultName: `${suggestedName}.plproj` }
+    );
+
+    if (pick.canceled || !pick.filePath) {
+      setStatus("Export canceled");
+      return;
+    }
+
+    setStatus("Exporting project...");
+    const result = await rpc<{ outPath: string }>("project.export", {
+      projectRoot,
+      outPath: pick.filePath,
+    });
+
+    setStatus(`Exported: ${result.outPath}`);
+    await refreshRecents();
+  } catch (e: any) {
+    setStatus(`Error: ${e.message || String(e)}`);
+  }
+}
+
+function handleNewProject() {
+  setUiError("");
+  setShowNew(true);
+}
 
 async function refreshRecents() {
   try {
@@ -55,6 +146,34 @@ useEffect(() => {
   // eslint-disable-next-line react-hooks/exhaustive-deps
 }, []);
 
+useEffect(() => {
+  const unsubscribe = window.plMenu?.onMenuAction?.((channel) => {
+    if (channel === "menu:new-project") {
+      handleNewProject();
+      return;
+    }
+
+    if (channel === "menu:open-project") {
+      void handleOpenProject();
+      return;
+    }
+
+    if (channel === "menu:import-project") {
+      void handleImportProject();
+      return;
+    }
+
+    if (channel === "menu:export-project") {
+      void handleExportProject();
+    }
+  });
+
+  return () => {
+    if (typeof unsubscribe === "function") {
+      unsubscribe();
+    }
+  };
+}, [projectRoot]);
 
   return (
   <div className="shell">
@@ -120,48 +239,11 @@ useEffect(() => {
     <main className="main">
       <header className="topbar">
         <div className="topbarRight">
-          <button
-            className="btn"
-            type="button"
-            onClick={() => {
-              setUiError("");
-              setShowNew(true);
-            }}
-          >
+          <button className="btn" type="button" onClick={handleNewProject}>
             New Project
           </button>
 
-          <button
-            className="btn"
-            type="button"
-            onClick={async () => {
-              try {
-                setStatus("Choosing project folder...");
-
-                const pick = await rpc<{ canceled: boolean; projectRoot?: string }>(
-                  "dialog.openProjectFolder"
-                );
-
-                if (pick.canceled || !pick.projectRoot) {
-                  setStatus("Open canceled");
-                  return;
-                }
-
-                setStatus("Opening project...");
-
-                const result = await rpc<{ projectRoot: string; manifestPath: string; manifest: any }>(
-                  "project.open",
-                  { projectRoot: pick.projectRoot }
-                );
-
-                setProjectRoot(result.projectRoot);
-                setStatus(`Opened: ${result.projectRoot}`);
-                await refreshRecents();
-              } catch (e: any) {
-                setStatus(`Error: ${e.message || String(e)}`);
-              }
-            }}
-          >
+          <button className="btn" type="button" onClick={handleOpenProject}>
             Open Project
           </button>
 
@@ -182,66 +264,15 @@ useEffect(() => {
           >
             Export Logs
           </button>
-<button
-  className="btn"
-  type="button"
-  onClick={async () => {
-    try {
-      if (!projectRoot) return setStatus("No project open");
 
-      const suggestedName =
-        projectRoot.split("/").pop() || "project";
+          <button className="btn" type="button" onClick={handleExportProject}>
+            Export Project
+          </button>
 
-      setStatus("Choose export location...");
-      const pick = await rpc<{ canceled: boolean; filePath?: string }>(
-        "dialog.savePlproj",
-        { defaultName: `${suggestedName}.plproj` }
-      );
+          <button className="btn" type="button" onClick={handleImportProject}>
+            Import Project
+          </button>
 
-      if (pick.canceled || !pick.filePath) {
-        setStatus("Export canceled");
-        return;
-      }
-
-      setStatus("Exporting project...");
-      const result = await rpc<{ outPath: string }>("project.export", {
-        projectRoot,
-        outPath: pick.filePath,
-      });
-
-      setStatus(`Exported: ${result.outPath}`);
-      await refreshRecents();
-    } catch (e: any) {
-      setStatus(`Error: ${e.message || String(e)}`);
-    }
-  }}
->
-  Export Project
-</button>
-<button
-  className="btn"
-  type="button"
-  onClick={async () => {
-    try {
-      setStatus("Choose .plproj file...");
-      const pick = await rpc<{ canceled: boolean; filePath?: string }>("dialog.openPlproj");
-      if (pick.canceled || !pick.filePath) {
-        setStatus("Import canceled");
-        return;
-      }
-
-      setStatus("Importing project...");
-      const result = await rpc<{ projectRoot: string }>("project.import", { filePath: pick.filePath });
-      setProjectRoot(result.projectRoot);
-      setStatus(`Imported: ${result.projectRoot}`);
-      await refreshRecents();
-    } catch (e: any) {
-      setStatus(`Error: ${e.message || String(e)}`);
-    }
-  }}
->
-  Import Project
-</button>
         </div>
       </header>
 

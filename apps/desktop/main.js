@@ -1,3 +1,4 @@
+const path = require("path");
 const { app, BrowserWindow } = require("electron");
 const { startRpcServer } = require("./backend");
 const { loadWindowState, saveWindowState } = require("./storage/windowState");
@@ -17,21 +18,26 @@ const win = new BrowserWindow({
   height: state.height,
   x: state.x,
   y: state.y,
+  webPreferences: {
+    preload: path.join(__dirname, "preload.js"),
+    contextIsolation: true,
+    nodeIntegration: false,
+  },
   // keep all your existing options here
 });
 
 createAppMenu({
   onNewProject: () => {
-    win.webContents.send("menu:new-project");
+    win.webContents.send("pl-menu-action", "menu:new-project");
   },
   onOpenProject: () => {
-    win.webContents.send("menu:open-project");
+    win.webContents.send("pl-menu-action", "menu:open-project");
   },
   onImportProject: () => {
-    win.webContents.send("menu:import-project");
+    win.webContents.send("pl-menu-action", "menu:import-project");
   },
   onExportProject: () => {
-    win.webContents.send("menu:export-project");
+    win.webContents.send("pl-menu-action", "menu:export-project");
   },
 });
 
