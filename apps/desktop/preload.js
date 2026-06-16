@@ -7,9 +7,9 @@ const allowedMenuChannels = new Set([
   "menu:export-project",
 ]);
 
-contextBridge.exposeInMainWorld("plMenu", {
+const plMenuApi = Object.freeze({
   onMenuAction(callback) {
-    if (typeof callback !== "function") return;
+    if (typeof callback !== "function") return undefined;
 
     const handler = (_event, channel) => {
       if (!allowedMenuChannels.has(channel)) return;
@@ -23,3 +23,5 @@ contextBridge.exposeInMainWorld("plMenu", {
     };
   },
 });
+
+contextBridge.exposeInMainWorld("plMenu", plMenuApi);
