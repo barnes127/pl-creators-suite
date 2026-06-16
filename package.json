@@ -2,7 +2,16 @@
   "name": "pl-creators-suite",
   "private": true,
   "version": "0.0.1",
+  "description": "Offline-first creator-focused software suite.",
+  "author": "Praecursor Labs",
   "scripts": {
-    "dev": "pnpm -r dev"
+    "dev": "pnpm -r dev",
+    "build:renderer": "pnpm --filter renderer build",
+    "package:linux": "pnpm build:renderer && electron-builder --linux AppImage --config electron-builder.yml"
+  },
+  "devDependencies": {
+    "asar": "^3.2.0",
+    "electron": "^40.0.0",
+    "electron-builder": "^26.15.3"
   }
 }

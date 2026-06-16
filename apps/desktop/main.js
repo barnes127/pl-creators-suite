@@ -52,8 +52,14 @@ win.on("close", async () => {
 });
 
   // Pass port to renderer via query param (dev)
-  win.loadURL(`http://localhost:5173/?rpcPort=${rpcPort}`);
-}
+  if (app.isPackaged) {
+    win.loadFile(path.join(app.getAppPath(), "apps/renderer/dist/index.html"), {
+      query: { rpcPort: String(rpcPort) },
+    });
+  } else {
+    win.loadURL("http://localhost:5173?rpcPort=${rpcPort}");
+  }
+  }
 
 app.whenReady().then(() => {
   createWindow();
