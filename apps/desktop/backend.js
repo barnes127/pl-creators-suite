@@ -12,6 +12,7 @@ const dialogs = require("./services/dialogs");
 const plugins = require("./services/plugins/registry");
 const pluginManifest = require("./services/plugins/manifest");
 const pluginDiscovery = require("./services/plugins/discovery");
+const entitlements = require("./services/entitlements");
 
 
 async function readRecents() {
@@ -364,6 +365,9 @@ const METHODS = {
   "recent.add": recent_add,
   "project.export": projects.projectExport,
   "project.import": projects.projectImport,
+  "entitlements.flags": async () => {
+    return { flags: await entitlements.getFeatureFlags() };
+  },
   "plugins.setEnabled": async (params) => {
     const plugin = await plugins.setPluginEnabled(params?.pluginId, params?.enabled);
     return { plugin, plugins: await plugins.listPlugins() };

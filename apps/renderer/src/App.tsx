@@ -22,6 +22,14 @@ type PluginInfo = {
   description: string;
 };
 
+type FeatureFlags = {
+  plugins: boolean;
+  localAi: boolean;
+  cloudSync: boolean;
+  paidExtensions: boolean;
+  marketplace: boolean;
+};
+
 type NavItem = {
   id: AppId;
   label: string;
@@ -54,6 +62,7 @@ export default function App() {
   const [openError, setOpenError] = useState("");
   const [showOpen, setShowOpen] = useState(false);
   const [plugins, setPlugins] = useState<PluginInfo[]>([]);
+  const [featureFlags, setFeatureFlags] = useState<FeatureFlags | null>(null);
 
 
 async function handleOpenProject() {
@@ -158,6 +167,15 @@ async function refreshPlugins() {
   }
 }
 
+async function refreshFeatureFlags() {
+  try {
+    const result = await rpc<{ flags: FeatureFlags }>("entitlements.flags");
+    setFeatureFlags(result.flags);
+  } catch (e: any) {
+    setStatus(`Entitlements error: ${e.message || String(e)}`);
+  }
+}
+
 async function handleSetPluginEnabled(pluginId: string, enabled: boolean) {
   try {
     const result = await rpc<{ plugins: PluginInfo[] }>("plugins.setEnabled", {
@@ -184,6 +202,7 @@ async function refreshRecents() {
 useEffect(() => {
   refreshRecents();
   void refreshPlugins();
+  void refreshFeatureFlags();
   // eslint-disable-next-line react-hooks/exhaustive-deps
 }, []);
 
@@ -273,6 +292,20 @@ useEffect(() => {
               </button>
             ))}
           </div>
+        )}
+      </div>
+
+      <div className="panel">
+        <div className="panelTitle">Feature Flags</div>
+
+        {featureFlags ? (
+          <div className="recentList">
+            <div className="recentItem">Plugins: {featureFlags.plugins ? "On" : "Off"}</div>
+            <div className="recentItem">Local AI: {featureFlags.localAi ? "On" : "Off"}</div>
+            <div className="recentItem">Cloud Sync: {featureFlags.cloudSync ? "On" : "Off"}</div>
+          </div>
+        ) : (
+          <div className="emptyState">Loading flags...</div>
         )}
       </div>
 
