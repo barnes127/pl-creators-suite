@@ -158,6 +158,20 @@ async function refreshPlugins() {
   }
 }
 
+async function handleSetPluginEnabled(pluginId: string, enabled: boolean) {
+  try {
+    const result = await rpc<{ plugins: PluginInfo[] }>("plugins.setEnabled", {
+      pluginId,
+      enabled,
+    });
+
+    setPlugins(result.plugins);
+    setStatus(`Plugin ${enabled ? "enabled" : "disabled"}`);
+  } catch (e: any) {
+    setStatus(`Plugin error: ${e.message || String(e)}`);
+  }
+}
+
 async function refreshRecents() {
   try {
     const result = await rpc<{ items: any[] }>("recent.list");
@@ -275,6 +289,13 @@ useEffect(() => {
                 <span>
                   {plugin.version} · {plugin.enabled ? "Enabled" : "Disabled"}
                 </span>
+                <button
+                  className="btn"
+                  type="button"
+                  onClick={() => void handleSetPluginEnabled(plugin.id, !plugin.enabled)}
+>
+                  {plugin.enabled ? "Disable" : "Enable"}
+                </button>
               </div>
             ))}
           </div>

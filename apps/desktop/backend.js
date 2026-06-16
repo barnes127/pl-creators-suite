@@ -364,6 +364,10 @@ const METHODS = {
   "recent.add": recent_add,
   "project.export": projects.projectExport,
   "project.import": projects.projectImport,
+  "plugins.setEnabled": async (params) => {
+    const plugin = await plugins.setPluginEnabled(params?.pluginId, params?.enabled);
+    return { plugin, plugins: await plugins.listPlugins() };
+  },
   "plugins.refreshDiscovered": async () => {
     const repoRoot = path.resolve(__dirname, "../..");
     return pluginDiscovery.refreshDiscoveredPlugins(repoRoot);

@@ -75,10 +75,31 @@ async function listPlugins() {
   return registry.plugins;
 }
 
+async function setPluginEnabled(pluginId, enabled) {
+  const id = String(pluginId || "").trim();
+  if (!id) throw new Error("pluginId is required");
+
+  const registry = await readPluginRegistry();
+  const index = registry.plugins.findIndex((plugin) => plugin.id === id);
+
+  if (index === -1) {
+    throw new Error(`Plugin not found: ${id}`);
+  }
+
+  registry.plugins[index] = {
+    ...registry.plugins[index],
+    enabled: Boolean(enabled),
+  };
+
+  const saved = await writePluginRegistry(registry);
+  return saved.plugins.find((plugin) => plugin.id === id);
+}
+
 module.exports = {
   PLUGINS_DIR,
   PLUGIN_REGISTRY_PATH,
   readPluginRegistry,
   writePluginRegistry,
   listPlugins,
+  setPluginEnabled,
 };
