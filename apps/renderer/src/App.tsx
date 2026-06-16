@@ -13,6 +13,15 @@ declare global {
 
 type AppId = "code" | "game" | "movie" | "docs" | "sheets" | "modeler";
 
+type AppMetadata = {
+  name: string;
+  productName: string;
+  version: string;
+  description: string;
+  appId: string;
+  isPackaged: boolean;
+};
+
 type LocalAiStatus = {
   available: boolean;
   provider: string;
@@ -71,6 +80,7 @@ export default function App() {
   const [plugins, setPlugins] = useState<PluginInfo[]>([]);
   const [featureFlags, setFeatureFlags] = useState<FeatureFlags | null>(null);
   const [localAiStatus, setLocalAiStatus] = useState<LocalAiStatus | null>(null);
+  const [appMetadata, setAppMetadata] = useState<AppMetadata | null>(null);
 
 
 async function handleOpenProject() {
@@ -170,13 +180,13 @@ async function refreshLocalAiStatus() {
 
 async function refreshPlugins() {
   try {
-    const result = await rpc<{ plugins: PluginInfo[]; error?: any[] }>(
+    const result = await rpc<{ plugins: PluginInfo[]; errors?: any[] }>(
       "plugins.refreshDiscovered"
     );
 
     setPlugins(result.plugins);
 
-    if (results.errors?.length) {
+    if (result.errors?.length) {
       setStatus('Plugin discovery warning: ${result.errors.length} issue(s)');
     }
   } catch (e: any) {
@@ -190,6 +200,15 @@ async function refreshFeatureFlags() {
     setFeatureFlags(result.flags);
   } catch (e: any) {
     setStatus(`Entitlements error: ${e.message || String(e)}`);
+  }
+}
+
+async function refreshAppMetadata() {
+  try {
+    const result = await rpc<{ metadata: AppMetadata }>("app.metadata");
+    setAppMetadata(result.metadata);
+  } catch (e: any) {
+    setStatus(`App metadata error: ${e.message || String(e)}`);
   }
 }
 
@@ -221,6 +240,7 @@ useEffect(() => {
   void refreshPlugins();
   void refreshFeatureFlags();
   void refreshLocalAiStatus();
+  void refreshAppMetadata();
   // eslint-disable-next-line react-hooks/exhaustive-deps
 }, []);
 
@@ -415,7 +435,11 @@ useEffect(() => {
 
       <footer className="statusbar">
         <div className="statusLeft">Status: {status}</div>
-        <div className="statusRight">Renderer → Electron dev loop</div>
+        <div className="statusRight">
+          {appMetadata
+            ? `${appMetadata.productName} v${appMetadata.version}${appMetadata.isPackaged ? " packaged" : "dev"}`
+            : "PL Creators Suite"}
+        </div>
       </footer>
 
       {showNew && (
