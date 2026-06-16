@@ -10,6 +10,7 @@ const { app, dialog } = require("electron");
 const projects = require("./services/projects");
 const dialogs = require("./services/dialogs");
 const plugins = require("./services/plugins/registry");
+const pluginManifest = require("./services/plugins/manifest");
 
 
 async function readRecents() {
@@ -362,6 +363,9 @@ const METHODS = {
   "recent.add": recent_add,
   "project.export": projects.projectExport,
   "project.import": projects.projectImport,
+  "plugins.validateManifest": async (params) => {
+    return pluginManifest.validateManifest(params?.manifest);
+  },
   "dialog.openProjectFolder": async () => {
   const folder = await dialogs.openProjectFolder();
   if (!folder) return { canceled: true };

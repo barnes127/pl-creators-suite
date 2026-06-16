@@ -1,0 +1,12 @@
+{
+  "id": "com.praecursorlabs.sample-tool",
+  "name": "Sample Tool Plugin",
+  "version": "0.1.0",
+  "apiVersion": "0.1",
+  "type": "tool",
+  "entry": "index.js",
+  "description": "A sample plugin manifest used to test PL Creators Suite plugin discovery.",
+  "permissions": [],
+  "contributes": {}
+}
+
