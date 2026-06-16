@@ -13,6 +13,15 @@ declare global {
 
 type AppId = "code" | "game" | "movie" | "docs" | "sheets" | "modeler";
 
+type PluginInfo = {
+  id: string;
+  name: string;
+  version: string;
+  enabled: boolean;
+  type: string;
+  description: string;
+};
+
 type NavItem = {
   id: AppId;
   label: string;
@@ -44,6 +53,7 @@ export default function App() {
   const [openPath, setOpenPath] = useState("");
   const [openError, setOpenError] = useState("");
   const [showOpen, setShowOpen] = useState(false);
+  const [plugins, setPlugins] = useState<PluginInfo[]>([]);
 
 
 async function handleOpenProject() {
@@ -132,6 +142,15 @@ function handleNewProject() {
   setShowNew(true);
 }
 
+async function refreshPlugins() {
+  try {
+    const result = await rpc<{ plugins: PluginInfo[] }>("plugins.list");
+    setPlugins(result.plugins);
+  } catch (e: any) {
+    setStatus(`Plugin error: ${e.message || String(e)}`);
+  }
+}
+
 async function refreshRecents() {
   try {
     const result = await rpc<{ items: any[] }>("recent.list");
@@ -143,6 +162,7 @@ async function refreshRecents() {
 
 useEffect(() => {
   refreshRecents();
+  void refreshPlugins();
   // eslint-disable-next-line react-hooks/exhaustive-deps
 }, []);
 
@@ -230,6 +250,25 @@ useEffect(() => {
               >
                 {r.name}
               </button>
+            ))}
+          </div>
+        )}
+      </div>
+
+      <div className="panel">
+        <div className="panelTitle">Plugins</div>
+
+        {plugins.length === 0 ? (
+          <div className="emptyState">No plugins installed</div>
+        ) : (
+          <div className="recentList">
+            {plugins.map((plugin) => (
+              <div className="recentItem" key={plugin.id}>
+                <strong>{plugin.name}</strong>
+                <span>
+                  {plugin.version} · {plugin.enabled ? "Enabled" : "Disabled"}
+                </span>
+              </div>
             ))}
           </div>
         )}

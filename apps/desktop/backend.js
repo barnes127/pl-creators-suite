@@ -9,6 +9,7 @@ const { spawn } = require("child_process");
 const { app, dialog } = require("electron");
 const projects = require("./services/projects");
 const dialogs = require("./services/dialogs");
+const plugins = require("./services/plugins/registry");
 
 
 async function readRecents() {
@@ -380,6 +381,9 @@ const METHODS = {
   return { canceled: false, filePath: file };
 },
 
+"plugins.list": async () => {
+  return { plugins: await plugins.listPlugins() };
+},
 
 };
 
