@@ -1,5 +1,6 @@
 appId: com.praecursorlabs.plcreatorssuite
 productName: PL Creators Suite
+copyright: Copyright © 2026 Praecursor Labs
 
 directories:
   output: release
@@ -12,8 +13,14 @@ files:
 
 extraMetadata:
   main: apps/desktop/main.js
+  name: pl-creators-suite
+  productionName: PL Creators Suite
+  description: Offline-first creator-focused software suite.
+  author: Praecursor Labs
 
 linux:
   target:
     - AppImage
   category: Development
+  executableName: pl-creators-suite
+  syncDesktopName: true
