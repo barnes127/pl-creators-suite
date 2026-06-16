@@ -13,6 +13,13 @@ declare global {
 
 type AppId = "code" | "game" | "movie" | "docs" | "sheets" | "modeler";
 
+type LocalAiStatus = {
+  available: boolean;
+  provider: string;
+  model: string | null;
+  reason: string;
+};
+
 type PluginInfo = {
   id: string;
   name: string;
@@ -63,6 +70,7 @@ export default function App() {
   const [showOpen, setShowOpen] = useState(false);
   const [plugins, setPlugins] = useState<PluginInfo[]>([]);
   const [featureFlags, setFeatureFlags] = useState<FeatureFlags | null>(null);
+  const [localAiStatus, setLocalAiStatus] = useState<LocalAiStatus | null>(null);
 
 
 async function handleOpenProject() {
@@ -151,6 +159,15 @@ function handleNewProject() {
   setShowNew(true);
 }
 
+async function refreshLocalAiStatus() {
+  try {
+    const result = await rpc<{ status: LocalAiStatus }>("ai.local.status");
+    setLocalAiStatus(result.status);
+  } catch (e: any) {
+    setStatus(`AI status error: ${e.message || String(e)}`);
+  }
+}
+
 async function refreshPlugins() {
   try {
     const result = await rpc<{ plugins: PluginInfo[]; error?: any[] }>(
@@ -203,6 +220,7 @@ useEffect(() => {
   refreshRecents();
   void refreshPlugins();
   void refreshFeatureFlags();
+  void refreshLocalAiStatus();
   // eslint-disable-next-line react-hooks/exhaustive-deps
 }, []);
 
@@ -292,6 +310,21 @@ useEffect(() => {
               </button>
             ))}
           </div>
+        )}
+      </div>
+
+      <div className="panel">
+        <div className="panelTitle">Local AI</div>
+
+        {localAiStatus ? (
+          <div className="recentList">
+            <div className="recentItem">
+              Status: {localAiStatus.available ? "Available" : "Not configured"}
+            </div>
+            <div className="recentItem">Provider: {localAiStatus.provider}</div>
+          </div>
+        ) : (
+          <div className="emptyState">Checking AI status...</div>
         )}
       </div>
 

@@ -13,6 +13,7 @@ const plugins = require("./services/plugins/registry");
 const pluginManifest = require("./services/plugins/manifest");
 const pluginDiscovery = require("./services/plugins/discovery");
 const entitlements = require("./services/entitlements");
+const localAi = require("./services/ai/local");
 
 
 async function readRecents() {
@@ -365,6 +366,12 @@ const METHODS = {
   "recent.add": recent_add,
   "project.export": projects.projectExport,
   "project.import": projects.projectImport,
+  "ai.local.status": async () => {
+    return { status: await localAi.getLocalAiStatus() };
+  },
+  "ai.local.chat": async (params) => {
+    return localAi.chat(params);
+  },
   "entitlements.flags": async () => {
     return { flags: await entitlements.getFeatureFlags() };
   },
