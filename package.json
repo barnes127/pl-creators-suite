@@ -8,7 +8,10 @@
   "scripts": {
     "dev": "pnpm -r dev",
     "build:renderer": "pnpm --filter renderer build",
-    "package:linux": "pnpm build:renderer && electron-builder --linux AppImage --config electron-builder.yml"
+    "package:linux": "pnpm build:renderer && electron-builder --linux AppImage --config electron-builder.yml",
+    "clean:release": "rm -rf release",
+    "release:linux": "pnpm clean:release && pnpm package:linux",
+    "release:check": "ls -lah release && ls -lah release/linux-unpacked | head"
   },
   "devDependencies": {
     "asar": "^3.2.0",
