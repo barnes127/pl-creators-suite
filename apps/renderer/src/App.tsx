@@ -22,11 +22,19 @@ type AppMetadata = {
   isPackaged: boolean;
 };
 
+type LocalAiModel = {
+  name: string;
+  modifiedAt: string;
+  size: number;
+};
+
 type LocalAiStatus = {
   available: boolean;
   provider: string;
   model: string | null;
+  models?: LocalAiModel[];
   reason: string;
+  host?: string;
 };
 
 type PluginInfo = {
@@ -342,6 +350,18 @@ useEffect(() => {
               Status: {localAiStatus.available ? "Available" : "Not configured"}
             </div>
             <div className="recentItem">Provider: {localAiStatus.provider}</div>
+            {localAiStatus.host && (
+              <div className="recentItem">Host: {localAiStatus.host}</div>
+            )}
+            <div className="recentItem">
+              Model: {localAiStatus.model || "(none)"}
+            </div>
+            <div className="recentItem">
+              Models: {localAiStatus.models?.length || 0}
+            </div>
+            {!localAiStatus.available && (
+              <div className="recentItem">Reason: {localAiStatus.reason}</div>
+            )}
           </div>
         ) : (
           <div className="emptyState">Checking AI status...</div>
