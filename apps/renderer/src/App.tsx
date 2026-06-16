@@ -144,8 +144,15 @@ function handleNewProject() {
 
 async function refreshPlugins() {
   try {
-    const result = await rpc<{ plugins: PluginInfo[] }>("plugins.list");
+    const result = await rpc<{ plugins: PluginInfo[]; error?: any[] }>(
+      "plugins.refreshDiscovered"
+    );
+
     setPlugins(result.plugins);
+
+    if (results.errors?.length) {
+      setStatus('Plugin discovery warning: ${result.errors.length} issue(s)');
+    }
   } catch (e: any) {
     setStatus(`Plugin error: ${e.message || String(e)}`);
   }

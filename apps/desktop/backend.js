@@ -11,6 +11,7 @@ const projects = require("./services/projects");
 const dialogs = require("./services/dialogs");
 const plugins = require("./services/plugins/registry");
 const pluginManifest = require("./services/plugins/manifest");
+const pluginDiscovery = require("./services/plugins/discovery");
 
 
 async function readRecents() {
@@ -363,6 +364,10 @@ const METHODS = {
   "recent.add": recent_add,
   "project.export": projects.projectExport,
   "project.import": projects.projectImport,
+  "plugins.refreshDiscovered": async () => {
+    const repoRoot = path.resolve(__dirname, "../..");
+    return pluginDiscovery.refreshDiscoveredPlugins(repoRoot);
+  },
   "plugins.validateManifest": async (params) => {
     return pluginManifest.validateManifest(params?.manifest);
   },
