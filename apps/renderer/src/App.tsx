@@ -3,6 +3,7 @@ import { rpc } from "./rpc";
 import "./app.css";
 import { Modal } from "./components/Modal";
 import { CollapsiblePanel } from "./components/CollapsiblePanel";
+import { Button, Toolbar, WorkspaceHeader } from "./components/pl-ui";
 
 declare global {
   interface Window {
@@ -534,6 +535,24 @@ useEffect(() => {
       </header>
 
       <section className="workspace">
+        <WorkspaceHeader
+          title={active}
+          subtitle={projectRoot ? `Project: ${projectRoot}` : "No project open"}
+          actions={
+            <Toolbar>
+              <Button type="button" variant="ghost" onClick={handleNewProject}>
+                New
+              </Button>
+              <Button type="button" variant="ghost" onClick={handleOpenProject}>
+                Open
+              </Button>
+              <Button type="button" variant="ghost" onClick={handleExportProject}>
+                Export
+              </Button>
+            </Toolbar>
+          }
+        />
+
         <Workspace active={active} />
       </section>
 
