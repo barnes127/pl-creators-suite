@@ -22,6 +22,13 @@ type AppMetadata = {
   isPackaged: boolean;
 };
 
+type LocalAiChatResult = {
+  ok: boolean;
+  message: string;
+  response: string;
+  model?: string;
+};
+
 type LocalAiModel = {
   name: string;
   modifiedAt: string;
@@ -89,6 +96,9 @@ export default function App() {
   const [featureFlags, setFeatureFlags] = useState<FeatureFlags | null>(null);
   const [localAiStatus, setLocalAiStatus] = useState<LocalAiStatus | null>(null);
   const [appMetadata, setAppMetadata] = useState<AppMetadata | null>(null);
+  const [aiPrompt, setAiPrompt] = useState("");
+  const [aiResponse, setAiResponse] = useState("");
+  const [aiBusy, setAiBusy] = useState(false);
 
 
 async function handleOpenProject() {
@@ -183,6 +193,33 @@ async function refreshLocalAiStatus() {
     setLocalAiStatus(result.status);
   } catch (e: any) {
     setStatus(`AI status error: ${e.message || String(e)}`);
+  }
+}
+
+async function handleSendAiPrompt() {
+  try {
+    const prompt = aiPrompt.trim();
+
+    if (!prompt) {
+      setStatus("AI prompt is empty");
+      return;
+    }
+
+    setAiBusy(true);
+    setStatus("Sending prompt to local AI...");
+    setAiResponse("");
+
+    const result = await rpc<LocalAiChatResult>("ai.local.chat", {
+      prompt,
+      model: localAiStatus?.model || undefined,
+    });
+
+    setAiResponse(result.response || result.message);
+    setStatus(result.ok ? "AI response received" : `AI unavailable: ${result.message}`);
+  } catch (e: any) {
+    setStatus(`AI error: ${e.message || String(e)}`);
+  } finally {
+    setAiBusy(false);
   }
 }
 
@@ -365,6 +402,36 @@ useEffect(() => {
           </div>
         ) : (
           <div className="emptyState">Checking AI status...</div>
+        )}
+      </div>
+
+      <div className="panel">
+        <div className="panelTitle">Copilot</div>
+
+        <textarea
+          className="input"
+          value={aiPrompt}
+          onChange={(e) => setAiPrompt(e.target.value)}
+          placeholder="Ask the local copilot..."
+          rows={4}
+        />
+
+        <button
+          className="btn"
+          type="button"
+          onClick={() => void handleSendAiPrompt()}
+          disabled={aiBusy}
+        >
+          {aiBusy ? "Thinking..." : "Send"}
+        </button>
+
+        {aiResponse ? (
+          <div className="recentItem">
+            <strong>Response</strong>
+            <div>{aiResponse}</div>
+          </div>
+        ) : (
+          <div className="emptyState">No response yet</div>
         )}
       </div>
 

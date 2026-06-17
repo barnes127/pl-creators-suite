@@ -101,7 +101,7 @@ async function getLocalAiStatus() {
 
 async function chat(params) {
   const prompt = String(params?.prompt || "").trim();
-  const model = String(params?.model || "").trim();
+  const requestedModel = String(params?.model || "").trim();
 
   if (!prompt) {
     throw new Error("prompt is required");
@@ -113,17 +113,50 @@ async function chat(params) {
     return {
       ok: false,
       message: "Local AI is not available. Start Ollama or install a local model runner.",
+      response: "",
+      status,
+    };
+  }
+
+  const model = requestedModel || status.model;
+
+  if (!model) {
+    return {
+      ok: false,
+      message: "No local model is available. Pull a model in Ollama first.",
+      response: "",
+      status,
+    };
+  }
+
+  const result = await requestJson({
+    hostname: OLLAMA_HOST,
+    port: OLLAMA_PORT,
+    path: "/api/generate",
+    method: "POST",
+    timeoutMs: 120000,
+    body: {
+      model,
+      prompt,
+      stream: false,
+    },
+  });
+
+  if (!result.ok) {
+    return {
+      ok: false,
+      message: `Ollama generation failed with HTTP ${result.statusCode}`,
+      response: "",
       status,
     };
   }
 
   return {
-    ok: false,
-    message: "Local AI chat provider is detected, but generation is not wired yet.",
-    status: {
-      ...status,
-      selectedModel: model || status.model,
-    },
+    ok: true,
+    message: "Generated response",
+    response: String(result.data?.response || ""),
+    model,
+    status,
   };
 }
 
