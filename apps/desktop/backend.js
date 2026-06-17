@@ -16,6 +16,7 @@ const entitlements = require("./services/entitlements");
 const localAi = require("./services/ai/local");
 const appMetadata = require("./services/app/metadata");
 const assets = require("./services/assets");
+const docs = require("./services/docs");
 
 
 async function readRecents() {
@@ -431,6 +432,21 @@ const METHODS = {
     return {
       type: assets.detectAssetType(params?.filePath),
     };
+  },
+  "docs.ensure": async (params) => {
+    return docs.ensureDocsStorage(params?.projectRoot);
+  },
+  "docs.list": async (params) => {
+    return docs.listDocs(params);
+  },
+  "docs.create": async (params) => {
+    return docs.createDoc(params);
+  },
+  "docs.read": async (params) => {
+    return docs.readDoc(params);
+  },
+  "docs.save": async (params) => {
+    return docs.saveDoc(params);
   },
 
 };
