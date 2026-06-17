@@ -15,6 +15,16 @@ declare global {
 
 type AppId = "code" | "game" | "movie" | "docs" | "sheets" | "modeler";
 
+type AssetInfo = {
+  id: string;
+  name: string;
+  type: string;
+  relativePath: string;
+  sourcePath: string;
+  createdAt: string;
+  updatedAt: string;
+};
+
 type AppMetadata = {
   name: string;
   productName: string;
@@ -116,6 +126,7 @@ export default function App() {
   const [copilotDrawerOpen, setCopilotDrawerOpen] = useState(() =>
     readStoredBoolean("pl.layout.copilotDrawerOpen", true)
   );
+  const [assets, setAssets] = useState<AssetInfo[]>([]);
 
 
 async function handleOpenProject() {
@@ -202,6 +213,25 @@ async function handleExportProject() {
 function handleNewProject() {
   setUiError("");
   setShowNew(true);
+}
+
+async function refreshAssets(root = projectRoot) {
+  try {
+    if (!root) {
+      setAssets([]);
+      return;
+    }
+
+    await rpc("assets.ensure", { projectRoot: root });
+
+    const result = await rpc<{ assets: AssetInfo[] }>("assets.list", {
+      projectRoot: root,
+    });
+
+    setAssets(result.assets);
+  } catch (e: any) {
+    setStatus(`Asset error: ${e.message || String(e)}`);
+  }
 }
 
 async function refreshLocalAiStatus() {
@@ -307,6 +337,11 @@ useEffect(() => {
   void refreshAppMetadata();
   // eslint-disable-next-line react-hooks/exhaustive-deps
 }, []);
+
+useEffect(() => {
+  void refreshAssets(projectRoot);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+}, [projectRoot]);
 
 useEffect(() => {
   try {
@@ -461,6 +496,34 @@ useEffect(() => {
           </div>
         ) : (
           <div className="emptyState">Loading system status...</div>
+        )}
+      </CollapsiblePanel>
+
+      <CollapsiblePanel
+        title="Assets"
+        defaultOpen={false}
+        storageKey="pl.layout.panel.assets"
+      >
+        {projectRoot ? (
+          <div className="recentList">
+            <div className="recentItem">Asset Registry: Ready</div>
+            <div className="recentItem">Assets: {assets.length}</div>
+
+            {assets.length === 0 ? (
+              <div className="emptyState">No assets registered</div>
+            ) : (
+              assets.map((asset) => (
+                <div className="recentItem" key={asset.id}>
+                  <strong>{asset.name}</strong>
+                  <span>
+                    {asset.type} · {asset.relativePath}
+                  </span>
+                </div>
+              ))
+            )}
+          </div>
+        ) : (
+          <div className="emptyState">Open a project to view assets</div>
         )}
       </CollapsiblePanel>
 

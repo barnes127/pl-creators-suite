@@ -15,6 +15,7 @@ const pluginDiscovery = require("./services/plugins/discovery");
 const entitlements = require("./services/entitlements");
 const localAi = require("./services/ai/local");
 const appMetadata = require("./services/app/metadata");
+const assets = require("./services/assets");
 
 
 async function readRecents() {
@@ -367,6 +368,12 @@ const METHODS = {
   "recent.add": recent_add,
   "project.export": projects.projectExport,
   "project.import": projects.projectImport,
+  "assets.ensure": async (params) => {
+    return assets.ensureAssetStorage(params?.projectRoot);
+  },
+  "assets.list": async (params) => {
+    return assets.listAssets(params);
+  },
   "app.metadata": async () => {
     return { metadata: await appMetadata.getAppMetadata() };
   },
