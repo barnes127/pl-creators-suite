@@ -447,16 +447,25 @@ useEffect(() => {
         )}
       </CollapsiblePanel>
 
-      <CollapsiblePanel title="Feature Flags" defaultOpen={false}>
+      <CollapsiblePanel title="System Status" defaultOpen={false}>
 
         {featureFlags ? (
           <div className="recentList">
-            <div className="recentItem">Plugins: {featureFlags.plugins ? "On" : "Off"}</div>
-            <div className="recentItem">Local AI: {featureFlags.localAi ? "On" : "Off"}</div>
-            <div className="recentItem">Cloud Sync: {featureFlags.cloudSync ? "On" : "Off"}</div>
+            <div className="recentItem">
+              Plugin System: {featureFlags.plugins ? "Enabled" : "Disabled"}
+            </div>
+            <div className="recentItem">
+              Installed Plugins: {plugins.length}
+            </div>
+            <div className="recentItem">
+              Local AI: {localAiStatus?.available ? "Available" : "Unavailable"}
+            </div>
+            <div className="recentItem">
+              Cloud Sync: {featureFlags.cloudSync ? "Enabled" : "Disabled"}
+            </div>
           </div>
         ) : (
-          <div className="emptyState">Loading flags...</div>
+          <div className="emptyState">Loading system status...</div>
         )}
       </CollapsiblePanel>
 
