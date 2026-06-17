@@ -2,6 +2,37 @@ const fs = require("fs/promises");
 const path = require("path");
 
 const ASSET_FOLDERS = ["images", "audio", "video", "models", "docs", "other"];
+const EXTENSION_TYPE_MAP = {
+  ".png": "images",
+  ".jpg": "images",
+  ".jpeg": "images",
+  ".gif": "images",
+  ".webp": "images",
+  ".svg": "images",
+
+  ".mp3": "audio",
+  ".wav": "audio",
+  ".ogg": "audio",
+
+  ".mp4": "video",
+  ".mov": "video",
+  ".webm": "video",
+
+  ".obj": "models",
+  ".gltf": "models",
+  ".glb": "models",
+  ".fbx": "models",
+
+  ".txt": "docs",
+  ".md": "docs",
+  ".json": "docs",
+  ".csv": "docs",
+};
+
+function detectAssetType(filePath) {
+  const ext = path.extname(String(filePath || "").toLowerCase());
+  return EXTENSION_TYPE_MAP[ext] || "other";
+}
 
 function cleanProjectRoot(projectRoot) {
   const root = String(projectRoot || "").trim();
@@ -182,7 +213,8 @@ async function importAsset(params) {
 
   if (!sourcePath) throw new Error("sourcePath is required");
 
-  const assetType = ASSET_FOLDERS.includes(type) ? type : "other";
+  const detectedType = detectAssetType(sourcePath);
+  const assetType = ASSET_FOLDERS.includes(type) && type !== "other" ? type : detectedType;
   const assetsDir = getAssetsDir(projectRoot);
   const targetFolder = path.join(assetsDir, assetType);
 
@@ -213,4 +245,5 @@ module.exports = {
   listAssets,
   registerAsset,
   importAsset,
+  detectAssetType,
 };

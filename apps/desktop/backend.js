@@ -427,6 +427,11 @@ const METHODS = {
   "plugins.list": async () => {
     return { plugins: await plugins.listPlugins() };
   },
+  "assets.detectType": async (params) => {
+    return {
+      type: assets.detectAssetType(params?.filePath),
+    };
+  },
 
 };
 

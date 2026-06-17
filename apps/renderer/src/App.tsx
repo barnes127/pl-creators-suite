@@ -231,6 +231,12 @@ async function handleChooseAssetFile() {
     }
 
     setAssetSourcePath(pick.filePath);
+    
+    const detected = await rpc<{ type: string }>("assets.detectType", {
+      filePath: pick.filePath,
+    });
+
+    setAssetType(detected.type);
 
     if (!assetName.trim()) {
       const fileName = pick.filePath.split("/").pop() || "";
