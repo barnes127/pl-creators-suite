@@ -2,6 +2,7 @@ import { useEffect,  useMemo, useState } from "react";
 import { rpc } from "./rpc";
 import "./app.css";
 import { Modal } from "./components/Modal";
+import { CollapsiblePanel } from "./components/CollapsiblePanel";
 
 declare global {
   interface Window {
@@ -381,8 +382,7 @@ useEffect(() => {
         )}
       </div>
 
-      <div className="panel">
-        <div className="panelTitle">Local AI</div>
+      <CollapsiblePanel title="Local AI" defaultOpen={true}>
 
         {localAiStatus ? (
           <div className="recentList">
@@ -406,10 +406,9 @@ useEffect(() => {
         ) : (
           <div className="emptyState">Checking AI status...</div>
         )}
-      </div>
+      </CollapsiblePanel>
 
-      <div className="panel">
-        <div className="panelTitle">Copilot</div>
+      <CollapsiblePanel title="Copilot" defaultOpen={true}>
 
         <textarea
           className="input"
@@ -446,10 +445,9 @@ useEffect(() => {
         ) : (
           <div className="emptyState">No response yet</div>
         )}
-      </div>
+      </CollapsiblePanel>
 
-      <div className="panel">
-        <div className="panelTitle">Feature Flags</div>
+      <CollapsiblePanel title="Feature Flags" defaultOpen={false}>
 
         {featureFlags ? (
           <div className="recentList">
@@ -460,10 +458,9 @@ useEffect(() => {
         ) : (
           <div className="emptyState">Loading flags...</div>
         )}
-      </div>
+      </CollapsiblePanel>
 
-      <div className="panel">
-        <div className="panelTitle">Plugins</div>
+      <CollapsiblePanel title="PLugins" defaultOpen={false}>
 
         {plugins.length === 0 ? (
           <div className="emptyState">No plugins installed</div>
@@ -486,7 +483,7 @@ useEffect(() => {
             ))}
           </div>
         )}
-      </div>
+      </CollapsiblePanel>
     </aside>
 
     <main className="main">
