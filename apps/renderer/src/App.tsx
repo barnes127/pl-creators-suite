@@ -401,6 +401,35 @@ async function handleOpenDoc(name: string) {
   }
 }
 
+async function handleSaveDoc() {
+  try {
+    if (!projectRoot) {
+      setStatus("Open a project before saving docs");
+      return;
+    }
+
+    if (!activeDocName) {
+      setStatus("Open a document before saving");
+      return;
+    }
+
+    const saved = await rpc<{
+      name: string;
+      path: string;
+      content: string;
+    }>("docs.save", {
+      projectRoot,
+      name: activeDocName,
+      content: docContent,
+    });
+
+    setDocContent(saved.content);
+    setStatus(`Saved doc: ${saved.name}`);
+  } catch (e: any) {
+    setStatus(`Docs save error: ${e.message || String(e)}`);
+  }
+}
+
 async function refreshAssets(root = projectRoot) {
   try {
     if (!root) {
@@ -873,8 +902,10 @@ useEffect(() => {
           setNewDocName={setNewDocName}
           activeDocName={activeDocName}
           docContent={docContent}
+          setDocContent={setDocContent}
           onCreateDoc={handleCreateDoc}
           onOpenDoc={handleOpenDoc}
+          onSaveDoc={handleSaveDoc}
         />
       </section>
 
@@ -1069,8 +1100,10 @@ type WorkspaceProps = {
   setNewDocName: React.Dispatch<React.SetStateAction<string>>;
   activeDocName: string;
   docContent: string;
+  setDocContent: React.Dispatch<React.SetStateAction<string>>;
   onCreateDoc: () => Promise<void>;
   onOpenDoc: (name: string) => Promise<void>;
+  onSaveDoc: () => Promise<void>;
 };
 
 function Workspace({
@@ -1081,8 +1114,10 @@ function Workspace({
   setNewDocName,
   activeDocName,
   docContent,
+  setDocContent,
   onCreateDoc,
   onOpenDoc,
+  onSaveDoc,
 }: WorkspaceProps) {
   switch (active) {
     case "code":
@@ -1140,14 +1175,28 @@ function Workspace({
 
           <section className="workspaceSplitMain">
             <Panel title={activeDocName || "No document selected"}>
-              <pre
-                style={{
-                  whiteSpace: "pre-wrap",
-                  wordBreak: "break-word",
-                }}
-              >
-                {docContent || "Create or open a document."}
-              </pre>
+              {activeDocName ? (
+                <>
+                  <textarea
+                    className="docsEditor"
+                    value={docContent}
+                    onChange={(e) => setDocContent(e.target.value)}
+                    spellCheck={true}
+                  />
+
+                  <div className="docsEditorActions">
+                    <button
+                      className="btn"
+                      type="button"
+                      onClick={() => void onSaveDoc()}
+                    >
+                      Save Document
+                    </button>
+                  </div>
+                </>
+              ) : (
+                <div className="emptyState">Create or open a document.</div>
+              )}
             </Panel>
           </section>
         </div>
