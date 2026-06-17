@@ -68,6 +68,17 @@ type NavItem = {
   hint: string;
 };
 
+function readStoredBoolean(key: string, fallback: boolean) {
+  try {
+    const raw = window.localStorage.getItem(key);
+    if (raw === "true") return true;
+    if (raw === "false") return false;
+    return fallback;
+  } catch {
+    return fallback;
+  }
+}
+
 export default function App() {
   const navItems: NavItem[] = useMemo(
     () => [
@@ -101,6 +112,9 @@ export default function App() {
   const [aiResponse, setAiResponse] = useState("");
   const [aiBusy, setAiBusy] = useState(false);
   const [allowProjectContext, setAllowProjectContext] = useState(false);
+  const [copilotDrawerOpen, setCopilotDrawerOpen] = useState(() =>
+    readStoredBoolean("pl.layout.copilotDrawerOpen", true)
+  );
 
 
 async function handleOpenProject() {
@@ -294,6 +308,17 @@ useEffect(() => {
 }, []);
 
 useEffect(() => {
+  try {
+    window.localStorage.setItem(
+      "pl.layout.copilotDrawerOpen",
+      String(copilotDrawerOpen)
+    );
+  } catch {
+    // Ignore storage failures.
+  }
+}, [copilotDrawerOpen]);
+
+useEffect(() => {
   const unsubscribe = window.plMenu?.onMenuAction?.((channel) => {
     if (channel === "menu:new-project") {
       handleNewProject();
@@ -382,7 +407,11 @@ useEffect(() => {
         )}
       </div>
 
-      <CollapsiblePanel title="Local AI" defaultOpen={true}>
+      <CollapsiblePanel 
+        title="Local AI"
+        defaultOpen={true}
+        storageKey="pl.layout.panel.localAi"
+      >
 
         {localAiStatus ? (
           <div className="recentList">
@@ -408,46 +437,11 @@ useEffect(() => {
         )}
       </CollapsiblePanel>
 
-      <CollapsiblePanel title="Copilot" defaultOpen={true}>
-
-        <textarea
-          className="input"
-          value={aiPrompt}
-          onChange={(e) => setAiPrompt(e.target.value)}
-          placeholder="Ask the local copilot..."
-          rows={4}
-        />
-
-        <label className="recentItem">
-          <input
-            type="checkbox"
-            checked={allowProjectContext}
-            onChange={(e) => setAllowProjectContext(e.target.checked)}
-            disabled={!projectRoot}
-          />
-          Allow project context
-        </label>
-
-        <button
-          className="btn"
-          type="button"
-          onClick={() => void handleSendAiPrompt()}
-          disabled={aiBusy}
-        >
-          {aiBusy ? "Thinking..." : "Send"}
-        </button>
-
-        {aiResponse ? (
-          <div className="recentItem">
-            <strong>Response</strong>
-            <div>{aiResponse}</div>
-          </div>
-        ) : (
-          <div className="emptyState">No response yet</div>
-        )}
-      </CollapsiblePanel>
-
-      <CollapsiblePanel title="System Status" defaultOpen={false}>
+      <CollapsiblePanel 
+        title="System Status" 
+        defaultOpen={false}
+        storageKey="pl.layout.panel.systemStatus"
+      >
 
         {featureFlags ? (
           <div className="recentList">
@@ -469,7 +463,11 @@ useEffect(() => {
         )}
       </CollapsiblePanel>
 
-      <CollapsiblePanel title="PLugins" defaultOpen={false}>
+      <CollapsiblePanel 
+        title="PLugins" 
+        defaultOpen={false}
+        storageKey="pl.layout.plugins"
+      >
 
         {plugins.length === 0 ? (
           <div className="emptyState">No plugins installed</div>
@@ -537,6 +535,66 @@ useEffect(() => {
 
       <section className="workspace">
         <Workspace active={active} />
+      </section>
+
+      <section className={`copilotDrawer ${copilotDrawerOpen ? "open" : "closed"}`}>
+        <div className="copilotDrawerHeader">
+          <button
+            className="panelTitle"
+            type="button"
+            onClick={() => setCopilotDrawerOpen((value) => !value)}
+          >
+            {copilotDrawerOpen ? "▼" : "▲"} Copilot
+          </button>
+
+          <div className="copilotDrawerMeta">
+            {localAiStatus?.available
+              ? `Local AI: ${localAiStatus.model || "available"}`
+              : "Local AI unavailable"}
+          </div>
+        </div>
+
+        {copilotDrawerOpen && (
+          <div className="copilotDrawerBody">
+            <textarea
+              className="input copilotInput"
+              value={aiPrompt}
+              onChange={(e) => setAiPrompt(e.target.value)}
+              placeholder="Ask the local copilot..."
+              rows={3}
+            />
+
+            <div className="copilotActions">
+              <label className="recentItem">
+                <input
+                  type="checkbox"
+                  checked={allowProjectContext}
+                  onChange={(e) => setAllowProjectContext(e.target.checked)}
+                  disabled={!projectRoot}
+                />
+                Allow project context
+              </label>
+
+              <button
+                className="btn"
+                type="button"
+                onClick={() => void handleSendAiPrompt()}
+                disabled={aiBusy}
+              >
+                {aiBusy ? "Thinking..." : "Send"}
+              </button>
+            </div>
+
+            {aiResponse ? (
+              <div className="copilotResponse">
+                <strong>Response</strong>
+                <div>{aiResponse}</div>
+              </div>
+            ) : (
+              <div className="emptyState">No response yet</div>
+            )}
+          </div>
+        )}
       </section>
 
       <footer className="statusbar">
