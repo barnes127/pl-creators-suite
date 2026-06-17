@@ -3,7 +3,7 @@ import { rpc } from "./rpc";
 import "./app.css";
 import { Modal } from "./components/Modal";
 import { CollapsiblePanel } from "./components/CollapsiblePanel";
-import { Button, Toolbar, WorkspaceHeader } from "./components/pl-ui";
+import { Button, Panel, Toolbar, WorkspaceHeader } from "./components/pl-ui";
 
 declare global {
   interface Window {
@@ -79,6 +79,11 @@ type NavItem = {
   hint: string;
 };
 
+type DocInfo = {
+  name: string;
+  path: string;
+};
+
 function readStoredBoolean(key: string, fallback: boolean) {
   try {
     const raw = window.localStorage.getItem(key);
@@ -127,6 +132,10 @@ export default function App() {
   const [assetType, setAssetType] = useState("other");
   const [assetRelativePath, setAssetRelativePath] = useState("");
   const [assetSourcePath, setAssetSourcePath] = useState("");
+  const [docsList, setDocsList] = useState<DocInfo[]>([]);
+  const [newDocName, setNewDocName] = useState("");
+  const [activeDocName, setActiveDocName] = useState("");
+  const [docContent, setDocContent] = useState("");
   const [copilotDrawerOpen, setCopilotDrawerOpen] = useState(() =>
     readStoredBoolean("pl.layout.copilotDrawerOpen", true)
   );
@@ -314,6 +323,84 @@ async function handleImportAsset() {
   }
 }
 
+async function refreshDocs(root = projectRoot) {
+  try {
+    if (!root) {
+      setDocsList([]);
+      setActiveDocName("");
+      setDocContent("");
+      return;
+    }
+
+    await rpc("docs.ensure", { projectRoot: root });
+
+    const result = await rpc<{ docs: DocInfo[] }>("docs.list", {
+      projectRoot: root,
+    });
+
+    setDocsList(result.docs);
+  } catch (e: any) {
+    setStatus(`Docs error: ${e.message || String(e)}`);
+  }
+}
+
+async function handleCreateDoc() {
+  try {
+    if (!projectRoot) {
+      setStatus("Open a project before creating docs");
+      return;
+    }
+
+    const name = newDocName.trim();
+
+    if (!name) {
+      setStatus("Document name is required");
+      return;
+    }
+
+    const created = await rpc<{
+      name: string;
+      path: string;
+      content: string;
+    }>("docs.create", {
+      projectRoot,
+      name,
+    });
+
+    setActiveDocName(created.name);
+    setDocContent(created.content);
+    setNewDocName("");
+    await refreshDocs(projectRoot);
+    setStatus(`Created doc: ${created.name}`);
+  } catch (e: any) {
+    setStatus(`Docs error: ${e.message || String(e)}`);
+  }
+}
+
+async function handleOpenDoc(name: string) {
+  try {
+    if (!projectRoot) {
+      setStatus("Open a project before opening docs");
+      return;
+    }
+
+    const opened = await rpc<{
+      name: string;
+      path: string;
+      content: string;
+    }>("docs.read", {
+      projectRoot,
+      name,
+    });
+
+    setActiveDocName(opened.name);
+    setDocContent(opened.content);
+    setStatus(`Opened doc: ${opened.name}`);
+  } catch (e: any) {
+    setStatus(`Docs error: ${e.message || String(e)}`);
+  }
+}
+
 async function refreshAssets(root = projectRoot) {
   try {
     if (!root) {
@@ -439,6 +526,11 @@ useEffect(() => {
 
 useEffect(() => {
   void refreshAssets(projectRoot);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+}, [projectRoot]);
+
+useEffect(() => {
+  void refreshDocs(projectRoot);
   // eslint-disable-next-line react-hooks/exhaustive-deps
 }, [projectRoot]);
 
@@ -773,7 +865,17 @@ useEffect(() => {
           }
         />
 
-        <Workspace active={active} />
+        <Workspace 
+          active={active}
+          projectRoot={projectRoot}
+          docsList={docsList}
+          newDocName={newDocName}
+          setNewDocName={setNewDocName}
+          activeDocName={activeDocName}
+          docContent={docContent}
+          onCreateDoc={handleCreateDoc}
+          onOpenDoc={handleOpenDoc}
+        />
       </section>
 
       <section className={`copilotDrawer ${copilotDrawerOpen ? "open" : "closed"}`}>
@@ -959,9 +1061,29 @@ useEffect(() => {
 }
 
     
+type WorkspaceProps = {
+  active: AppId;
+  projectRoot: string;
+  docsList: DocInfo[];
+  newDocName: string;
+  setNewDocName: React.Dispatch<React.SetStateAction<string>>;
+  activeDocName: string;
+  docContent: string;
+  onCreateDoc: () => Promise<void>;
+  onOpenDoc: (name: string) => Promise<void>;
+};
 
-
-function Workspace({ active }: { active: AppId }) {
+function Workspace({
+  active,
+  projectRoot,
+  docsList,
+  newDocName,
+  setNewDocName,
+  activeDocName,
+  docContent,
+  onCreateDoc,
+  onOpenDoc,
+}: WorkspaceProps) {
   switch (active) {
     case "code":
       return <Placeholder title="Code IDE" bullets={["Editor", "Run tasks", "Git helpers (later)"]} />;
@@ -970,7 +1092,66 @@ function Workspace({ active }: { active: AppId }) {
     case "movie":
       return <Placeholder title="Movie / Animation Studio" bullets={["Media bin", "Timeline", "Export (later)"]} />;
     case "docs":
-      return <Placeholder title="Docs" bullets={["Markdown doc", "Export", "Templates (later)"]} />;
+      return (
+        <div className="workspaceSplit">
+          <aside className="workspaceSplitSide">
+            <Panel title="Documents">
+              {!projectRoot && <div className="emptyState">Open a project to use Docs.</div>}
+
+              {projectRoot && (
+                <>
+                  <input
+                    className="input"
+                    value={newDocName}
+                    onChange={(e) => setNewDocName(e.target.value)}
+                    placeholder="new-doc.md"
+                  />
+
+                  <button className="btn" type="button" onClick={() => void onCreateDoc()}>
+                    Create
+                  </button>
+
+                  <div style={{ marginTop: 12 }}>
+                    {docsList.length === 0 ? (
+                      <div className="emptyState">No documents yet</div>
+                    ) : (
+                      docsList.map((doc) => (
+                        <button
+                          key={doc.name}
+                          className="btn"
+                          type="button"
+                          style={{
+                            width: "100%",
+                            marginBottom: 6,
+                            textAlign: "left",
+                          }}
+                          onClick={() => void onOpenDoc(doc.name)}
+                        >
+                          {doc.name}
+                          {activeDocName === doc.name ? " ✓" : ""}
+                        </button>
+                      ))
+                    )}
+                  </div>
+                </>
+              )}
+            </Panel>
+          </aside>
+
+          <section className="workspaceSplitMain">
+            <Panel title={activeDocName || "No document selected"}>
+              <pre
+                style={{
+                  whiteSpace: "pre-wrap",
+                  wordBreak: "break-word",
+                }}
+              >
+                {docContent || "Create or open a document."}
+              </pre>
+            </Panel>
+          </section>
+        </div>
+      );
     case "sheets":
       return <Placeholder title="Sheets" bullets={["Grid", "Formulas", "CSV import/export (later)"]} />;
     case "modeler":
