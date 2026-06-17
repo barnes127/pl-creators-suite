@@ -140,6 +140,7 @@ export default function App() {
     readStoredBoolean("pl.layout.copilotDrawerOpen", true)
   );
   const [assets, setAssets] = useState<AssetInfo[]>([]);
+  const [docDirty, setDocDirty] = useState(false);
 
 
 async function handleOpenProject() {
@@ -329,6 +330,7 @@ async function refreshDocs(root = projectRoot) {
       setDocsList([]);
       setActiveDocName("");
       setDocContent("");
+      setDocDirty(false);
       return;
     }
 
@@ -369,6 +371,7 @@ async function handleCreateDoc() {
 
     setActiveDocName(created.name);
     setDocContent(created.content);
+    setDocDirty(false);
     setNewDocName("");
     await refreshDocs(projectRoot);
     setStatus(`Created doc: ${created.name}`);
@@ -395,6 +398,7 @@ async function handleOpenDoc(name: string) {
 
     setActiveDocName(opened.name);
     setDocContent(opened.content);
+    setDocDirty(false);
     setStatus(`Opened doc: ${opened.name}`);
   } catch (e: any) {
     setStatus(`Docs error: ${e.message || String(e)}`);
@@ -424,10 +428,26 @@ async function handleSaveDoc() {
     });
 
     setDocContent(saved.content);
+    setDocDirty(false);
     setStatus(`Saved doc: ${saved.name}`);
   } catch (e: any) {
     setStatus(`Docs save error: ${e.message || String(e)}`);
   }
+}
+
+function handleCloseDoc() {
+  if (docDirty) {
+    const shouldClose = window.confirm(
+      "This document has unsaved changes. Close without saving?"
+    );
+
+    if (!shouldClose) return;
+  }
+
+  setActiveDocName("");
+  setDocContent("");
+  setDocDirty(false);
+  setStatus("Closed document");
 }
 
 async function refreshAssets(root = projectRoot) {
@@ -903,9 +923,12 @@ useEffect(() => {
           activeDocName={activeDocName}
           docContent={docContent}
           setDocContent={setDocContent}
+          docDirty={docDirty}
+          setDocDirty={setDocDirty}
           onCreateDoc={handleCreateDoc}
           onOpenDoc={handleOpenDoc}
           onSaveDoc={handleSaveDoc}
+          onCloseDoc={handleCloseDoc}
         />
       </section>
 
@@ -1101,9 +1124,12 @@ type WorkspaceProps = {
   activeDocName: string;
   docContent: string;
   setDocContent: React.Dispatch<React.SetStateAction<string>>;
+  docDirty: boolean;
+  setDocDirty: React.Dispatch<React.SetStateAction<boolean>>;
   onCreateDoc: () => Promise<void>;
   onOpenDoc: (name: string) => Promise<void>;
   onSaveDoc: () => Promise<void>;
+  onCloseDoc: () => void;
 };
 
 function Workspace({
@@ -1115,9 +1141,12 @@ function Workspace({
   activeDocName,
   docContent,
   setDocContent,
+  docDirty,
+  setDocDirty,
   onCreateDoc,
   onOpenDoc,
   onSaveDoc,
+  onCloseDoc,
 }: WorkspaceProps) {
   switch (active) {
     case "code":
@@ -1174,17 +1203,38 @@ function Workspace({
           </aside>
 
           <section className="workspaceSplitMain">
-            <Panel title={activeDocName || "No document selected"}>
+            <Panel 
+              title={
+                activeDocName
+                  ? `${activeDocName}${docDirty ? " *" : ""}`
+                  : "No document selected"
+              }
+            >
               {activeDocName ? (
                 <>
                   <textarea
                     className="docsEditor"
                     value={docContent}
-                    onChange={(e) => setDocContent(e.target.value)}
+                    onChange={(e) => {
+                      setDocContent(e.target.value);
+                      setDocDirty(true);
+                    }}
                     spellCheck={true}
                   />
 
                   <div className="docsEditorActions">
+                    <span className={docDirty ? "docsDirty" : "docsSaved"}>
+                      {docDirty ? "Unsaved changes" : "Saved"}
+                    </span>
+
+                    <button
+                      className="btn"
+                      type="button"
+                      onClick={() => onCloseDoc()}
+                    >
+                      Close Document
+                    </button>
+
                     <button
                       className="btn"
                       type="button"

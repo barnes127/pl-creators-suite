@@ -398,3 +398,15 @@ html, body, #root {
   justify-content: flex-end;
   margin-top: 10px;
 }
+
+.docsDirty {
+  margin-right: auto;
+  color: #f5c542;
+  font-size: 12px;
+}
+
+.docsSaved {
+  margin-right: auto;
+  color: #8fd18f;
+  font-size: 12px;
+}
