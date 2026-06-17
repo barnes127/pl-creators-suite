@@ -48,6 +48,16 @@ async function ensureAssetStorage(projectRoot) {
   };
 }
 
+function createAssetId(name) {
+  const base = String(name || "asset")
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "")
+    .slice(0, 48);
+
+  return `${base || "asset"}-${Date.now()}`;
+}
+
 function normalizeAsset(asset) {
   return {
     id: String(asset?.id || "").trim(),
@@ -115,6 +125,44 @@ async function listAssets(params) {
   };
 }
 
+async function registerAsset(params) {
+  const projectRoot = cleanProjectRoot(params?.projectRoot);
+  const name = String(params?.name || "").trim();
+  const type = String(params?.type || "other").trim();
+  const relativePath = String(params?.relativePath || "").trim();
+  const sourcePath = String(params?.sourcePath || "").trim();
+
+  if (!name) throw new Error("Asset name is required");
+  if (!relativePath) throw new Error("Asset relativePath is required");
+
+  if (relativePath.includes("..") || relativePath.startsWith("/") || relativePath.startsWith("\\")) {
+    throw new Error("Asset relativePath must stay inside the project");
+  }
+
+  const registry = await readAssetRegistry(projectRoot);
+  const now = new Date().toISOString();
+
+  const asset = normalizeAsset({
+    id: createAssetId(name),
+    name,
+    type: ASSET_FOLDERS.includes(type) ? type : "other",
+    relativePath,
+    sourcePath,
+    createdAt: now,
+    updatedAt: now,
+  });
+
+  const saved = await writeAssetRegistry(projectRoot, {
+    version: 1,
+    assets: [...registry.assets, asset],
+  });
+
+  return {
+    asset,
+    assets: saved.assets,
+  };
+}
+
 module.exports = {
   ASSET_FOLDERS,
   getAssetsDir,
@@ -123,4 +171,5 @@ module.exports = {
   readAssetRegistry,
   writeAssetRegistry,
   listAssets,
+  registerAsset,
 };

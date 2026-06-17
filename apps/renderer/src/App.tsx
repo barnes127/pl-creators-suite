@@ -123,6 +123,9 @@ export default function App() {
   const [aiResponse, setAiResponse] = useState("");
   const [aiBusy, setAiBusy] = useState(false);
   const [allowProjectContext, setAllowProjectContext] = useState(false);
+  const [assetName, setAssetName] = useState("");
+  const [assetType, setAssetType] = useState("other");
+  const [assetRelativePath, setAssetRelativePath] = useState("");
   const [copilotDrawerOpen, setCopilotDrawerOpen] = useState(() =>
     readStoredBoolean("pl.layout.copilotDrawerOpen", true)
   );
@@ -213,6 +216,39 @@ async function handleExportProject() {
 function handleNewProject() {
   setUiError("");
   setShowNew(true);
+}
+
+async function handleRegisterAsset() {
+  try {
+    if (!projectRoot) {
+      setStatus("Open a project before registering assets");
+      return;
+    }
+
+    const name = assetName.trim();
+    const relativePath = assetRelativePath.trim();
+
+    if (!name || !relativePath) {
+      setStatus("Asset name and relative path are required");
+      return;
+    }
+
+    const result = await rpc<{ assets: AssetInfo[] }>("assets.register", {
+      projectRoot,
+      name,
+      type: assetType,
+      relativePath,
+      sourcePath: "",
+    });
+
+    setAssets(result.assets);
+    setAssetName("");
+    setAssetRelativePath("");
+    setAssetType("other");
+    setStatus(`Registered asset: ${name}`);
+  } catch (e: any) {
+    setStatus(`Asset error: ${e.message || String(e)}`);
+  }
 }
 
 async function refreshAssets(root = projectRoot) {
@@ -508,6 +544,42 @@ useEffect(() => {
           <div className="recentList">
             <div className="recentItem">Asset Registry: Ready</div>
             <div className="recentItem">Assets: {assets.length}</div>
+            <div className="recentList">
+              <input
+                className="input"
+                value={assetName}
+                onChange={(e) => setAssetName(e.target.value)}
+                placeholder="Asset name"
+              />
+
+              <select
+                className="input"
+                value={assetType}
+                onChange={(e) => setAssetType(e.target.value)}
+              >
+                <option value="images">images</option>
+                <option value="audio">audio</option>
+                <option value="video">video</option>
+                <option value="models">models</option>
+                <option value="docs">docs</option>
+                <option value="other">other</option>
+              </select>
+
+              <input
+                className="input"
+                value={assetRelativePath}
+                onChange={(e) => setAssetRelativePath(e.target.value)}
+                placeholder="relative/path.ext"
+              />
+
+              <button
+                className="btn"
+                type="button"
+                onClick={() => void handleRegisterAsset()}
+              >
+                Register Asset
+              </button>
+            </div>
 
             {assets.length === 0 ? (
               <div className="emptyState">No assets registered</div>
