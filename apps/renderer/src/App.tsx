@@ -99,6 +99,7 @@ export default function App() {
   const [aiPrompt, setAiPrompt] = useState("");
   const [aiResponse, setAiResponse] = useState("");
   const [aiBusy, setAiBusy] = useState(false);
+  const [allowProjectContext, setAllowProjectContext] = useState(false);
 
 
 async function handleOpenProject() {
@@ -212,6 +213,8 @@ async function handleSendAiPrompt() {
     const result = await rpc<LocalAiChatResult>("ai.local.chat", {
       prompt,
       model: localAiStatus?.model || undefined,
+      projectRoot: allowProjectContext ? projectRoot : undefined,
+      allowProjectContext,
     });
 
     setAiResponse(result.response || result.message);
@@ -415,6 +418,16 @@ useEffect(() => {
           placeholder="Ask the local copilot..."
           rows={4}
         />
+
+        <label className="recentItem">
+          <input
+            type="checkbox"
+            checked={allowProjectContext}
+            onChange={(e) => setAllowProjectContext(e.target.checked)}
+            disabled={!projectRoot}
+          />
+          Allow project context
+        </label>
 
         <button
           className="btn"

@@ -102,6 +102,8 @@ async function getLocalAiStatus() {
 async function chat(params) {
   const prompt = String(params?.prompt || "").trim();
   const requestedModel = String(params?.model || "").trim();
+  const allowProjectContext = Boolean(params?.allowProjectContext);
+  const projectRoot = String(params?.projectRoot || "").trim();
 
   if (!prompt) {
     throw new Error("prompt is required");
@@ -129,6 +131,11 @@ async function chat(params) {
     };
   }
 
+  const finalPrompt =
+    allowProjectContext && projectRoot
+      ? `Project context is allowed for this request.\nProject root: ${projectRoot}\n\nUser prompt:\n${prompt}`
+      : prompt;
+
   const result = await requestJson({
     hostname: OLLAMA_HOST,
     port: OLLAMA_PORT,
@@ -137,7 +144,7 @@ async function chat(params) {
     timeoutMs: 120000,
     body: {
       model,
-      prompt,
+      prompt: finalPrompt,
       stream: false,
     },
   });
