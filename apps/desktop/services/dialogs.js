@@ -43,8 +43,30 @@ async function savePlprojFile(defaultName = "project.plproj") {
     : `${result.filePath}.plproj`;
 }
 
+async function openAssetFile() {
+  const win = getWindow();
+
+  const result = await dialog.showOpenDialog(win || undefined, {
+    title: "Import Asset",
+    properties: ["openFile"],
+    filters: [
+      { name: "All Supported Assets", extensions: ["png", "jpg", "jpeg", "gif", "webp", "svg", "mp3", "wav", "ogg", "mp4", "mov", "obj", "gltf", "glb", "fbx", "txt", "md", "json", "csv"] },
+      { name: "Images", extensions: ["png", "jpg", "jpeg", "gif", "webp", "svg"] },
+      { name: "Audio", extensions: ["mp3", "wav", "ogg"] },
+      { name: "Video", extensions: ["mp4", "mov"] },
+      { name: "Models", extensions: ["obj", "gltf", "glb", "fbx"] },
+      { name: "Documents", extensions: ["txt", "md", "json", "csv"] },
+      { name: "All Files", extensions: ["*"] },
+    ],
+  });
+
+  if (result.canceled || !result.filePaths.length) return null;
+  return result.filePaths[0];
+}
+
 module.exports = {
   openProjectFolder,
   openPlprojFile,
   savePlprojFile,
+  openAssetFile,
 };

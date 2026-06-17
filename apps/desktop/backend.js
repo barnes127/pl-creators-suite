@@ -407,24 +407,26 @@ const METHODS = {
   const folder = await dialogs.openProjectFolder();
   if (!folder) return { canceled: true };
   return { canceled: false, projectRoot: folder };
-},
-
-"dialog.openPlproj": async () => {
-  const file = await dialogs.openPlprojFile();
-  if (!file) return { canceled: true };
-  return { canceled: false, filePath: file };
-},
-
-"dialog.savePlproj": async (params) => {
-  const name = params?.defaultName || "project.plproj";
-  const file = await dialogs.savePlprojFile(name);
-  if (!file) return { canceled: true };
-  return { canceled: false, filePath: file };
-},
-
-"plugins.list": async () => {
-  return { plugins: await plugins.listPlugins() };
-},
+  },
+  "dialog.openPlproj": async () => {
+    const file = await dialogs.openPlprojFile();
+    if (!file) return { canceled: true };
+    return { canceled: false, filePath: file };
+  },
+  "dialog.savePlproj": async (params) => {
+    const name = params?.defaultName || "project.plproj";
+    const file = await dialogs.savePlprojFile(name);
+    if (!file) return { canceled: true };
+    return { canceled: false, filePath: file };
+  },
+  "dialog.openAssetFile": async () => {
+    const file = await dialogs.openAssetFile();
+    if (!file) return { canceled: true };
+    return { canceled: false, filePath: file };
+  },
+  "plugins.list": async () => {
+    return { plugins: await plugins.listPlugins() };
+  },
 
 };
 

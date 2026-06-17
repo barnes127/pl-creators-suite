@@ -219,6 +219,30 @@ function handleNewProject() {
   setShowNew(true);
 }
 
+async function handleChooseAssetFile() {
+  try {
+    const pick = await rpc<{ canceled: boolean; filePath?: string }>(
+      "dialog.openAssetFile"
+    );
+
+    if (pick.canceled || !pick.filePath) {
+      setStatus("Asset file selection canceled");
+      return;
+    }
+
+    setAssetSourcePath(pick.filePath);
+
+    if (!assetName.trim()) {
+      const fileName = pick.filePath.split("/").pop() || "";
+      setAssetName(fileName);
+    }
+
+    setStatus("Asset file selected");
+  } catch (e: any) {
+    setStatus(`Asset file picker error: ${e.message || String(e)}`);
+  }
+}
+
 async function handleRegisterAsset() {
   try {
     if (!projectRoot) {
@@ -611,6 +635,13 @@ useEffect(() => {
                 onChange={(e) => setAssetSourcePath(e.target.value)}
                 placeholder="/absolute/path/to/file.ext"
               />
+              <button
+                className="btn"
+                type="button"
+                onClick={() => void handleChooseAssetFile()}
+              >
+                Choose File
+              </button>
 
               <button
                 className="btn"
