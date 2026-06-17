@@ -58,6 +58,17 @@ function createAssetId(name) {
   return `${base || "asset"}-${Date.now()}`;
 }
 
+function safeFileName(filePath) {
+  const fileName = path.basename(String(filePath || "").trim());
+
+  if (!fileName) throw new Error("Source file path is required");
+  if (fileName.includes("..") || fileName.includes("/") || fileName.includes("\\")) {
+    throw new Error("Invalid source file name");
+  }
+
+  return fileName;
+}
+
 function normalizeAsset(asset) {
   return {
     id: String(asset?.id || "").trim(),
@@ -163,6 +174,35 @@ async function registerAsset(params) {
   };
 }
 
+async function importAsset(params) {
+  const projectRoot = cleanProjectRoot(params?.projectRoot);
+  const sourcePath = String(params?.sourcePath || "").trim();
+  const name = String(params?.name || "").trim();
+  const type = String(params?.type || "other").trim();
+
+  if (!sourcePath) throw new Error("sourcePath is required");
+
+  const assetType = ASSET_FOLDERS.includes(type) ? type : "other";
+  const assetsDir = getAssetsDir(projectRoot);
+  const targetFolder = path.join(assetsDir, assetType);
+
+  await ensureAssetStorage(projectRoot);
+
+  const fileName = safeFileName(sourcePath);
+  const targetPath = path.join(targetFolder, fileName);
+  const relativePath = path.join("assets", assetType, fileName);
+
+  await fs.copyFile(sourcePath, targetPath);
+
+  return registerAsset({
+    projectRoot,
+    name: name || fileName,
+    type: assetType,
+    relativePath,
+    sourcePath,
+  });
+}
+
 module.exports = {
   ASSET_FOLDERS,
   getAssetsDir,
@@ -172,4 +212,5 @@ module.exports = {
   writeAssetRegistry,
   listAssets,
   registerAsset,
+  importAsset,
 };

@@ -368,6 +368,9 @@ const METHODS = {
   "recent.add": recent_add,
   "project.export": projects.projectExport,
   "project.import": projects.projectImport,
+  "assets.import": async (params) => {
+    return assets.importAsset(params);
+  },
   "assets.register": async (params) => {
     return assets.registerAsset(params);
   },

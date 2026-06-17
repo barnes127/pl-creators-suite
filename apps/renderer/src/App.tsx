@@ -126,6 +126,7 @@ export default function App() {
   const [assetName, setAssetName] = useState("");
   const [assetType, setAssetType] = useState("other");
   const [assetRelativePath, setAssetRelativePath] = useState("");
+  const [assetSourcePath, setAssetSourcePath] = useState("");
   const [copilotDrawerOpen, setCopilotDrawerOpen] = useState(() =>
     readStoredBoolean("pl.layout.copilotDrawerOpen", true)
   );
@@ -248,6 +249,38 @@ async function handleRegisterAsset() {
     setStatus(`Registered asset: ${name}`);
   } catch (e: any) {
     setStatus(`Asset error: ${e.message || String(e)}`);
+  }
+}
+
+async function handleImportAsset() {
+  try {
+    if (!projectRoot) {
+      setStatus("Open a project before importing assets");
+      return;
+    }
+
+    const sourcePath = assetSourcePath.trim();
+
+    if (!sourcePath) {
+      setStatus("Asset source path is required");
+      return;
+    }
+
+    const result = await rpc<{ assets: AssetInfo[] }>("assets.import", {
+      projectRoot,
+      name: assetName.trim(),
+      type: assetType,
+      sourcePath,
+    });
+
+    setAssets(result.assets);
+    setAssetName("");
+    setAssetRelativePath("");
+    setAssetSourcePath("");
+    setAssetType("other");
+    setStatus("Imported asset");
+  } catch (e: any) {
+    setStatus(`Asset import error: ${e.message || String(e)}`);
   }
 }
 
@@ -571,6 +604,21 @@ useEffect(() => {
                 onChange={(e) => setAssetRelativePath(e.target.value)}
                 placeholder="relative/path.ext"
               />
+
+              <input
+                className="input"
+                value={assetSourcePath}
+                onChange={(e) => setAssetSourcePath(e.target.value)}
+                placeholder="/absolute/path/to/file.ext"
+              />
+
+              <button
+                className="btn"
+                type="button"
+                onClick={() => void handleImportAsset()}
+              >
+                Import Asset
+              </button>
 
               <button
                 className="btn"
