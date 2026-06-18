@@ -110,11 +110,18 @@ type MovieInfo = {
   path: string;
 };
 
+type MovieClip = {
+  id: string;
+  name: string;
+  startSeconds: number;
+  durationSeconds: number;
+};
+
 type MovieTrack = {
   id: string;
   name: string;
   type: string;
-  clips: unknown[];
+  clips: MovieClip[];
 };
 
 type MovieData = {
@@ -204,6 +211,10 @@ export default function App() {
   const [activeMovieName, setActiveMovieName] = useState("");
   const [movieData, setMovieData] = useState<MovieData | null>(null);
   const [movieDirty, setMovieDirty] = useState(false);
+  const [newMovieClipName, setNewMovieClipName] = useState("");
+  const [newMovieClipTrackId, setNewMovieClipTrackId] = useState("");
+  const [newMovieClipStart, setNewMovieClipStart] = useState("0");
+  const [newMovieClipDuration, setNewMovieClipDuration] = useState("2");
 
 async function handleOpenProject() {
   try {
@@ -923,6 +934,7 @@ async function handleCreateMovie() {
     setActiveMovieName(created.name);
     setMovieData(created.movie);
     setMovieDirty(false);
+    setNewMovieClipTrackId(created.movie.tracks[0]?.id || "");
     setNewMovieName("");
     await refreshMovies(projectRoot);
     setStatus(`Created movie: ${created.name}`);
@@ -958,6 +970,7 @@ async function handleOpenMovie(name: string) {
     setActiveMovieName(opened.name);
     setMovieData(opened.movie);
     setMovieDirty(false);
+    setNewMovieClipTrackId(opened.movie.tracks[0]?.id || "");
     setStatus(`Opened movie: ${opened.name}`);
   } catch (e: any) {
     setStatus(`Movie error: ${e.message || String(e)}`);
@@ -1007,6 +1020,10 @@ function handleCloseMovie() {
   setActiveMovieName("");
   setMovieData(null);
   setMovieDirty(false);
+  setNewMovieClipName("");
+  setNewMovieClipTrackId("");
+  setNewMovieClipStart("0");
+  setNewMovieClipDuration("2");
   setStatus("Closed movie");
 }
 
@@ -1024,6 +1041,68 @@ function handleUpdateMovieField<K extends keyof MovieData>(
   });
 
   setMovieDirty(true);
+}
+
+function handleAddMovieClip() {
+  if (!movieData) {
+    setStatus("Open a movie before adding clips");
+    return;
+  }
+
+  const trackId = newMovieClipTrackId || movieData.tracks[0]?.id;
+  const name = newMovieClipName.trim();
+
+  if (!trackId) {
+    setStatus("Movie needs at least one track before adding clips");
+    return;
+  }
+
+  if (!name) {
+    setStatus("Clip name is required");
+    return;
+  }
+
+  const startSeconds = Number(newMovieClipStart);
+  const durationSeconds = Number(newMovieClipDuration);
+
+  if (!Number.isFinite(startSeconds) || startSeconds < 0) {
+    setStatus("Clip start time must be 0 or greater");
+    return;
+  }
+
+  if (!Number.isFinite(durationSeconds) || durationSeconds <= 0) {
+    setStatus("Clip duration must be greater than 0");
+    return;
+  }
+
+  const clip: MovieClip = {
+    id: `clip-${Date.now()}`,
+    name,
+    startSeconds,
+    durationSeconds,
+  };
+
+  setMovieData((current) => {
+    if (!current) return current;
+
+    return {
+      ...current,
+      tracks: current.tracks.map((track) =>
+        track.id === trackId
+          ? {
+              ...track,
+              clips: [...track.clips, clip],
+            }
+          : track
+      ),
+    };
+  });
+
+  setNewMovieClipName("");
+  setNewMovieClipStart("0");
+  setNewMovieClipDuration("2");
+  setMovieDirty(true);
+  setStatus(`Added clip: ${name}`);
 }
 
 async function refreshAssets(root = projectRoot) {
@@ -1559,6 +1638,15 @@ useEffect(() => {
           onSaveMovie={handleSaveMovie}
           onCloseMovie={handleCloseMovie}
           onUpdateMovieField={handleUpdateMovieField}
+          newMovieClipName={newMovieClipName}
+          setNewMovieClipName={setNewMovieClipName}
+          newMovieClipTrackId={newMovieClipTrackId}
+          setNewMovieClipTrackId={setNewMovieClipTrackId}
+          newMovieClipStart={newMovieClipStart}
+          setNewMovieClipStart={setNewMovieClipStart}
+          newMovieClipDuration={newMovieClipDuration}
+          setNewMovieClipDuration={setNewMovieClipDuration}
+          onAddMovieClip={handleAddMovieClip}
         />
       </section>
 
@@ -1802,6 +1890,15 @@ type WorkspaceProps = {
     field: K,
     value: MovieData[K]
   ) => void;
+  newMovieClipName: string;
+  setNewMovieClipName: React.Dispatch<React.SetStateAction<string>>;
+  newMovieClipTrackId: string;
+  setNewMovieClipTrackId: React.Dispatch<React.SetStateAction<string>>;
+  newMovieClipStart: string;
+  setNewMovieClipStart: React.Dispatch<React.SetStateAction<string>>;
+  newMovieClipDuration: string;
+  setNewMovieClipDuration: React.Dispatch<React.SetStateAction<string>>;
+  onAddMovieClip: () => void;
 };
 
 function Workspace({
@@ -1858,6 +1955,15 @@ function Workspace({
   onSaveMovie,
   onCloseMovie,
   onUpdateMovieField,
+  newMovieClipName,
+  setNewMovieClipName,
+  newMovieClipTrackId,
+  setNewMovieClipTrackId,
+  newMovieClipStart,
+  setNewMovieClipStart,
+  newMovieClipDuration,
+  setNewMovieClipDuration,
+  onAddMovieClip,
 }: WorkspaceProps) {
   switch (active) {
     case "code":
@@ -2112,14 +2218,90 @@ function Workspace({
                     </label>
                   </div>
 
+                  <div className="movieClipForm">
+                    <div className="movieTimelineHeader">Add Timeline Clip</div>
+
+                    <div className="movieClipFormGrid">
+                      <label>
+                        Clip Name
+                        <input
+                          className="input"
+                          value={newMovieClipName}
+                          onChange={(e) => setNewMovieClipName(e.target.value)}
+                          placeholder="Scene 1"
+                        />
+                      </label>
+
+                      <label>
+                        Track
+                        <select
+                          className="input"
+                          value={newMovieClipTrackId}
+                          onChange={(e) => setNewMovieClipTrackId(e.target.value)}
+                        >
+                          {movieData.tracks.map((track) => (
+                            <option key={track.id} value={track.id}>
+                              {track.name}
+                            </option>
+                          ))}
+                        </select>
+                      </label>
+
+                      <label>
+                        Start
+                        <input
+                          className="input"
+                          type="number"
+                          min={0}
+                          value={newMovieClipStart}
+                          onChange={(e) => setNewMovieClipStart(e.target.value)}
+                        />
+                      </label>
+
+                      <label>
+                        Duration
+                        <input
+                          className="input"
+                          type="number"
+                          min={0.1}
+                          step={0.1}
+                          value={newMovieClipDuration}
+                          onChange={(e) => setNewMovieClipDuration(e.target.value)}
+                        />
+                      </label>
+
+                      <button
+                        className="btn"
+                        type="button"
+                        onClick={() => onAddMovieClip()}
+                      >
+                        Add Clip
+                      </button>
+                    </div>
+                  </div>
+
                   <div className="movieTimelinePreview">
                     <div className="movieTimelineHeader">Timeline Tracks</div>
 
                     {movieData.tracks.map((track) => (
-                      <div className="movieTrack" key={track.id}>
-                        <span>{track.name}</span>
-                        <span>{track.type}</span>
-                        <span>{track.clips.length} clips</span>
+                      <div className="movieTrackBlock" key={track.id}>
+                        <div className="movieTrack">
+                          <span>{track.name}</span>
+                          <span>{track.type}</span>
+                          <span>{track.clips.length} clips</span>
+                        </div>
+
+                        {track.clips.length > 0 && (
+                          <div className="movieClips">
+                            {track.clips.map((clip) => (
+                              <div className="movieClip" key={clip.id}>
+                                <span>{clip.name}</span>
+                                <span>start {clip.startSeconds}s</span>
+                                <span>{clip.durationSeconds}s</span>
+                              </div>
+                            ))}
+                          </div>
+                        )}
                       </div>
                     ))}
                   </div>
