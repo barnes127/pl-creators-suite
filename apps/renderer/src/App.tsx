@@ -84,6 +84,12 @@ type DocInfo = {
   path: string;
 };
 
+type CodeFileInfo = {
+  name: string;
+  path: string;
+  language: string;
+};
+
 function readStoredBoolean(key: string, fallback: boolean) {
   try {
     const raw = window.localStorage.getItem(key);
@@ -141,7 +147,12 @@ export default function App() {
   );
   const [assets, setAssets] = useState<AssetInfo[]>([]);
   const [docDirty, setDocDirty] = useState(false);
-
+  const [codeFiles, setCodeFiles] = useState<CodeFileInfo[]>([]);
+  const [newCodeFileName, setNewCodeFileName] = useState("");
+  const [activeCodeFileName, setActiveCodeFileName] = useState("");
+  const [activeCodeLanguage, setActiveCodeLanguage] = useState("");
+  const [codeContent, setCodeContent] = useState("");
+  const [codeDirty, setCodeDirty] = useState(false);
 
 async function handleOpenProject() {
   try {
@@ -450,6 +461,149 @@ function handleCloseDoc() {
   setStatus("Closed document");
 }
 
+async function refreshCodeFiles(root = projectRoot) {
+  try {
+    if (!root) {
+      setCodeFiles([]);
+      setActiveCodeFileName("");
+      setActiveCodeLanguage("");
+      setCodeContent("");
+      setCodeDirty(false);
+      return;
+    }
+
+    await rpc("code.ensure", { projectRoot: root });
+
+    const result = await rpc<{ files: CodeFileInfo[] }>("code.list", {
+      projectRoot: root,
+    });
+
+    setCodeFiles(result.files);
+  } catch (e: any) {
+    setStatus(`Code error: ${e.message || String(e)}`);
+  }
+}
+
+async function handleCreateCodeFile() {
+  try {
+    if (!projectRoot) {
+      setStatus("Open a project before creating code files");
+      return;
+    }
+
+    const name = newCodeFileName.trim();
+
+    if (!name) {
+      setStatus("Code file name is required");
+      return;
+    }
+
+    const created = await rpc<{
+      name: string;
+      path: string;
+      language: string;
+      content: string;
+    }>("code.create", {
+      projectRoot,
+      name,
+    });
+
+    setActiveCodeFileName(created.name);
+    setActiveCodeLanguage(created.language);
+    setCodeContent(created.content);
+    setCodeDirty(false);
+    setNewCodeFileName("");
+    await refreshCodeFiles(projectRoot);
+    setStatus(`Created code file: ${created.name}`);
+  } catch (e: any) {
+    setStatus(`Code error: ${e.message || String(e)}`);
+  }
+}
+
+async function handleOpenCodeFile(name: string) {
+  try {
+    if (!projectRoot) {
+      setStatus("Open a project before opening code files");
+      return;
+    }
+
+    if (codeDirty) {
+      const shouldOpen = window.confirm(
+        "The current code file has unsaved changes. Open another file without saving?"
+      );
+
+      if (!shouldOpen) return;
+    }
+
+    const opened = await rpc<{
+      name: string;
+      path: string;
+      language: string;
+      content: string;
+    }>("code.read", {
+      projectRoot,
+      name,
+    });
+
+    setActiveCodeFileName(opened.name);
+    setActiveCodeLanguage(opened.language);
+    setCodeContent(opened.content);
+    setCodeDirty(false);
+    setStatus(`Opened code file: ${opened.name}`);
+  } catch (e: any) {
+    setStatus(`Code error: ${e.message || String(e)}`);
+  }
+}
+
+async function handleSaveCodeFile() {
+  try {
+    if (!projectRoot) {
+      setStatus("Open a project before saving code files");
+      return;
+    }
+
+    if (!activeCodeFileName) {
+      setStatus("Open a code file before saving");
+      return;
+    }
+
+    const saved = await rpc<{
+      name: string;
+      path: string;
+      language: string;
+      content: string;
+    }>("code.save", {
+      projectRoot,
+      name: activeCodeFileName,
+      content: codeContent,
+    });
+
+    setActiveCodeFileName(saved.name);
+    setActiveCodeLanguage(saved.language);
+    setCodeContent(saved.content);
+    setCodeDirty(false);
+    setStatus(`Saved code file: ${saved.name}`);
+  } catch (e: any) {
+    setStatus(`Code save error: ${e.message || String(e)}`);
+  }
+}
+
+function handleCloseCodeFile() {
+  if (codeDirty) {
+    const shouldClose = window.confirm(
+      "This code file has unsaved changes. Close without saving?"
+    );
+
+    if (!shouldClose) return;
+  }
+
+  setActiveCodeFileName("");
+  setActiveCodeLanguage("");
+  setCodeContent("");
+  setCodeDirty(false);
+  setStatus("Closed code file");
+}
+
 async function refreshAssets(root = projectRoot) {
   try {
     if (!root) {
@@ -580,6 +734,11 @@ useEffect(() => {
 
 useEffect(() => {
   void refreshDocs(projectRoot);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+}, [projectRoot]);
+
+useEffect(() => {
+  void refreshCodeFiles(projectRoot);
   // eslint-disable-next-line react-hooks/exhaustive-deps
 }, [projectRoot]);
 
@@ -929,6 +1088,19 @@ useEffect(() => {
           onOpenDoc={handleOpenDoc}
           onSaveDoc={handleSaveDoc}
           onCloseDoc={handleCloseDoc}
+          codeFiles={codeFiles}
+          newCodeFileName={newCodeFileName}
+          setNewCodeFileName={setNewCodeFileName}
+          activeCodeFileName={activeCodeFileName}
+          activeCodeLanguage={activeCodeLanguage}
+          codeContent={codeContent}
+          setCodeContent={setCodeContent}
+          codeDirty={codeDirty}
+          setCodeDirty={setCodeDirty}
+          onCreateCodeFile={handleCreateCodeFile}
+          onOpenCodeFile={handleOpenCodeFile}
+          onSaveCodeFile={handleSaveCodeFile}
+          onCloseCodeFile={handleCloseCodeFile}
         />
       </section>
 
@@ -1130,6 +1302,19 @@ type WorkspaceProps = {
   onOpenDoc: (name: string) => Promise<void>;
   onSaveDoc: () => Promise<void>;
   onCloseDoc: () => void;
+  codeFiles: CodeFileInfo[];
+  newCodeFileName: string;
+  setNewCodeFileName: React.Dispatch<React.SetStateAction<string>>;
+  activeCodeFileName: string;
+  activeCodeLanguage: string;
+  codeContent: string;
+  setCodeContent: React.Dispatch<React.SetStateAction<string>>;
+  codeDirty: boolean;
+  setCodeDirty: React.Dispatch<React.SetStateAction<boolean>>;
+  onCreateCodeFile: () => Promise<void>;
+  onOpenCodeFile: (name: string) => Promise<void>;
+  onSaveCodeFile: () => Promise<void>;
+  onCloseCodeFile: () => void;
 };
 
 function Workspace({
@@ -1147,10 +1332,129 @@ function Workspace({
   onOpenDoc,
   onSaveDoc,
   onCloseDoc,
+  codeFiles,
+  newCodeFileName,
+  setNewCodeFileName,
+  activeCodeFileName,
+  activeCodeLanguage,
+  codeContent,
+  setCodeContent,
+  codeDirty,
+  setCodeDirty,
+  onCreateCodeFile,
+  onOpenCodeFile,
+  onSaveCodeFile,
+  onCloseCodeFile,
 }: WorkspaceProps) {
   switch (active) {
     case "code":
-      return <Placeholder title="Code IDE" bullets={["Editor", "Run tasks", "Git helpers (later)"]} />;
+      return (
+        <div className="workspaceSplit">
+          <aside className="workspaceSplitSide">
+            <Panel title="Code Files">
+              {!projectRoot && (
+                <div className="emptyState">Open a project to use Code IDE.</div>
+              )}
+
+              {projectRoot && (
+                <>
+                  <input
+                    className="input"
+                    value={newCodeFileName}
+                    onChange={(e) => setNewCodeFileName(e.target.value)}
+                    placeholder="main.py"
+                  />
+
+                  <button
+                    className="btn"
+                    type="button"
+                    onClick={() => void onCreateCodeFile()}
+                  >
+                    Create
+                  </button>
+
+                  <div style={{ marginTop: 12 }}>
+                    {codeFiles.length === 0 ? (
+                      <div className="emptyState">No code files yet</div>
+                    ) : (
+                      codeFiles.map((file) => (
+                        <button
+                          key={file.name}
+                          className="btn"
+                          type="button"
+                          style={{
+                            width: "100%",
+                            marginBottom: 6,
+                            textAlign: "left",
+                          }}
+                          onClick={() => void onOpenCodeFile(file.name)}
+                        >
+                          {file.name}
+                          {activeCodeFileName === file.name ? " ✓" : ""}
+                          <span style={{ display: "block", opacity: 0.7 }}>
+                            {file.language}
+                          </span>
+                        </button>
+                      ))
+                    )}
+                  </div>
+                </>
+              )}
+            </Panel>
+          </aside>
+
+          <section className="workspaceSplitMain">
+            <Panel
+              title={
+                activeCodeFileName
+                  ? `${activeCodeFileName}${codeDirty ? " *" : ""}`
+                  : "No code file selected"
+              }
+            >
+              {activeCodeFileName ? (
+                <>
+                  <div className="codeMeta">
+                    <span>{activeCodeLanguage || "Plain Text"}</span>
+                    <span className={codeDirty ? "docsDirty" : "docsSaved"}>
+                      {codeDirty ? "Unsaved changes" : "Saved"}
+                    </span>
+                  </div>
+
+                  <textarea
+                    className="codeEditor"
+                    value={codeContent}
+                    onChange={(e) => {
+                      setCodeContent(e.target.value);
+                      setCodeDirty(true);
+                    }}
+                    spellCheck={false}
+                  />
+
+                  <div className="docsEditorActions">
+                    <button
+                      className="btn"
+                      type="button"
+                      onClick={() => onCloseCodeFile()}
+                    >
+                      Close File
+                    </button>
+
+                    <button
+                      className="btn"
+                      type="button"
+                      onClick={() => void onSaveCodeFile()}
+                    >
+                      Save File
+                    </button>
+                  </div>
+                </>
+              ) : (
+                <div className="emptyState">Create or open a code file.</div>
+              )}
+            </Panel>
+          </section>
+        </div>
+      );
     case "game":
       return <Placeholder title="Game Studio" bullets={["Scene graph", "Play mode", "Asset links (later)"]} />;
     case "movie":

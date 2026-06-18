@@ -410,3 +410,27 @@ html, body, #root {
   color: #8fd18f;
   font-size: 12px;
 }
+
+.codeMeta {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 8px;
+  font-size: 12px;
+  opacity: 0.85;
+}
+
+.codeEditor {
+  width: 100%;
+  min-height: 460px;
+  resize: vertical;
+  padding: 12px;
+  border: 1px solid #333;
+  border-radius: 8px;
+  background: #0d0d0d;
+  color: #e6e6e6;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+  font-size: 14px;
+  line-height: 1.5;
+  tab-size: 2;
+}
