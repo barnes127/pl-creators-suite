@@ -17,6 +17,7 @@ const localAi = require("./services/ai/local");
 const appMetadata = require("./services/app/metadata");
 const assets = require("./services/assets");
 const docs = require("./services/docs");
+const code = require("./services/code");
 
 
 async function readRecents() {
@@ -447,6 +448,21 @@ const METHODS = {
   },
   "docs.save": async (params) => {
     return docs.saveDoc(params);
+  },
+  "code.ensure": async (params) => {
+    return code.ensureCodeStorage(params?.projectRoot);
+  },
+  "code.list": async (params) => {
+    return code.listCodeFiles(params);
+  },
+  "code.create": async (params) => {
+    return code.createCodeFile(params);
+  },
+  "code.read": async (params) => {
+    return code.readCodeFile(params);
+  },
+  "code.save": async (params) => {
+    return code.saveCodeFile(params);
   },
 
 };
