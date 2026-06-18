@@ -20,6 +20,7 @@ const docs = require("./services/docs");
 const code = require("./services/code");
 const sheets = require("./services/sheets");
 const movies = require("./services/movies");
+const models = require("./services/models");
 
 
 async function readRecents() {
@@ -495,6 +496,21 @@ const METHODS = {
   },
   "movies.save": async (params) => {
     return movies.saveMovie(params);
+  },
+  "models.ensure": async (params) => {
+    return models.ensureModelsStorage(params?.projectRoot);
+  },
+  "models.list": async (params) => {
+    return models.listModels(params);
+  },
+  "models.create": async (params) => {
+    return models.createModel(params);
+  },
+  "models.read": async (params) => {
+    return models.readModel(params);
+  },
+  "models.save": async (params) => {
+    return models.saveModel(params);
   },
 };
 
