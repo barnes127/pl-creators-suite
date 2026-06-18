@@ -138,6 +138,32 @@ type MovieData = {
   updatedAt: string;
 };
 
+type ModelInfo = {
+  name: string;
+  path: string;
+};
+
+type ModelObject = {
+  id: string;
+  name: string;
+  primitive: string;
+  position: [number, number, number];
+  rotation: [number, number, number];
+  scale: [number, number, number];
+};
+
+type ModelData = {
+  version: number;
+  name: string;
+  title: string;
+  units: string;
+  gridEnabled: boolean;
+  objects: ModelObject[];
+  notes: string;
+  createdAt: string;
+  updatedAt: string;
+};
+
 function readStoredBoolean(key: string, fallback: boolean) {
   try {
     const raw = window.localStorage.getItem(key);
@@ -215,6 +241,14 @@ export default function App() {
   const [newMovieClipTrackId, setNewMovieClipTrackId] = useState("");
   const [newMovieClipStart, setNewMovieClipStart] = useState("0");
   const [newMovieClipDuration, setNewMovieClipDuration] = useState("2");
+  const [modelsList, setModelsList] = useState<ModelInfo[]>([]);
+  const [newModelName, setNewModelName] = useState("");
+  const [activeModelName, setActiveModelName] = useState("");
+  const [modelData, setModelData] = useState<ModelData | null>(null);
+  const [modelDirty, setModelDirty] = useState(false);
+
+  const [newModelObjectName, setNewModelObjectName] = useState("");
+  const [newModelPrimitive, setNewModelPrimitive] = useState("cube");
 
 async function handleOpenProject() {
   try {
@@ -1105,6 +1139,196 @@ function handleAddMovieClip() {
   setStatus(`Added clip: ${name}`);
 }
 
+async function refreshModels(root = projectRoot) {
+  try {
+    if (!root) {
+      setModelsList([]);
+      setActiveModelName("");
+      setModelData(null);
+      setModelDirty(false);
+      return;
+    }
+
+    await rpc("models.ensure", { projectRoot: root });
+
+    const result = await rpc<{ models: ModelInfo[] }>("models.list", {
+      projectRoot: root,
+    });
+
+    setModelsList(result.models);
+  } catch (e: any) {
+    setStatus(`Modeling error: ${e.message || String(e)}`);
+  }
+}
+
+async function handleCreateModel() {
+  try {
+    if (!projectRoot) {
+      setStatus("Open a project before creating model scenes");
+      return;
+    }
+
+    const name = newModelName.trim();
+
+    if (!name) {
+      setStatus("Model scene name is required");
+      return;
+    }
+
+    const created = await rpc<{
+      name: string;
+      path: string;
+      model: ModelData;
+    }>("models.create", {
+      projectRoot,
+      name,
+    });
+
+    setActiveModelName(created.name);
+    setModelData(created.model);
+    setModelDirty(false);
+    setNewModelName("");
+    setStatus(`Created model scene: ${created.name}`);
+    await refreshModels(projectRoot);
+  } catch (e: any) {
+    setStatus(`Modeling error: ${e.message || String(e)}`);
+  }
+}
+
+async function handleOpenModel(name: string) {
+  try {
+    if (!projectRoot) {
+      setStatus("Open a project before opening model scenes");
+      return;
+    }
+
+    if (modelDirty) {
+      const shouldOpen = window.confirm(
+        "The current model scene has unsaved changes. Open another scene without saving?"
+      );
+
+      if (!shouldOpen) return;
+    }
+
+    const opened = await rpc<{
+      name: string;
+      path: string;
+      model: ModelData;
+    }>("models.read", {
+      projectRoot,
+      name,
+    });
+
+    setActiveModelName(opened.name);
+    setModelData(opened.model);
+    setModelDirty(false);
+    setStatus(`Opened model scene: ${opened.name}`);
+  } catch (e: any) {
+    setStatus(`Modeling error: ${e.message || String(e)}`);
+  }
+}
+
+async function handleSaveModel() {
+  try {
+    if (!projectRoot) {
+      setStatus("Open a project before saving model scenes");
+      return;
+    }
+
+    if (!activeModelName || !modelData) {
+      setStatus("Open a model scene before saving");
+      return;
+    }
+
+    const saved = await rpc<{
+      name: string;
+      path: string;
+      model: ModelData;
+    }>("models.save", {
+      projectRoot,
+      name: activeModelName,
+      model: modelData,
+    });
+
+    setActiveModelName(saved.name);
+    setModelData(saved.model);
+    setModelDirty(false);
+    setStatus(`Saved model scene: ${saved.name}`);
+  } catch (e: any) {
+    setStatus(`Modeling save error: ${e.message || String(e)}`);
+  }
+}
+
+function handleCloseModel() {
+  if (modelDirty) {
+    const shouldClose = window.confirm(
+      "This model scene has unsaved changes. Close without saving?"
+    );
+
+    if (!shouldClose) return;
+  }
+
+  setActiveModelName("");
+  setModelData(null);
+  setModelDirty(false);
+  setNewModelObjectName("");
+  setNewModelPrimitive("cube");
+  setStatus("Closed model scene");
+}
+
+function handleUpdateModelField<K extends keyof ModelData>(
+  field: K,
+  value: ModelData[K]
+) {
+  setModelData((current) => {
+    if (!current) return current;
+
+    return {
+      ...current,
+      [field]: value,
+    };
+  });
+
+  setModelDirty(true);
+}
+
+function handleAddModelObject() {
+  if (!modelData) {
+    setStatus("Open a model scene before adding objects");
+    return;
+  }
+
+  const name = newModelObjectName.trim();
+
+  if (!name) {
+    setStatus("Object name is required");
+    return;
+  }
+
+  const object: ModelObject = {
+    id: `object-${Date.now()}`,
+    name,
+    primitive: newModelPrimitive,
+    position: [0, 0, 0],
+    rotation: [0, 0, 0],
+    scale: [1, 1, 1],
+  };
+
+  setModelData((current) => {
+    if (!current) return current;
+
+    return {
+      ...current,
+      objects: [...current.objects, object],
+    };
+  });
+
+  setNewModelObjectName("");
+  setNewModelPrimitive("cube");
+  setModelDirty(true);
+  setStatus(`Added object: ${name}`);
+}
+
 async function refreshAssets(root = projectRoot) {
   try {
     if (!root) {
@@ -1250,6 +1474,11 @@ useEffect(() => {
 
 useEffect(() => {
   void refreshMovies(projectRoot);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+}, [projectRoot]);
+
+useEffect(() => {
+  void refreshModels(projectRoot);
   // eslint-disable-next-line react-hooks/exhaustive-deps
 }, [projectRoot]);
 
@@ -1647,6 +1876,22 @@ useEffect(() => {
           newMovieClipDuration={newMovieClipDuration}
           setNewMovieClipDuration={setNewMovieClipDuration}
           onAddMovieClip={handleAddMovieClip}
+          modelsList={modelsList}
+          newModelName={newModelName}
+          setNewModelName={setNewModelName}
+          activeModelName={activeModelName}
+          modelData={modelData}
+          modelDirty={modelDirty}
+          newModelObjectName={newModelObjectName}
+          setNewModelObjectName={setNewModelObjectName}
+          newModelPrimitive={newModelPrimitive}
+          setNewModelPrimitive={setNewModelPrimitive}
+          onCreateModel={handleCreateModel}
+          onOpenModel={handleOpenModel}
+          onSaveModel={handleSaveModel}
+          onCloseModel={handleCloseModel}
+          onUpdateModelField={handleUpdateModelField}
+          onAddModelObject={handleAddModelObject}
         />
       </section>
 
@@ -1899,6 +2144,25 @@ type WorkspaceProps = {
   newMovieClipDuration: string;
   setNewMovieClipDuration: React.Dispatch<React.SetStateAction<string>>;
   onAddMovieClip: () => void;
+  modelsList: ModelInfo[];
+  newModelName: string;
+  setNewModelName: React.Dispatch<React.SetStateAction<string>>;
+  activeModelName: string;
+  modelData: ModelData | null;
+  modelDirty: boolean;
+  newModelObjectName: string;
+  setNewModelObjectName: React.Dispatch<React.SetStateAction<string>>;
+  newModelPrimitive: string;
+  setNewModelPrimitive: React.Dispatch<React.SetStateAction<string>>;
+  onCreateModel: () => Promise<void>;
+  onOpenModel: (name: string) => Promise<void>;
+  onSaveModel: () => Promise<void>;
+  onCloseModel: () => void;
+  onUpdateModelField: <K extends keyof ModelData>(
+    field: K,
+    value: ModelData[K]
+  ) => void;
+  onAddModelObject: () => void;
 };
 
 function Workspace({
@@ -1964,6 +2228,22 @@ function Workspace({
   newMovieClipDuration,
   setNewMovieClipDuration,
   onAddMovieClip,
+  modelsList,
+  newModelName,
+  setNewModelName,
+  activeModelName,
+  modelData,
+  modelDirty,
+  newModelObjectName,
+  setNewModelObjectName,
+  newModelPrimitive,
+  setNewModelPrimitive,
+  onCreateModel,
+  onOpenModel,
+  onSaveModel,
+  onCloseModel,
+  onUpdateModelField,
+  onAddModelObject,
 }: WorkspaceProps) {
   switch (active) {
     case "code":
@@ -2610,7 +2890,215 @@ function Workspace({
         </div>
       );
     case "modeler":
-      return <Placeholder title="Computer Modeling Studio" bullets={["Primitives", "Transforms", "Physics tools (later)"]} />;
+      return (
+        <div className="workspaceSplit">
+          <aside className="workspaceSplitSide">
+            <Panel title="Model Scenes">
+              {!projectRoot && (
+                <div className="emptyState">Open a project to use Modeling Studio.</div>
+              )}
+
+              {projectRoot && (
+                <>
+                  <input
+                    className="input"
+                    value={newModelName}
+                    onChange={(e) => setNewModelName(e.target.value)}
+                    placeholder="scene"
+                  />
+
+                  <button
+                    className="btn"
+                    type="button"
+                    onClick={() => void onCreateModel()}
+                  >
+                    Create
+                  </button>
+
+                  <div style={{ marginTop: 12 }}>
+                    {modelsList.length === 0 ? (
+                      <div className="emptyState">No model scenes yet</div>
+                    ) : (
+                      modelsList.map((model) => (
+                        <button
+                          key={model.name}
+                          className="btn"
+                          type="button"
+                          style={{
+                            width: "100%",
+                            marginBottom: 6,
+                            textAlign: "left",
+                          }}
+                          onClick={() => void onOpenModel(model.name)}
+                        >
+                          {model.name}
+                          {activeModelName === model.name ? " ✓" : ""}
+                        </button>
+                      ))
+                    )}
+                  </div>
+                </>
+              )}
+            </Panel>
+          </aside>
+
+          <section className="workspaceSplitMain">
+            <Panel
+              title={
+                activeModelName
+                  ? `${activeModelName}${modelDirty ? " *" : ""}`
+                  : "No model scene selected"
+              }
+            >
+              {activeModelName && modelData ? (
+                <>
+                  <div className="modelMeta">
+                    <span>
+                      {modelData.objects.length} objects · units: {modelData.units}
+                    </span>
+
+                    <span className={modelDirty ? "docsDirty" : "docsSaved"}>
+                      {modelDirty ? "Unsaved changes" : "Saved"}
+                    </span>
+                  </div>
+
+                  <div className="modelFormGrid">
+                    <label>
+                      Title
+                      <input
+                        className="input"
+                        value={modelData.title}
+                        onChange={(e) =>
+                          onUpdateModelField("title", e.target.value)
+                        }
+                      />
+                    </label>
+
+                    <label>
+                      Units
+                      <select
+                        className="input"
+                        value={modelData.units}
+                        onChange={(e) =>
+                          onUpdateModelField("units", e.target.value)
+                        }
+                      >
+                        <option value="meters">meters</option>
+                        <option value="centimeters">centimeters</option>
+                        <option value="millimeters">millimeters</option>
+                        <option value="inches">inches</option>
+                      </select>
+                    </label>
+
+                    <label className="modelCheckbox">
+                      <input
+                        type="checkbox"
+                        checked={modelData.gridEnabled}
+                        onChange={(e) =>
+                          onUpdateModelField("gridEnabled", e.target.checked)
+                        }
+                      />
+                      Grid enabled
+                    </label>
+                  </div>
+
+                  <div className="modelPreviewBox">
+                    <div className="modelPreviewTitle">Viewport Stub</div>
+                    <div className="modelPreviewGrid">
+                      {modelData.objects.length === 0 ? (
+                        <div className="emptyState">No objects yet</div>
+                      ) : (
+                        modelData.objects.map((object) => (
+                          <div className="modelObjectCard" key={object.id}>
+                            <strong>{object.name}</strong>
+                            <span>{object.primitive}</span>
+                            <span>
+                              pos [{object.position.join(", ")}]
+                            </span>
+                            <span>
+                              scale [{object.scale.join(", ")}]
+                            </span>
+                          </div>
+                        ))
+                      )}
+                    </div>
+                  </div>
+
+                  <div className="modelObjectForm">
+                    <div className="modelSectionTitle">Add Primitive Object</div>
+
+                    <div className="modelObjectFormGrid">
+                      <label>
+                        Object Name
+                        <input
+                          className="input"
+                          value={newModelObjectName}
+                          onChange={(e) => setNewModelObjectName(e.target.value)}
+                          placeholder="Cube 1"
+                        />
+                      </label>
+
+                      <label>
+                        Primitive
+                        <select
+                          className="input"
+                          value={newModelPrimitive}
+                          onChange={(e) => setNewModelPrimitive(e.target.value)}
+                        >
+                          <option value="cube">Cube</option>
+                          <option value="sphere">Sphere</option>
+                          <option value="plane">Plane</option>
+                          <option value="cylinder">Cylinder</option>
+                          <option value="cone">Cone</option>
+                        </select>
+                      </label>
+
+                      <button
+                        className="btn"
+                        type="button"
+                        onClick={() => onAddModelObject()}
+                      >
+                        Add Object
+                      </button>
+                    </div>
+                  </div>
+
+                  <label className="modelNotes">
+                    Notes
+                    <textarea
+                      className="docsEditor"
+                      value={modelData.notes}
+                      onChange={(e) =>
+                        onUpdateModelField("notes", e.target.value)
+                      }
+                    />
+                  </label>
+
+                  <div className="docsEditorActions">
+                    <button
+                      className="btn"
+                      type="button"
+                      onClick={() => onCloseModel()}
+                    >
+                      Close Model
+                    </button>
+
+                    <button
+                      className="btn"
+                      type="button"
+                      onClick={() => void onSaveModel()}
+                    >
+                      Save Model
+                    </button>
+                  </div>
+                </>
+              ) : (
+                <div className="emptyState">Create or open a model scene.</div>
+              )}
+            </Panel>
+          </section>
+        </div>
+      );
     default:
       return null;
   }

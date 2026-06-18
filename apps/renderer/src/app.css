@@ -590,3 +590,74 @@ html, body, #root {
   border-radius: 6px;
   font-size: 12px;
 }
+
+.modelMeta {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 12px;
+  font-size: 12px;
+  opacity: 0.85;
+}
+
+.modelFormGrid,
+.modelObjectFormGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 10px;
+  margin-bottom: 14px;
+  align-items: end;
+}
+
+.modelFormGrid label,
+.modelObjectFormGrid label,
+.modelNotes {
+  display: grid;
+  gap: 6px;
+  font-size: 12px;
+}
+
+.modelCheckbox {
+  display: flex !important;
+  align-items: center;
+  gap: 8px;
+}
+
+.modelPreviewBox,
+.modelObjectForm {
+  border: 1px solid #333;
+  border-radius: 8px;
+  overflow: hidden;
+  margin-bottom: 14px;
+}
+
+.modelPreviewTitle,
+.modelSectionTitle {
+  padding: 8px 10px;
+  background: #151515;
+  border-bottom: 1px solid #333;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.modelPreviewGrid {
+  min-height: 180px;
+  padding: 10px;
+  display: grid;
+  gap: 8px;
+  background:
+    linear-gradient(#161616 1px, transparent 1px),
+    linear-gradient(90deg, #161616 1px, transparent 1px);
+  background-size: 24px 24px;
+  background-color: #0d0d0d;
+}
+
+.modelObjectCard {
+  display: grid;
+  gap: 4px;
+  padding: 8px;
+  border: 1px solid #333;
+  border-radius: 8px;
+  background: rgba(20, 20, 20, 0.9);
+  font-size: 12px;
+}
