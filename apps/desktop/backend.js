@@ -18,6 +18,7 @@ const appMetadata = require("./services/app/metadata");
 const assets = require("./services/assets");
 const docs = require("./services/docs");
 const code = require("./services/code");
+const sheets = require("./services/sheets");
 
 
 async function readRecents() {
@@ -464,7 +465,21 @@ const METHODS = {
   "code.save": async (params) => {
     return code.saveCodeFile(params);
   },
-
+  "sheets.ensure": async (params) => {
+    return sheets.ensureSheetsStorage(params?.projectRoot);
+  },
+  "sheets.list": async (params) => {
+    return sheets.listSheets(params);
+  },
+  "sheets.create": async (params) => {
+    return sheets.createSheet(params);
+  },
+  "sheets.read": async (params) => {
+    return sheets.readSheet(params);
+  },
+  "sheets.save": async (params) => {
+    return sheets.saveSheet(params);
+  },
 };
 
 function makeJsonRpcResponse(id, result, error) {
