@@ -90,6 +90,21 @@ type CodeFileInfo = {
   language: string;
 };
 
+type SheetInfo = {
+  name: string;
+  path: string;
+};
+
+type SheetData = {
+  version: number;
+  name: string;
+  rows: number;
+  columns: number;
+  cells: string[][];
+  createdAt: string;
+  updatedAt: string;
+};
+
 function readStoredBoolean(key: string, fallback: boolean) {
   try {
     const raw = window.localStorage.getItem(key);
@@ -153,6 +168,11 @@ export default function App() {
   const [activeCodeLanguage, setActiveCodeLanguage] = useState("");
   const [codeContent, setCodeContent] = useState("");
   const [codeDirty, setCodeDirty] = useState(false);
+  const [sheetsList, setSheetsList] = useState<SheetInfo[]>([]);
+  const [newSheetName, setNewSheetName] = useState("");
+  const [activeSheetName, setActiveSheetName] = useState("");
+  const [sheetData, setSheetData] = useState<SheetData | null>(null);
+  const [sheetDirty, setSheetDirty] = useState(false);
 
 async function handleOpenProject() {
   try {
@@ -604,6 +624,157 @@ function handleCloseCodeFile() {
   setStatus("Closed code file");
 }
 
+async function refreshSheets(root = projectRoot) {
+  try {
+    if (!root) {
+      setSheetsList([]);
+      setActiveSheetName("");
+      setSheetData(null);
+      setSheetDirty(false);
+      return;
+    }
+
+    await rpc("sheets.ensure", { projectRoot: root });
+
+    const result = await rpc<{ sheets: SheetInfo[] }>("sheets.list", {
+      projectRoot: root,
+    });
+
+    setSheetsList(result.sheets);
+  } catch (e: any) {
+    setStatus(`Sheets error: ${e.message || String(e)}`);
+  }
+}
+
+async function handleCreateSheet() {
+  try {
+    if (!projectRoot) {
+      setStatus("Open a project before creating sheets");
+      return;
+    }
+
+    const name = newSheetName.trim();
+
+    if (!name) {
+      setStatus("Sheet name is required");
+      return;
+    }
+
+    const created = await rpc<{
+      name: string;
+      path: string;
+      sheet: SheetData;
+    }>("sheets.create", {
+      projectRoot,
+      name,
+    });
+
+    setActiveSheetName(created.name);
+    setSheetData(created.sheet);
+    setSheetDirty(false);
+    setNewSheetName("");
+    await refreshSheets(projectRoot);
+    setStatus(`Created sheet: ${created.name}`);
+  } catch (e: any) {
+    setStatus(`Sheets error: ${e.message || String(e)}`);
+  }
+}
+
+async function handleOpenSheet(name: string) {
+  try {
+    if (!projectRoot) {
+      setStatus("Open a project before opening sheets");
+      return;
+    }
+
+    if (sheetDirty) {
+      const shouldOpen = window.confirm(
+        "The current sheet has unsaved changes. Open another sheet without saving?"
+      );
+
+      if (!shouldOpen) return;
+    }
+
+    const opened = await rpc<{
+      name: string;
+      path: string;
+      sheet: SheetData;
+    }>("sheets.read", {
+      projectRoot,
+      name,
+    });
+
+    setActiveSheetName(opened.name);
+    setSheetData(opened.sheet);
+    setSheetDirty(false);
+    setStatus(`Opened sheet: ${opened.name}`);
+  } catch (e: any) {
+    setStatus(`Sheets error: ${e.message || String(e)}`);
+  }
+}
+
+async function handleSaveSheet() {
+  try {
+    if (!projectRoot) {
+      setStatus("Open a project before saving sheets");
+      return;
+    }
+
+    if (!activeSheetName || !sheetData) {
+      setStatus("Open a sheet before saving");
+      return;
+    }
+
+    const saved = await rpc<{
+      name: string;
+      path: string;
+      sheet: SheetData;
+    }>("sheets.save", {
+      projectRoot,
+      name: activeSheetName,
+      sheet: sheetData,
+    });
+
+    setActiveSheetName(saved.name);
+    setSheetData(saved.sheet);
+    setSheetDirty(false);
+    setStatus(`Saved sheet: ${saved.name}`);
+  } catch (e: any) {
+    setStatus(`Sheets save error: ${e.message || String(e)}`);
+  }
+}
+
+function handleCloseSheet() {
+  if (sheetDirty) {
+    const shouldClose = window.confirm(
+      "This sheet has unsaved changes. Close without saving?"
+    );
+
+    if (!shouldClose) return;
+  }
+
+  setActiveSheetName("");
+  setSheetData(null);
+  setSheetDirty(false);
+  setStatus("Closed sheet");
+}
+
+function handleUpdateSheetCell(rowIndex: number, columnIndex: number, value: string) {
+  setSheetData((current) => {
+    if (!current) return current;
+
+    const nextCells = current.cells.map((row) => [...row]);
+    nextCells[rowIndex][columnIndex] = value;
+
+    return {
+      ...current,
+      cells: nextCells,
+    };
+  });
+
+  setSheetDirty(true);
+}
+
 async function refreshAssets(root = projectRoot) {
   try {
     if (!root) {
@@ -739,6 +910,11 @@ useEffect(() => {
 
 useEffect(() => {
   void refreshCodeFiles(projectRoot);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+}, [projectRoot]);
+
+useEffect(() => {
+  void refreshSheets(projectRoot);
   // eslint-disable-next-line react-hooks/exhaustive-deps
 }, [projectRoot]);
 
@@ -1101,6 +1277,17 @@ useEffect(() => {
           onOpenCodeFile={handleOpenCodeFile}
           onSaveCodeFile={handleSaveCodeFile}
           onCloseCodeFile={handleCloseCodeFile}
+          sheetsList={sheetsList}
+          newSheetName={newSheetName}
+          setNewSheetName={setNewSheetName}
+          activeSheetName={activeSheetName}
+          sheetData={sheetData}
+          sheetDirty={sheetDirty}
+          onCreateSheet={handleCreateSheet}
+          onOpenSheet={handleOpenSheet}
+          onSaveSheet={handleSaveSheet}
+          onCloseSheet={handleCloseSheet}
+          onUpdateSheetCell={handleUpdateSheetCell}
         />
       </section>
 
@@ -1315,6 +1502,17 @@ type WorkspaceProps = {
   onOpenCodeFile: (name: string) => Promise<void>;
   onSaveCodeFile: () => Promise<void>;
   onCloseCodeFile: () => void;
+  sheetsList: SheetInfo[];
+  newSheetName: string;
+  setNewSheetName: React.Dispatch<React.SetStateAction<string>>;
+  activeSheetName: string;
+  sheetData: SheetData | null;
+  sheetDirty: boolean;
+  onCreateSheet: () => Promise<void>;
+  onOpenSheet: (name: string) => Promise<void>;
+  onSaveSheet: () => Promise<void>;
+  onCloseSheet: () => void;
+  onUpdateSheetCell: (rowIndex: number, columnIndex: number, value: string) => void;
 };
 
 function Workspace({
@@ -1345,6 +1543,17 @@ function Workspace({
   onOpenCodeFile,
   onSaveCodeFile,
   onCloseCodeFile,
+  sheetsList,
+  newSheetName,
+  setNewSheetName,
+  activeSheetName,
+  sheetData,
+  sheetDirty,
+  onCreateSheet,
+  onOpenSheet,
+  onSaveSheet,
+  onCloseSheet,
+  onUpdateSheetCell,
 }: WorkspaceProps) {
   switch (active) {
     case "code":
@@ -1556,7 +1765,142 @@ function Workspace({
         </div>
       );
     case "sheets":
-      return <Placeholder title="Sheets" bullets={["Grid", "Formulas", "CSV import/export (later)"]} />;
+      return (
+        <div className="workspaceSplit">
+          <aside className="workspaceSplitSide">
+            <Panel title="Sheets">
+              {!projectRoot && (
+                <div className="emptyState">Open a project to use Sheets.</div>
+              )}
+
+              {projectRoot && (
+                <>
+                  <input
+                    className="input"
+                    value={newSheetName}
+                    onChange={(e) => setNewSheetName(e.target.value)}
+                    placeholder="budget"
+                  />
+
+                  <button
+                    className="btn"
+                    type="button"
+                    onClick={() => void onCreateSheet()}
+                  >
+                    Create
+                  </button>
+
+                  <div style={{ marginTop: 12 }}>
+                    {sheetsList.length === 0 ? (
+                      <div className="emptyState">No sheets yet</div>
+                    ) : (
+                      sheetsList.map((sheet) => (
+                        <button
+                          key={sheet.name}
+                          className="btn"
+                          type="button"
+                          style={{
+                            width: "100%",
+                            marginBottom: 6,
+                            textAlign: "left",
+                          }}
+                          onClick={() => void onOpenSheet(sheet.name)}
+                        >
+                          {sheet.name}
+                          {activeSheetName === sheet.name ? " ✓" : ""}
+                        </button>
+                      ))
+                    )}
+                  </div>
+                </>
+              )}
+            </Panel>
+          </aside>
+
+          <section className="workspaceSplitMain">
+            <Panel
+              title={
+                activeSheetName
+                  ? `${activeSheetName}${sheetDirty ? " *" : ""}`
+                  : "No sheet selected"
+              }
+            >
+              {activeSheetName && sheetData ? (
+                <>
+                  <div className="sheetMeta">
+                    <span>
+                      {sheetData.rows} rows × {sheetData.columns} columns
+                    </span>
+
+                    <span className={sheetDirty ? "docsDirty" : "docsSaved"}>
+                      {sheetDirty ? "Unsaved changes" : "Saved"}
+                    </span>
+                  </div>
+
+                  <div className="sheetGridWrap">
+                    <table className="sheetGrid">
+                      <thead>
+                        <tr>
+                          <th></th>
+                          {Array.from({ length: sheetData.columns }, (_, columnIndex) => (
+                            <th key={columnIndex}>
+                              {String.fromCharCode(65 + columnIndex)}
+                            </th>
+                          ))}
+                        </tr>
+                      </thead>
+
+                      <tbody>
+                        {sheetData.cells.map((row, rowIndex) => (
+                          <tr key={rowIndex}>
+                            <th>{rowIndex + 1}</th>
+
+                            {row.map((cell, columnIndex) => (
+                              <td key={columnIndex}>
+                                <input
+                                  className="sheetCell"
+                                  value={cell}
+                                  onChange={(e) =>
+                                    onUpdateSheetCell(
+                                      rowIndex,
+                                      columnIndex,
+                                      e.target.value
+                                    )
+                                  }
+                                />
+                              </td>
+                            ))}
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+
+                  <div className="docsEditorActions">
+                    <button
+                      className="btn"
+                      type="button"
+                      onClick={() => onCloseSheet()}
+                    >
+                      Close Sheet
+                    </button>
+
+                    <button
+                      className="btn"
+                      type="button"
+                      onClick={() => void onSaveSheet()}
+                    >
+                      Save Sheet
+                    </button>
+                  </div>
+                </>
+              ) : (
+                <div className="emptyState">Create or open a sheet.</div>
+              )}
+            </Panel>
+          </section>
+        </div>
+      );
     case "modeler":
       return <Placeholder title="Computer Modeling Studio" bullets={["Primitives", "Transforms", "Physics tools (later)"]} />;
     default:

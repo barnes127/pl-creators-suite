@@ -434,3 +434,54 @@ html, body, #root {
   line-height: 1.5;
   tab-size: 2;
 }
+
+.sheetMeta {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 8px;
+  font-size: 12px;
+  opacity: 0.85;
+}
+
+.sheetGridWrap {
+  overflow: auto;
+  border: 1px solid #333;
+  border-radius: 8px;
+  max-width: 100%;
+}
+
+.sheetGrid {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 680px;
+}
+
+.sheetGrid th {
+  background: #151515;
+  color: #cfcfcf;
+  border: 1px solid #333;
+  padding: 6px;
+  font-size: 12px;
+  text-align: center;
+}
+
+.sheetGrid td {
+  border: 1px solid #333;
+  padding: 0;
+}
+
+.sheetCell {
+  width: 100%;
+  min-width: 90px;
+  border: 0;
+  padding: 8px;
+  background: #0d0d0d;
+  color: #e6e6e6;
+  font: inherit;
+}
+
+.sheetCell:focus {
+  outline: 1px solid #666;
+  background: #121212;
+}
