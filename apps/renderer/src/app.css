@@ -485,3 +485,62 @@ html, body, #root {
   outline: 1px solid #666;
   background: #121212;
 }
+
+.sheetToolbar {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 10px;
+  flex-wrap: wrap;
+}
+
+.movieMeta {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 12px;
+  font-size: 12px;
+  opacity: 0.85;
+}
+
+.movieFormGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 10px;
+  margin-bottom: 14px;
+}
+
+.movieFormGrid label,
+.movieNotes {
+  display: grid;
+  gap: 6px;
+  font-size: 12px;
+  opacity: 0.95;
+}
+
+.movieTimelinePreview {
+  border: 1px solid #333;
+  border-radius: 8px;
+  overflow: hidden;
+  margin-bottom: 14px;
+}
+
+.movieTimelineHeader {
+  padding: 8px 10px;
+  background: #151515;
+  border-bottom: 1px solid #333;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.movieTrack {
+  display: grid;
+  grid-template-columns: 1fr 80px 80px;
+  gap: 8px;
+  padding: 8px 10px;
+  border-bottom: 1px solid #262626;
+  font-size: 12px;
+}
+
+.movieTrack:last-child {
+  border-bottom: 0;
+}

@@ -105,6 +105,32 @@ type SheetData = {
   updatedAt: string;
 };
 
+type MovieInfo = {
+  name: string;
+  path: string;
+};
+
+type MovieTrack = {
+  id: string;
+  name: string;
+  type: string;
+  clips: unknown[];
+};
+
+type MovieData = {
+  version: number;
+  name: string;
+  title: string;
+  fps: number;
+  durationSeconds: number;
+  width: number;
+  height: number;
+  tracks: MovieTrack[];
+  notes: string;
+  createdAt: string;
+  updatedAt: string;
+};
+
 function readStoredBoolean(key: string, fallback: boolean) {
   try {
     const raw = window.localStorage.getItem(key);
@@ -173,6 +199,11 @@ export default function App() {
   const [activeSheetName, setActiveSheetName] = useState("");
   const [sheetData, setSheetData] = useState<SheetData | null>(null);
   const [sheetDirty, setSheetDirty] = useState(false);
+  const [moviesList, setMoviesList] = useState<MovieInfo[]>([]);
+  const [newMovieName, setNewMovieName] = useState("");
+  const [activeMovieName, setActiveMovieName] = useState("");
+  const [movieData, setMovieData] = useState<MovieData | null>(null);
+  const [movieDirty, setMovieDirty] = useState(false);
 
 async function handleOpenProject() {
   try {
@@ -844,6 +875,157 @@ function handleDeleteLastSheetColumn() {
   setSheetDirty(true);
 }
 
+async function refreshMovies(root = projectRoot) {
+  try {
+    if (!root) {
+      setMoviesList([]);
+      setActiveMovieName("");
+      setMovieData(null);
+      setMovieDirty(false);
+      return;
+    }
+
+    await rpc("movies.ensure", { projectRoot: root });
+
+    const result = await rpc<{ movies: MovieInfo[] }>("movies.list", {
+      projectRoot: root,
+    });
+
+    setMoviesList(result.movies);
+  } catch (e: any) {
+    setStatus(`Movie error: ${e.message || String(e)}`);
+  }
+}
+
+async function handleCreateMovie() {
+  try {
+    if (!projectRoot) {
+      setStatus("Open a project before creating movies");
+      return;
+    }
+
+    const name = newMovieName.trim();
+
+    if (!name) {
+      setStatus("Movie name is required");
+      return;
+    }
+
+    const created = await rpc<{
+      name: string;
+      path: string;
+      movie: MovieData;
+    }>("movies.create", {
+      projectRoot,
+      name,
+    });
+
+    setActiveMovieName(created.name);
+    setMovieData(created.movie);
+    setMovieDirty(false);
+    setNewMovieName("");
+    await refreshMovies(projectRoot);
+    setStatus(`Created movie: ${created.name}`);
+  } catch (e: any) {
+    setStatus(`Movie error: ${e.message || String(e)}`);
+  }
+}
+
+async function handleOpenMovie(name: string) {
+  try {
+    if (!projectRoot) {
+      setStatus("Open a project before opening movies");
+      return;
+    }
+
+    if (movieDirty) {
+      const shouldOpen = window.confirm(
+        "The current movie has unsaved changes. Open another movie without saving?"
+      );
+
+      if (!shouldOpen) return;
+    }
+
+    const opened = await rpc<{
+      name: string;
+      path: string;
+      movie: MovieData;
+    }>("movies.read", {
+      projectRoot,
+      name,
+    });
+
+    setActiveMovieName(opened.name);
+    setMovieData(opened.movie);
+    setMovieDirty(false);
+    setStatus(`Opened movie: ${opened.name}`);
+  } catch (e: any) {
+    setStatus(`Movie error: ${e.message || String(e)}`);
+  }
+}
+
+async function handleSaveMovie() {
+  try {
+    if (!projectRoot) {
+      setStatus("Open a project before saving movies");
+      return;
+    }
+
+    if (!activeMovieName || !movieData) {
+      setStatus("Open a movie before saving");
+      return;
+    }
+
+    const saved = await rpc<{
+      name: string;
+      path: string;
+      movie: MovieData;
+    }>("movies.save", {
+      projectRoot,
+      name: activeMovieName,
+      movie: movieData,
+    });
+
+    setActiveMovieName(saved.name);
+    setMovieData(saved.movie);
+    setMovieDirty(false);
+    setStatus(`Saved movie: ${saved.name}`);
+  } catch (e: any) {
+    setStatus(`Movie save error: ${e.message || String(e)}`);
+  }
+}
+
+function handleCloseMovie() {
+  if (movieDirty) {
+    const shouldClose = window.confirm(
+      "This movie has unsaved changes. Close without saving?"
+    );
+
+    if (!shouldClose) return;
+  }
+
+  setActiveMovieName("");
+  setMovieData(null);
+  setMovieDirty(false);
+  setStatus("Closed movie");
+}
+
+function handleUpdateMovieField<K extends keyof MovieData>(
+  field: K,
+  value: MovieData[K]
+) {
+  setMovieData((current) => {
+    if (!current) return current;
+
+    return {
+      ...current,
+      [field]: value,
+    };
+  });
+
+  setMovieDirty(true);
+}
+
 async function refreshAssets(root = projectRoot) {
   try {
     if (!root) {
@@ -984,6 +1166,11 @@ useEffect(() => {
 
 useEffect(() => {
   void refreshSheets(projectRoot);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+}, [projectRoot]);
+
+useEffect(() => {
+  void refreshMovies(projectRoot);
   // eslint-disable-next-line react-hooks/exhaustive-deps
 }, [projectRoot]);
 
@@ -1361,6 +1548,17 @@ useEffect(() => {
           onAddSheetColumn={handleAddSheetColumn}
           onDeleteLastSheetRow={handleDeleteLastSheetRow}
           onDeleteLastSheetColumn={handleDeleteLastSheetColumn}
+          moviesList={moviesList}
+          newMovieName={newMovieName}
+          setNewMovieName={setNewMovieName}
+          activeMovieName={activeMovieName}
+          movieData={movieData}
+          movieDirty={movieDirty}
+          onCreateMovie={handleCreateMovie}
+          onOpenMovie={handleOpenMovie}
+          onSaveMovie={handleSaveMovie}
+          onCloseMovie={handleCloseMovie}
+          onUpdateMovieField={handleUpdateMovieField}
         />
       </section>
 
@@ -1590,6 +1788,20 @@ type WorkspaceProps = {
   onAddSheetColumn: () => void;
   onDeleteLastSheetRow: () => void;
   onDeleteLastSheetColumn: () => void;
+  moviesList: MovieInfo[];
+  newMovieName: string;
+  setNewMovieName: React.Dispatch<React.SetStateAction<string>>;
+  activeMovieName: string;
+  movieData: MovieData | null;
+  movieDirty: boolean;
+  onCreateMovie: () => Promise<void>;
+  onOpenMovie: (name: string) => Promise<void>;
+  onSaveMovie: () => Promise<void>;
+  onCloseMovie: () => void;
+  onUpdateMovieField: <K extends keyof MovieData>(
+    field: K,
+    value: MovieData[K]
+  ) => void;
 };
 
 function Workspace({
@@ -1635,6 +1847,17 @@ function Workspace({
   onAddSheetColumn,
   onDeleteLastSheetRow,
   onDeleteLastSheetColumn,
+  moviesList,
+  newMovieName,
+  setNewMovieName,
+  activeMovieName,
+  movieData,
+  movieDirty,
+  onCreateMovie,
+  onOpenMovie,
+  onSaveMovie,
+  onCloseMovie,
+  onUpdateMovieField,
 }: WorkspaceProps) {
   switch (active) {
     case "code":
@@ -1748,7 +1971,195 @@ function Workspace({
     case "game":
       return <Placeholder title="Game Studio" bullets={["Scene graph", "Play mode", "Asset links (later)"]} />;
     case "movie":
-      return <Placeholder title="Movie / Animation Studio" bullets={["Media bin", "Timeline", "Export (later)"]} />;
+      return (
+        <div className="workspaceSplit">
+          <aside className="workspaceSplitSide">
+            <Panel title="Movies">
+              {!projectRoot && (
+                <div className="emptyState">Open a project to use Movie Studio.</div>
+              )}
+
+              {projectRoot && (
+                <>
+                  <input
+                    className="input"
+                    value={newMovieName}
+                    onChange={(e) => setNewMovieName(e.target.value)}
+                    placeholder="intro"
+                  />
+
+                  <button
+                    className="btn"
+                    type="button"
+                    onClick={() => void onCreateMovie()}
+                  >
+                    Create
+                  </button>
+
+                  <div style={{ marginTop: 12 }}>
+                    {moviesList.length === 0 ? (
+                      <div className="emptyState">No movies yet</div>
+                    ) : (
+                      moviesList.map((movie) => (
+                        <button
+                          key={movie.name}
+                          className="btn"
+                          type="button"
+                          style={{
+                            width: "100%",
+                            marginBottom: 6,
+                            textAlign: "left",
+                          }}
+                          onClick={() => void onOpenMovie(movie.name)}
+                        >
+                          {movie.name}
+                          {activeMovieName === movie.name ? " ✓" : ""}
+                        </button>
+                      ))
+                    )}
+                  </div>
+                </>
+              )}
+            </Panel>
+          </aside>
+
+          <section className="workspaceSplitMain">
+            <Panel
+              title={
+                activeMovieName
+                  ? `${activeMovieName}${movieDirty ? " *" : ""}`
+                  : "No movie selected"
+              }
+            >
+              {activeMovieName && movieData ? (
+                <>
+                  <div className="movieMeta">
+                    <span>
+                      {movieData.width}×{movieData.height} · {movieData.fps} FPS ·{" "}
+                      {movieData.durationSeconds}s
+                    </span>
+
+                    <span className={movieDirty ? "docsDirty" : "docsSaved"}>
+                      {movieDirty ? "Unsaved changes" : "Saved"}
+                    </span>
+                  </div>
+
+                  <div className="movieFormGrid">
+                    <label>
+                      Title
+                      <input
+                        className="input"
+                        value={movieData.title}
+                        onChange={(e) =>
+                          onUpdateMovieField("title", e.target.value)
+                        }
+                      />
+                    </label>
+
+                    <label>
+                      FPS
+                      <input
+                        className="input"
+                        type="number"
+                        min={1}
+                        value={movieData.fps}
+                        onChange={(e) =>
+                          onUpdateMovieField("fps", Number(e.target.value))
+                        }
+                      />
+                    </label>
+
+                    <label>
+                      Duration Seconds
+                      <input
+                        className="input"
+                        type="number"
+                        min={1}
+                        value={movieData.durationSeconds}
+                        onChange={(e) =>
+                          onUpdateMovieField(
+                            "durationSeconds",
+                            Number(e.target.value)
+                          )
+                        }
+                      />
+                    </label>
+
+                    <label>
+                      Width
+                      <input
+                        className="input"
+                        type="number"
+                        min={1}
+                        value={movieData.width}
+                        onChange={(e) =>
+                          onUpdateMovieField("width", Number(e.target.value))
+                        }
+                      />
+                    </label>
+
+                    <label>
+                      Height
+                      <input
+                        className="input"
+                        type="number"
+                        min={1}
+                        value={movieData.height}
+                        onChange={(e) =>
+                          onUpdateMovieField("height", Number(e.target.value))
+                        }
+                      />
+                    </label>
+                  </div>
+
+                  <div className="movieTimelinePreview">
+                    <div className="movieTimelineHeader">Timeline Tracks</div>
+
+                    {movieData.tracks.map((track) => (
+                      <div className="movieTrack" key={track.id}>
+                        <span>{track.name}</span>
+                        <span>{track.type}</span>
+                        <span>{track.clips.length} clips</span>
+                      </div>
+                    ))}
+                  </div>
+
+                  <label className="movieNotes">
+                    Notes
+                    <textarea
+                      className="docsEditor"
+                      value={movieData.notes}
+                      onChange={(e) =>
+                        onUpdateMovieField("notes", e.target.value)
+                      }
+                    />
+                  </label>
+
+                  <div className="docsEditorActions">
+                    <button
+                      className="btn"
+                      type="button"
+                      onClick={() => onCloseMovie()}
+                    >
+                      Close Movie
+                    </button>
+
+                    <button
+                      className="btn"
+                      type="button"
+                      onClick={() => void onSaveMovie()}
+                    >
+                      Save Movie
+                    </button>
+                  </div>
+                </>
+              ) : (
+                <div className="emptyState">Create or open a movie.</div>
+              )}
+            </Panel>
+          </section>
+        </div>
+      );
     case "docs":
       return (
         <div className="workspaceSplit">
