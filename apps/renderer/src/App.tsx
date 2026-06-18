@@ -775,6 +775,75 @@ function handleUpdateSheetCell(rowIndex: number, columnIndex: number, value: str
   setSheetDirty(true);
 }
 
+function handleAddSheetRow() {
+  setSheetData((current) => {
+    if (!current) return current;
+
+    return {
+      ...current,
+      rows: current.rows + 1,
+      cells: [
+        ...current.cells,
+        Array.from({ length: current.columns }, () => ""),
+      ],
+    };
+  });
+
+  setSheetDirty(true);
+}
+
+function handleAddSheetColumn() {
+  setSheetData((current) => {
+    if (!current) return current;
+
+    return {
+      ...current,
+      columns: current.columns + 1,
+      cells: current.cells.map((row) => [...row, ""]),
+    };
+  });
+
+  setSheetDirty(true);
+}
+
+function handleDeleteLastSheetRow() {
+  setSheetData((current) => {
+    if (!current) return current;
+
+    if (current.rows <= 1) {
+      setStatus("Sheet must have at least one row");
+      return current;
+    }
+
+    return {
+      ...current,
+      rows: current.rows - 1,
+      cells: current.cells.slice(0, -1),
+    };
+  });
+
+  setSheetDirty(true);
+}
+
+function handleDeleteLastSheetColumn() {
+  setSheetData((current) => {
+    if (!current) return current;
+
+    if (current.columns <= 1) {
+      setStatus("Sheet must have at least one column");
+      return current;
+    }
+
+    return {
+      ...current,
+      columns: current.columns - 1,
+      cells: current.cells.map((row) => row.slice(0, -1)),
+    };
+  });
+
+  setSheetDirty(true);
+}
+
 async function refreshAssets(root = projectRoot) {
   try {
     if (!root) {
@@ -1288,6 +1357,10 @@ useEffect(() => {
           onSaveSheet={handleSaveSheet}
           onCloseSheet={handleCloseSheet}
           onUpdateSheetCell={handleUpdateSheetCell}
+          onAddSheetRow={handleAddSheetRow}
+          onAddSheetColumn={handleAddSheetColumn}
+          onDeleteLastSheetRow={handleDeleteLastSheetRow}
+          onDeleteLastSheetColumn={handleDeleteLastSheetColumn}
         />
       </section>
 
@@ -1513,6 +1586,10 @@ type WorkspaceProps = {
   onSaveSheet: () => Promise<void>;
   onCloseSheet: () => void;
   onUpdateSheetCell: (rowIndex: number, columnIndex: number, value: string) => void;
+  onAddSheetRow: () => void;
+  onAddSheetColumn: () => void;
+  onDeleteLastSheetRow: () => void;
+  onDeleteLastSheetColumn: () => void;
 };
 
 function Workspace({
@@ -1554,6 +1631,10 @@ function Workspace({
   onSaveSheet,
   onCloseSheet,
   onUpdateSheetCell,
+  onAddSheetRow,
+  onAddSheetColumn,
+  onDeleteLastSheetRow,
+  onDeleteLastSheetColumn,
 }: WorkspaceProps) {
   switch (active) {
     case "code":
@@ -1835,6 +1916,40 @@ function Workspace({
                     <span className={sheetDirty ? "docsDirty" : "docsSaved"}>
                       {sheetDirty ? "Unsaved changes" : "Saved"}
                     </span>
+                  </div>
+
+                  <div className="sheetToolbar">
+                    <button
+                      className="btn"
+                      type="button"
+                      onClick={() => onAddSheetRow()}
+                    >
+                      Add Row
+                    </button>
+
+                    <button
+                      className="btn"
+                      type="button"
+                      onClick={() => onAddSheetColumn()}
+                    >
+                      Add Column
+                    </button>
+
+                    <button
+                      className="btn"
+                      type="button"
+                      onClick={() => onDeleteLastSheetRow()}
+                    >
+                      Delete Last Row
+                    </button>
+
+                    <button
+                      className="btn"
+                      type="button"
+                      onClick={() => onDeleteLastSheetColumn()}
+                    >
+                      Delete Last Column
+                    </button>
                   </div>
 
                   <div className="sheetGridWrap">
