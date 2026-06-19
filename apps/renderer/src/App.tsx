@@ -27,6 +27,10 @@ import {
   setWorldGravityEnabled2D,
   applyImpulse2D,
   resolveWorldCollisions2D,
+  interpolateNumber,
+  interpolateVec2,
+  sampleNumericKeyframes,
+  sampleVec2Keyframes,
 } from "./engines";
 
 declare global {
@@ -2645,6 +2649,52 @@ function PhysicsSmokePanel() {
           (body) => body.id === "overlap-a"
         );
 
+        const linearMotionValue = interpolateNumber(0, 100, 0.25, "linear");
+        const easedMotionValue = interpolateNumber(0, 100, 0.25, "easeInOut");
+
+        const interpolatedVec2 = interpolateVec2(
+          physicsVec2(0, 0),
+          physicsVec2(100, 50),
+          0.5,
+          "easeOut"
+        );
+
+        const sampledNumericKeyframe = sampleNumericKeyframes(
+          [
+            {
+              id: "kf-1",
+              time: 0,
+              value: 0,
+              easing: "easeInOut",
+            },
+            {
+              id: "kf-2",
+              time: 2,
+              value: 100,
+              easing: "linear",
+            },
+          ],
+          1
+        );
+
+        const sampledVec2Keyframe = sampleVec2Keyframes(
+          [
+            {
+              id: "pos-1",
+              time: 0,
+              value: physicsVec2(0, 0),
+              easing: "easeOut",
+            },
+            {
+              id: "pos-2",
+              time: 2,
+              value: physicsVec2(100, 50),
+              easing: "linear",
+            },
+          ],
+          1
+        );
+
   return (
     <Panel title="Physics / Simulation Engine Smoke Test">
       <div className="physicsSmokeGrid">
@@ -2745,6 +2795,24 @@ function PhysicsSmokePanel() {
             resolved overlap-a pos [
             {overlapA?.position.x.toFixed(2) ?? "0.00"},{" "}
             {overlapA?.position.y.toFixed(2) ?? "0.00"}]
+          </code>
+        </div>
+        
+        <div className="physicsSmokeCard">
+          <strong>Motion Curves</strong>
+          <span>interpolation + keyframe sampling</span>
+          <code>linear 0→100 @ 0.25 = {linearMotionValue.toFixed(2)}</code>
+          <code>easeInOut 0→100 @ 0.25 = {easedMotionValue.toFixed(2)}</code>
+          <code>
+            vec2 easeOut @ 0.5 = [{interpolatedVec2.x.toFixed(2)},{" "}
+            {interpolatedVec2.y.toFixed(2)}]
+          </code>
+          <code>
+            sampled value @ 1s = {sampledNumericKeyframe.toFixed(2)}
+          </code>
+          <code>
+            sampled vec2 @ 1s = [{sampledVec2Keyframe.x.toFixed(2)},{" "}
+            {sampledVec2Keyframe.y.toFixed(2)}]
           </code>
         </div>
       </div>
