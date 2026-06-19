@@ -32,7 +32,10 @@ import {
   sampleNumericKeyframes,
   sampleVec2Keyframes,
   resetWorld2D,
-  type SimulationWorld2D
+  type SimulationWorld2D,
+  gameEntityToPhysicsBody2D,
+  modelObjectToPhysicsBody2D,
+  sampleAnimationMotion2D,
 } from "./engines";
 
 declare global {
@@ -2732,6 +2735,62 @@ function PhysicsSmokePanel() {
           1
         );
 
+        const modelAdapterBody = modelObjectToPhysicsBody2D({
+          id: "adapter-cube",
+          name: "Adapter Cube",
+          primitive: "cube",
+          position: [3, 4, 0],
+          rotation: [0, 0, 0],
+          scale: [2, 2, 2],
+        });
+
+        const gameAdapterBody = gameEntityToPhysicsBody2D({
+          id: "adapter-player",
+          name: "Adapter Player",
+          type: "player",
+          x: 8,
+          y: 6,
+          properties: {
+            width: 4,
+            height: 5,
+            mass: 2,
+          },
+        });
+
+        const sampledAnimationMotion = sampleAnimationMotion2D(
+          [
+            {
+              id: "pos-a",
+              time: 0,
+              x: 0,
+              y: 0,
+              easing: "easeInOut",
+            },
+            {
+              id: "pos-b",
+              time: 2,
+              x: 100,
+              y: 50,
+              easing: "linear",
+            },
+          ],
+          [
+            {
+              id: "opacity-a",
+              time: 0,
+              value: 0,
+              easing: "linear",
+            },
+            {
+              id: "opacity-b",
+              time: 2,
+              value: 1,
+              easing: "linear",
+            },
+          ],
+          1
+        );
+
   return (
     <Panel title="Physics / Simulation Engine Smoke Test">
       <div className="physicsSmokeGrid">
@@ -2850,6 +2909,24 @@ function PhysicsSmokePanel() {
           <code>
             sampled vec2 @ 1s = [{sampledVec2Keyframe.x.toFixed(2)},{" "}
             {sampledVec2Keyframe.y.toFixed(2)}]
+          </code>
+        </div>
+        
+                <div className="physicsSmokeCard">
+          <strong>Integration Contracts</strong>
+          <span>model/game/animation adapters</span>
+          <code>
+            model body pos [{modelAdapterBody.position.x.toFixed(2)},{" "}
+            {modelAdapterBody.position.y.toFixed(2)}]
+          </code>
+          <code>
+            game body size [{gameAdapterBody.size.x.toFixed(2)},{" "}
+            {gameAdapterBody.size.y.toFixed(2)}]
+          </code>
+          <code>
+            animation sample [{sampledAnimationMotion.position.x.toFixed(2)},{" "}
+            {sampledAnimationMotion.position.y.toFixed(2)}] opacity{" "}
+            {sampledAnimationMotion.opacity.toFixed(2)}
           </code>
         </div>
       </div>
