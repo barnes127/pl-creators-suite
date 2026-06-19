@@ -13,6 +13,13 @@ import {
   magnitudePhysicsVec2,
   physicsVec2,
   stepKinematicBody2D,
+  distance,
+  divideDistanceByTime,
+  formatQuantity,
+  mass,
+  multiplyMassByAcceleration,
+  acceleration,
+  time,
 } from "./engines";
 
 declare global {
@@ -2524,6 +2531,17 @@ function PhysicsSmokePanel() {
   );
 
   const metersFromFeet = convertDistance(10, "ft", "m");
+  const distanceQuantity = distance(10, "m");
+  const timeQuantity = time(2, "s");
+  const velocityQuantity = divideDistanceByTime(distanceQuantity, timeQuantity, "m/s");
+
+  const massQuantity = mass(5, "kg");
+  const accelerationQuantity = acceleration(9.80665, "m/s^2");
+  const forceQuantity = multiplyMassByAcceleration(
+  massQuantity,
+  accelerationQuantity,
+  "N"
+); 
 
   const vector = physicsVec2(3, 4);
   const vectorMagnitude = magnitudePhysicsVec2(vector);
@@ -2562,6 +2580,18 @@ function PhysicsSmokePanel() {
           <strong>Unit Conversion</strong>
           <span>10 ft → meters</span>
           <code>{metersFromFeet.toFixed(4)} m</code>
+        </div>
+
+        <div className="physicsSmokeCard">
+          <strong>Quantity Velocity</strong>
+          <span>10 m / 2 s</span>
+          <code>{formatQuantity(velocityQuantity, 4)}</code>
+        </div>
+
+        <div className="physicsSmokeCard">
+          <strong>Quantity Force</strong>
+          <span>5 kg * 9.80665 m/s²</span>
+          <code>{formatQuantity(forceQuantity, 4)}</code>
         </div>
 
         <div className="physicsSmokeCard">
