@@ -1182,6 +1182,32 @@ function handleAddMovieClip() {
   setStatus(`Added clip: ${name}`);
 }
 
+function handleDeleteMovieClip(trackId: string, clipId: string) {
+  if (!movieData) {
+    setStatus("Open a movie before deleting clips");
+    return;
+  }
+
+  setMovieData((current) => {
+    if (!current) return current;
+
+    return {
+      ...current,
+      tracks: current.tracks.map((track) =>
+        track.id === trackId
+          ? {
+              ...track,
+              clips: track.clips.filter((clip) => clip.id !== clipId),
+            }
+          : track
+      ),
+    };
+  });
+
+  setMovieDirty(true);
+  setStatus("Deleted clip");
+}
+
 async function refreshModels(root = projectRoot) {
   try {
     if (!root) {
@@ -1370,6 +1396,25 @@ function handleAddModelObject() {
   setNewModelPrimitive("cube");
   setModelDirty(true);
   setStatus(`Added object: ${name}`);
+}
+
+function handleDeleteModelObject(objectId: string) {
+  if (!modelData) {
+    setStatus("Open a model scene before deleting objects");
+    return;
+  }
+
+  setModelData((current) => {
+    if (!current) return current;
+
+    return {
+      ...current,
+      objects: current.objects.filter((object) => object.id !== objectId),
+    };
+  });
+
+  setModelDirty(true);
+  setStatus("Deleted model object");
 }
 
 async function refreshGames(root = projectRoot) {
@@ -1611,6 +1656,71 @@ function handleAddGameEntity() {
   setNewGameEntityType("object");
   setGameDirty(true);
   setStatus(`Added entity: ${name}`);
+}
+
+function handleDeleteGameEntity(sceneId: string, entityId: string) {
+  if (!gameData) {
+    setStatus("Open a game before deleting entities");
+    return;
+  }
+
+  setGameData((current) => {
+    if (!current) return current;
+
+    return {
+      ...current,
+      scenes: current.scenes.map((scene) =>
+        scene.id === sceneId
+          ? {
+              ...scene,
+              entities: scene.entities.filter(
+                (entity) => entity.id !== entityId
+              ),
+            }
+          : scene
+      ),
+    };
+  });
+
+  setGameDirty(true);
+  setStatus("Deleted game entity");
+}
+
+function handleDeleteGameScene(sceneId: string) {
+  if (!gameData) {
+    setStatus("Open a game before deleting scenes");
+    return;
+  }
+
+  if (gameData.scenes.length <= 1) {
+    setStatus("Game must have at least one scene");
+    return;
+  }
+
+  const shouldDelete = window.confirm(
+    "Delete this scene and all entities inside it?"
+  );
+
+  if (!shouldDelete) return;
+
+  setGameData((current) => {
+    if (!current) return current;
+
+    const nextScenes = current.scenes.filter((scene) => scene.id !== sceneId);
+
+    return {
+      ...current,
+      scenes: nextScenes,
+    };
+  });
+
+  if (newGameEntitySceneId === sceneId) {
+    const fallbackScene = gameData.scenes.find((scene) => scene.id !== sceneId);
+    setNewGameEntitySceneId(fallbackScene?.id || "");
+  }
+
+  setGameDirty(true);
+  setStatus("Deleted game scene");
 }
 
 async function refreshAssets(root = projectRoot) {
@@ -2202,6 +2312,10 @@ useEffect(() => {
           onUpdateGameField={handleUpdateGameField}
           onAddGameScene={handleAddGameScene}
           onAddGameEntity={handleAddGameEntity}
+          onDeleteMovieClip={handleDeleteMovieClip}
+          onDeleteModelObject={handleDeleteModelObject}
+          onDeleteGameEntity={handleDeleteGameEntity}
+          onDeleteGameScene={handleDeleteGameScene}
         />
       </section>
 
@@ -2497,6 +2611,10 @@ type WorkspaceProps = {
   ) => void;
   onAddGameScene: () => void;
   onAddGameEntity: () => void;
+  onDeleteMovieClip: (trackId: string, clipId: string) => void;
+  onDeleteModelObject: (objectId: string) => void;
+  onDeleteGameEntity: (sceneId: string, entityId: string) => void;
+  onDeleteGameScene: (sceneId: string) => void;
 };
 
 function Workspace({
@@ -2599,6 +2717,10 @@ function Workspace({
   onUpdateGameField,
   onAddGameScene,
   onAddGameEntity,
+  onDeleteMovieClip,
+  onDeleteModelObject,
+  onDeleteGameEntity,
+  onDeleteGameScene,
 }: WorkspaceProps) {
   switch (active) {
     case "code":
@@ -2912,7 +3034,16 @@ function Workspace({
                       <div className="gameSceneBlock" key={scene.id}>
                         <div className="gameSceneHeader">
                           <strong>{scene.name}</strong>
+
                           <span>{scene.entities.length} entities</span>
+
+                          <button
+                            className="btn btn-ghost"
+                            type="button"
+                            onClick={() => onDeleteGameScene(scene.id)}
+                          >
+                            Delete Scene
+                          </button>
                         </div>
 
                         {scene.entities.length === 0 ? (
@@ -2926,6 +3057,14 @@ function Workspace({
                                 <span>
                                   pos [{entity.x}, {entity.y}]
                                 </span>
+
+                                <button
+                                  className="btn btn-ghost"
+                                  type="button"
+                                  onClick={() => onDeleteGameEntity(scene.id, entity.id)}
+                                >
+                                  Delete
+                                </button>
                               </div>
                             ))}
                           </div>
@@ -3192,6 +3331,14 @@ function Workspace({
                                 <span>{clip.name}</span>
                                 <span>start {clip.startSeconds}s</span>
                                 <span>{clip.durationSeconds}s</span>
+
+                                <button
+                                  className="btn btn-ghost"
+                                  type="button"
+                                  onClick={() => onDeleteMovieClip(track.id, clip.id)}
+                                >
+                                  Delete
+                                </button>
                               </div>
                             ))}
                           </div>
@@ -3626,12 +3773,16 @@ function Workspace({
                           <div className="modelObjectCard" key={object.id}>
                             <strong>{object.name}</strong>
                             <span>{object.primitive}</span>
-                            <span>
-                              pos [{object.position.join(", ")}]
-                            </span>
-                            <span>
-                              scale [{object.scale.join(", ")}]
-                            </span>
+                            <span>pos [{object.position.join(", ")}]</span>
+                            <span>scale [{object.scale.join(", ")}]</span>
+
+                            <button
+                              className="btn btn-ghost"
+                              type="button"
+                              onClick={() => onDeleteModelObject(object.id)}
+                            >
+                              Delete
+                            </button>
                           </div>
                         ))
                       )}
