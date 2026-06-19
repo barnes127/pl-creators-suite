@@ -21,6 +21,7 @@ const code = require("./services/code");
 const sheets = require("./services/sheets");
 const movies = require("./services/movies");
 const models = require("./services/models");
+const games = require("./services/games");
 
 
 async function readRecents() {
@@ -511,6 +512,21 @@ const METHODS = {
   },
   "models.save": async (params) => {
     return models.saveModel(params);
+  },
+  "games.ensure": async (params) => {
+    return games.ensureGamesStorage(params?.projectRoot);
+  },
+  "games.list": async (params) => {
+    return games.listGames(params);
+  },
+  "games.create": async (params) => {
+    return games.createGame(params);
+  },
+  "games.read": async (params) => {
+    return games.readGame(params);
+  },
+  "games.save": async (params) => {
+    return games.saveGame(params);
   },
 };
 
