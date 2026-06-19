@@ -661,3 +661,79 @@ html, body, #root {
   background: rgba(20, 20, 20, 0.9);
   font-size: 12px;
 }
+
+.gameMeta {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 12px;
+  font-size: 12px;
+  opacity: 0.85;
+}
+
+.gameFormGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 10px;
+  margin-bottom: 14px;
+  align-items: end;
+}
+
+.gameFormGrid label,
+.gameNotes {
+  display: grid;
+  gap: 6px;
+  font-size: 12px;
+}
+
+.gameSceneForm,
+.gameEntityForm,
+.gameSceneList {
+  border: 1px solid #333;
+  border-radius: 8px;
+  overflow: hidden;
+  margin-bottom: 14px;
+}
+
+.gameSectionTitle {
+  padding: 8px 10px;
+  background: #151515;
+  border-bottom: 1px solid #333;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.gameSceneBlock {
+  border-bottom: 1px solid #262626;
+}
+
+.gameSceneBlock:last-child {
+  border-bottom: 0;
+}
+
+.gameSceneHeader {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 8px 10px;
+  background: #101010;
+  border-bottom: 1px solid #262626;
+  font-size: 12px;
+}
+
+.gameEntityList {
+  display: grid;
+  gap: 8px;
+  padding: 10px;
+}
+
+.gameEntityCard {
+  display: grid;
+  grid-template-columns: 1fr 90px 90px;
+  gap: 8px;
+  padding: 8px;
+  border: 1px solid #333;
+  border-radius: 8px;
+  background: rgba(20, 20, 20, 0.9);
+  font-size: 12px;
+}

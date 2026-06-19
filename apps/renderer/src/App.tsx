@@ -164,6 +164,38 @@ type ModelData = {
   updatedAt: string;
 };
 
+type GameInfo = {
+  name: string;
+  path: string;
+};
+
+type GameEntity = {
+  id: string;
+  name: string;
+  type: string;
+  x: number;
+  y: number;
+  properties: Record<string, unknown>;
+};
+
+type GameScene = {
+  id: string;
+  name: string;
+  entities: GameEntity[];
+};
+
+type GameData = {
+  version: number;
+  name: string;
+  title: string;
+  targetPlatform: string;
+  genre: string;
+  scenes: GameScene[];
+  notes: string;
+  createdAt: string;
+  updatedAt: string;
+};
+
 function readStoredBoolean(key: string, fallback: boolean) {
   try {
     const raw = window.localStorage.getItem(key);
@@ -249,6 +281,17 @@ export default function App() {
 
   const [newModelObjectName, setNewModelObjectName] = useState("");
   const [newModelPrimitive, setNewModelPrimitive] = useState("cube");
+
+  const [gamesList, setGamesList] = useState<GameInfo[]>([]);
+  const [newGameName, setNewGameName] = useState("");
+  const [activeGameName, setActiveGameName] = useState("");
+  const [gameData, setGameData] = useState<GameData | null>(null);
+  const [gameDirty, setGameDirty] = useState(false);
+
+  const [newGameSceneName, setNewGameSceneName] = useState("");
+  const [newGameEntityName, setNewGameEntityName] = useState("");
+  const [newGameEntityType, setNewGameEntityType] = useState("object");
+  const [newGameEntitySceneId, setNewGameEntitySceneId] = useState("");
 
 async function handleOpenProject() {
   try {
@@ -1329,6 +1372,247 @@ function handleAddModelObject() {
   setStatus(`Added object: ${name}`);
 }
 
+async function refreshGames(root = projectRoot) {
+  try {
+    if (!root) {
+      setGamesList([]);
+      setActiveGameName("");
+      setGameData(null);
+      setGameDirty(false);
+      return;
+    }
+
+    await rpc("games.ensure", { projectRoot: root });
+
+    const result = await rpc<{ games: GameInfo[] }>("games.list", {
+      projectRoot: root,
+    });
+
+    setGamesList(result.games);
+  } catch (e: any) {
+    setStatus(`Game error: ${e.message || String(e)}`);
+  }
+}
+
+async function handleCreateGame() {
+  try {
+    if (!projectRoot) {
+      setStatus("Open a project before creating games");
+      return;
+    }
+
+    const name = newGameName.trim();
+
+    if (!name) {
+      setStatus("Game name is required");
+      return;
+    }
+
+    const created = await rpc<{
+      name: string;
+      path: string;
+      game: GameData;
+    }>("games.create", {
+      projectRoot,
+      name,
+    });
+
+    setActiveGameName(created.name);
+    setGameData(created.game);
+    setGameDirty(false);
+    setNewGameName("");
+    setNewGameEntitySceneId(created.game.scenes[0]?.id || "");
+    await refreshGames(projectRoot);
+    setStatus(`Created game: ${created.name}`);
+  } catch (e: any) {
+    setStatus(`Game error: ${e.message || String(e)}`);
+  }
+}
+
+async function handleOpenGame(name: string) {
+  try {
+    if (!projectRoot) {
+      setStatus("Open a project before opening games");
+      return;
+    }
+
+    if (gameDirty) {
+      const shouldOpen = window.confirm(
+        "The current game has unsaved changes. Open another game without saving?"
+      );
+
+      if (!shouldOpen) return;
+    }
+
+    const opened = await rpc<{
+      name: string;
+      path: string;
+      game: GameData;
+    }>("games.read", {
+      projectRoot,
+      name,
+    });
+
+    setActiveGameName(opened.name);
+    setGameData(opened.game);
+    setGameDirty(false);
+    setNewGameEntitySceneId(opened.game.scenes[0]?.id || "");
+    setStatus(`Opened game: ${opened.name}`);
+  } catch (e: any) {
+    setStatus(`Game error: ${e.message || String(e)}`);
+  }
+}
+
+async function handleSaveGame() {
+  try {
+    if (!projectRoot) {
+      setStatus("Open a project before saving games");
+      return;
+    }
+
+    if (!activeGameName || !gameData) {
+      setStatus("Open a game before saving");
+      return;
+    }
+
+    const saved = await rpc<{
+      name: string;
+      path: string;
+      game: GameData;
+    }>("games.save", {
+      projectRoot,
+      name: activeGameName,
+      game: gameData,
+    });
+
+    setActiveGameName(saved.name);
+    setGameData(saved.game);
+    setGameDirty(false);
+    setStatus(`Saved game: ${saved.name}`);
+  } catch (e: any) {
+    setStatus(`Game save error: ${e.message || String(e)}`);
+  }
+}
+
+function handleCloseGame() {
+  if (gameDirty) {
+    const shouldClose = window.confirm(
+      "This game has unsaved changes. Close without saving?"
+    );
+
+    if (!shouldClose) return;
+  }
+
+  setActiveGameName("");
+  setGameData(null);
+  setGameDirty(false);
+  setNewGameSceneName("");
+  setNewGameEntityName("");
+  setNewGameEntityType("object");
+  setNewGameEntitySceneId("");
+  setStatus("Closed game");
+}
+
+function handleUpdateGameField<K extends keyof GameData>(
+  field: K,
+  value: GameData[K]
+) {
+  setGameData((current) => {
+    if (!current) return current;
+
+    return {
+      ...current,
+      [field]: value,
+    };
+  });
+
+  setGameDirty(true);
+}
+
+function handleAddGameScene() {
+  if (!gameData) {
+    setStatus("Open a game before adding scenes");
+    return;
+  }
+
+  const name = newGameSceneName.trim();
+
+  if (!name) {
+    setStatus("Scene name is required");
+    return;
+  }
+
+  const scene: GameScene = {
+    id: `scene-${Date.now()}`,
+    name,
+    entities: [],
+  };
+
+  setGameData((current) => {
+    if (!current) return current;
+
+    return {
+      ...current,
+      scenes: [...current.scenes, scene],
+    };
+  });
+
+  setNewGameSceneName("");
+  setNewGameEntitySceneId(scene.id);
+  setGameDirty(true);
+  setStatus(`Added scene: ${name}`);
+}
+
+function handleAddGameEntity() {
+  if (!gameData) {
+    setStatus("Open a game before adding entities");
+    return;
+  }
+
+  const sceneId = newGameEntitySceneId || gameData.scenes[0]?.id;
+  const name = newGameEntityName.trim();
+
+  if (!sceneId) {
+    setStatus("Game needs at least one scene before adding entities");
+    return;
+  }
+
+  if (!name) {
+    setStatus("Entity name is required");
+    return;
+  }
+
+  const entity: GameEntity = {
+    id: `entity-${Date.now()}`,
+    name,
+    type: newGameEntityType,
+    x: 0,
+    y: 0,
+    properties: {},
+  };
+
+  setGameData((current) => {
+    if (!current) return current;
+
+    return {
+      ...current,
+      scenes: current.scenes.map((scene) =>
+        scene.id === sceneId
+          ? {
+              ...scene,
+              entities: [...scene.entities, entity],
+            }
+          : scene
+      ),
+    };
+  });
+
+  setNewGameEntityName("");
+  setNewGameEntityType("object");
+  setGameDirty(true);
+  setStatus(`Added entity: ${name}`);
+}
+
 async function refreshAssets(root = projectRoot) {
   try {
     if (!root) {
@@ -1479,6 +1763,11 @@ useEffect(() => {
 
 useEffect(() => {
   void refreshModels(projectRoot);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+}, [projectRoot]);
+
+useEffect(() => {
+  void refreshGames(projectRoot);
   // eslint-disable-next-line react-hooks/exhaustive-deps
 }, [projectRoot]);
 
@@ -1892,6 +2181,27 @@ useEffect(() => {
           onCloseModel={handleCloseModel}
           onUpdateModelField={handleUpdateModelField}
           onAddModelObject={handleAddModelObject}
+          gamesList={gamesList}
+          newGameName={newGameName}
+          setNewGameName={setNewGameName}
+          activeGameName={activeGameName}
+          gameData={gameData}
+          gameDirty={gameDirty}
+          newGameSceneName={newGameSceneName}
+          setNewGameSceneName={setNewGameSceneName}
+          newGameEntityName={newGameEntityName}
+          setNewGameEntityName={setNewGameEntityName}
+          newGameEntityType={newGameEntityType}
+          setNewGameEntityType={setNewGameEntityType}
+          newGameEntitySceneId={newGameEntitySceneId}
+          setNewGameEntitySceneId={setNewGameEntitySceneId}
+          onCreateGame={handleCreateGame}
+          onOpenGame={handleOpenGame}
+          onSaveGame={handleSaveGame}
+          onCloseGame={handleCloseGame}
+          onUpdateGameField={handleUpdateGameField}
+          onAddGameScene={handleAddGameScene}
+          onAddGameEntity={handleAddGameEntity}
         />
       </section>
 
@@ -2163,6 +2473,30 @@ type WorkspaceProps = {
     value: ModelData[K]
   ) => void;
   onAddModelObject: () => void;
+  gamesList: GameInfo[];
+  newGameName: string;
+  setNewGameName: React.Dispatch<React.SetStateAction<string>>;
+  activeGameName: string;
+  gameData: GameData | null;
+  gameDirty: boolean;
+  newGameSceneName: string;
+  setNewGameSceneName: React.Dispatch<React.SetStateAction<string>>;
+  newGameEntityName: string;
+  setNewGameEntityName: React.Dispatch<React.SetStateAction<string>>;
+  newGameEntityType: string;
+  setNewGameEntityType: React.Dispatch<React.SetStateAction<string>>;
+  newGameEntitySceneId: string;
+  setNewGameEntitySceneId: React.Dispatch<React.SetStateAction<string>>;
+  onCreateGame: () => Promise<void>;
+  onOpenGame: (name: string) => Promise<void>;
+  onSaveGame: () => Promise<void>;
+  onCloseGame: () => void;
+  onUpdateGameField: <K extends keyof GameData>(
+    field: K,
+    value: GameData[K]
+  ) => void;
+  onAddGameScene: () => void;
+  onAddGameEntity: () => void;
 };
 
 function Workspace({
@@ -2244,6 +2578,27 @@ function Workspace({
   onCloseModel,
   onUpdateModelField,
   onAddModelObject,
+  gamesList,
+  newGameName,
+  setNewGameName,
+  activeGameName,
+  gameData,
+  gameDirty,
+  newGameSceneName,
+  setNewGameSceneName,
+  newGameEntityName,
+  setNewGameEntityName,
+  newGameEntityType,
+  setNewGameEntityType,
+  newGameEntitySceneId,
+  setNewGameEntitySceneId,
+  onCreateGame,
+  onOpenGame,
+  onSaveGame,
+  onCloseGame,
+  onUpdateGameField,
+  onAddGameScene,
+  onAddGameEntity,
 }: WorkspaceProps) {
   switch (active) {
     case "code":
@@ -2355,7 +2710,266 @@ function Workspace({
         </div>
       );
     case "game":
-      return <Placeholder title="Game Studio" bullets={["Scene graph", "Play mode", "Asset links (later)"]} />;
+      return (
+        <div className="workspaceSplit">
+          <aside className="workspaceSplitSide">
+            <Panel title="Games">
+              {!projectRoot && (
+                <div className="emptyState">Open a project to use Game Studio.</div>
+              )}
+
+              {projectRoot && (
+                <>
+                  <input
+                    className="input"
+                    value={newGameName}
+                    onChange={(e) => setNewGameName(e.target.value)}
+                    placeholder="prototype"
+                  />
+
+                  <button
+                    className="btn"
+                    type="button"
+                    onClick={() => void onCreateGame()}
+                  >
+                    Create
+                  </button>
+
+                  <div style={{ marginTop: 12 }}>
+                    {gamesList.length === 0 ? (
+                      <div className="emptyState">No games yet</div>
+                    ) : (
+                      gamesList.map((game) => (
+                        <button
+                          key={game.name}
+                          className="btn"
+                          type="button"
+                          style={{
+                            width: "100%",
+                            marginBottom: 6,
+                            textAlign: "left",
+                          }}
+                          onClick={() => void onOpenGame(game.name)}
+                        >
+                          {game.name}
+                          {activeGameName === game.name ? " ✓" : ""}
+                        </button>
+                      ))
+                    )}
+                  </div>
+                </>
+              )}
+            </Panel>
+          </aside>
+
+          <section className="workspaceSplitMain">
+            <Panel
+              title={
+                activeGameName
+                  ? `${activeGameName}${gameDirty ? " *" : ""}`
+                  : "No game selected"
+              }
+            >
+              {activeGameName && gameData ? (
+                <>
+                  <div className="gameMeta">
+                    <span>
+                      {gameData.scenes.length} scenes ·{" "}
+                      {gameData.scenes.reduce(
+                        (total, scene) => total + scene.entities.length,
+                        0
+                      )}{" "}
+                      entities
+                    </span>
+
+                    <span className={gameDirty ? "docsDirty" : "docsSaved"}>
+                      {gameDirty ? "Unsaved changes" : "Saved"}
+                    </span>
+                  </div>
+
+                  <div className="gameFormGrid">
+                    <label>
+                      Title
+                      <input
+                        className="input"
+                        value={gameData.title}
+                        onChange={(e) =>
+                          onUpdateGameField("title", e.target.value)
+                        }
+                      />
+                    </label>
+
+                    <label>
+                      Target Platform
+                      <select
+                        className="input"
+                        value={gameData.targetPlatform}
+                        onChange={(e) =>
+                          onUpdateGameField("targetPlatform", e.target.value)
+                        }
+                      >
+                        <option value="desktop">desktop</option>
+                        <option value="web">web</option>
+                        <option value="mobile">mobile</option>
+                        <option value="console">console</option>
+                      </select>
+                    </label>
+
+                    <label>
+                      Genre
+                      <input
+                        className="input"
+                        value={gameData.genre}
+                        onChange={(e) =>
+                          onUpdateGameField("genre", e.target.value)
+                        }
+                      />
+                    </label>
+                  </div>
+
+                  <div className="gameSceneForm">
+                    <div className="gameSectionTitle">Add Scene</div>
+
+                    <div className="gameFormGrid">
+                      <label>
+                        Scene Name
+                        <input
+                          className="input"
+                          value={newGameSceneName}
+                          onChange={(e) => setNewGameSceneName(e.target.value)}
+                          placeholder="Level 1"
+                        />
+                      </label>
+
+                      <button
+                        className="btn"
+                        type="button"
+                        onClick={() => onAddGameScene()}
+                      >
+                        Add Scene
+                      </button>
+                    </div>
+                  </div>
+
+                  <div className="gameEntityForm">
+                    <div className="gameSectionTitle">Add Entity</div>
+
+                    <div className="gameFormGrid">
+                      <label>
+                        Entity Name
+                        <input
+                          className="input"
+                          value={newGameEntityName}
+                          onChange={(e) => setNewGameEntityName(e.target.value)}
+                          placeholder="Player"
+                        />
+                      </label>
+
+                      <label>
+                        Type
+                        <select
+                          className="input"
+                          value={newGameEntityType}
+                          onChange={(e) => setNewGameEntityType(e.target.value)}
+                        >
+                          <option value="player">player</option>
+                          <option value="enemy">enemy</option>
+                          <option value="object">object</option>
+                          <option value="camera">camera</option>
+                          <option value="light">light</option>
+                        </select>
+                      </label>
+
+                      <label>
+                        Scene
+                        <select
+                          className="input"
+                          value={newGameEntitySceneId}
+                          onChange={(e) => setNewGameEntitySceneId(e.target.value)}
+                        >
+                          {gameData.scenes.map((scene) => (
+                            <option key={scene.id} value={scene.id}>
+                              {scene.name}
+                            </option>
+                          ))}
+                        </select>
+                      </label>
+
+                      <button
+                        className="btn"
+                        type="button"
+                        onClick={() => onAddGameEntity()}
+                      >
+                        Add Entity
+                      </button>
+                    </div>
+                  </div>
+
+                  <div className="gameSceneList">
+                    <div className="gameSectionTitle">Scene Graph Stub</div>
+
+                    {gameData.scenes.map((scene) => (
+                      <div className="gameSceneBlock" key={scene.id}>
+                        <div className="gameSceneHeader">
+                          <strong>{scene.name}</strong>
+                          <span>{scene.entities.length} entities</span>
+                        </div>
+
+                        {scene.entities.length === 0 ? (
+                          <div className="emptyState">No entities yet</div>
+                        ) : (
+                          <div className="gameEntityList">
+                            {scene.entities.map((entity) => (
+                              <div className="gameEntityCard" key={entity.id}>
+                                <strong>{entity.name}</strong>
+                                <span>{entity.type}</span>
+                                <span>
+                                  pos [{entity.x}, {entity.y}]
+                                </span>
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+
+                  <label className="gameNotes">
+                    Notes
+                    <textarea
+                      className="docsEditor"
+                      value={gameData.notes}
+                      onChange={(e) =>
+                        onUpdateGameField("notes", e.target.value)
+                      }
+                    />
+                  </label>
+
+                  <div className="docsEditorActions">
+                    <button
+                      className="btn"
+                      type="button"
+                      onClick={() => onCloseGame()}
+                    >
+                      Close Game
+                    </button>
+
+                    <button
+                      className="btn"
+                      type="button"
+                      onClick={() => void onSaveGame()}
+                    >
+                      Save Game
+                    </button>
+                  </div>
+                </>
+              ) : (
+                <div className="emptyState">Create or open a game.</div>
+              )}
+            </Panel>
+          </section>
+        </div>
+      );
     case "movie":
       return (
         <div className="workspaceSplit">
@@ -3104,20 +3718,3 @@ function Workspace({
   }
 }
 
-function Placeholder({ title, bullets }: { title: string; bullets: string[] }) {
-  return (
-    <div className="card">
-      <div className="cardTitle">{title}</div>
-      <div className="cardBody">
-        <div className="muted">
-          This is a Wave 3 placeholder. We’re building suite structure first.
-        </div>
-        <ul>
-          {bullets.map((b) => (
-            <li key={b}>{b}</li>
-          ))}
-        </ul>
-      </div>
-    </div>
-  );
-}
