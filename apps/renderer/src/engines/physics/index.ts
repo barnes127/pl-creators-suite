@@ -6,3 +6,4 @@ export * from "./simulationStep";
 export * from "./units";
 export * from "./vector2";
 export * from "./vector3";
+export * from "./world2d";

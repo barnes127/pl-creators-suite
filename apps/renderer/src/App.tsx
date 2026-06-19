@@ -20,6 +20,11 @@ import {
   multiplyMassByAcceleration,
   acceleration,
   time,
+  addBodyToWorld2D,
+  createSimulationBody2D,
+  createSimulationWorld2D,
+  stepWorldOnce2D,
+  setWorldGravityEnabled2D,
 } from "./engines";
 
 declare global {
@@ -2562,6 +2567,41 @@ function PhysicsSmokePanel() {
       size: physicsVec2(10, 10),
     },
   ]);
+      const baseWorld = createSimulationWorld2D("smoke-world", "Smoke World");
+
+      const worldWithBodies = addBodyToWorld2D(
+        addBodyToWorld2D(
+          baseWorld,
+          {
+            ...createSimulationBody2D(
+              "world-body-a",
+              "Falling Body",
+              physicsVec2(0, 0),
+              physicsVec2(10, 10)
+            ),
+            velocity: physicsVec2(2, 0),
+          }
+        ),
+        {
+          ...createSimulationBody2D(
+            "world-body-b",
+            "Static Floor",
+            physicsVec2(0, 12),
+            physicsVec2(20, 4)
+          ),
+          isStatic: true,
+        }
+      );
+
+      const steppedWorld = stepWorldOnce2D(worldWithBodies, 1);
+      const noGravityWorld = setWorldGravityEnabled2D(worldWithBodies, false);
+      const steppedNoGravityWorld = stepWorldOnce2D(noGravityWorld, 1);
+      const fallingBody = steppedWorld.bodies.find(
+        (body) => body.id === "world-body-a"
+      );
+      const noGravityBody = steppedNoGravityWorld.bodies.find(
+        (body) => body.id === "world-body-a"
+      );
 
   return (
     <Panel title="Physics / Simulation Engine Smoke Test">
@@ -2630,6 +2670,25 @@ function PhysicsSmokePanel() {
             {collisions.length > 0
               ? `${collisions.length} collision detected`
               : "no collision"}
+          </code>
+        </div>
+
+        <div className="physicsSmokeCard">
+          <strong>Simulation World</strong>
+          <span>2 bodies, gravity enabled, stepped 1 second</span>
+          <code>
+            time {steppedWorld.timeSeconds.toFixed(2)}s ·{" "}
+            {steppedWorld.collisions.length} collisions
+          </code>
+          <code>
+            falling body pos [
+            {fallingBody?.position.x.toFixed(2) ?? "0.00"},{" "}
+            {fallingBody?.position.y.toFixed(2) ?? "0.00"}]
+          </code>
+          <code>
+            no-gravity pos [
+            {noGravityBody?.position.x.toFixed(2) ?? "0.00"},{" "}
+            {noGravityBody?.position.y.toFixed(2) ?? "0.00"}]
           </code>
         </div>
       </div>
