@@ -9,6 +9,7 @@ import {
   type Aabb2D,
   type Collision2D,
 } from "./collision2d";
+import { resolveWorldCollisions2D } from "./rigidBody2d";
 
 export type SimulationBody2D = {
   id: string;
@@ -207,10 +208,12 @@ export function stepWorldOnce2D(
     collisions: [],
   };
 
-  return {
+    const worldWithCollisions = {
     ...nextWorld,
     collisions: detectWorldCollisions2D(nextWorld),
   };
+
+  return resolveWorldCollisions2D(worldWithCollisions);
 }
 
 export function stepWorldFixed2D(

@@ -25,6 +25,8 @@ import {
   createSimulationWorld2D,
   stepWorldOnce2D,
   setWorldGravityEnabled2D,
+  applyImpulse2D,
+  resolveWorldCollisions2D,
 } from "./engines";
 
 declare global {
@@ -2603,6 +2605,46 @@ function PhysicsSmokePanel() {
         (body) => body.id === "world-body-a"
       );
 
+        const impulseBody = applyImpulse2D(
+          createSimulationBody2D(
+            "impulse-body",
+            "Impulse Body",
+            physicsVec2(0, 0),
+            physicsVec2(5, 5)
+          ),
+          physicsVec2(10, 0)
+        );
+
+        const overlapWorld = addBodyToWorld2D(
+          addBodyToWorld2D(
+            createSimulationWorld2D("overlap-world", "Overlap World"),
+            {
+              ...createSimulationBody2D(
+                "overlap-a",
+                "Overlap A",
+                physicsVec2(0, 0),
+                physicsVec2(10, 10)
+              ),
+              velocity: physicsVec2(2, 0),
+            }
+          ),
+          {
+            ...createSimulationBody2D(
+              "overlap-b",
+              "Overlap B",
+              physicsVec2(5, 0),
+              physicsVec2(10, 10)
+            ),
+            isStatic: true,
+          }
+        );
+
+        const overlapWorldStepped = stepWorldOnce2D(overlapWorld, 0);
+        const overlapResolvedWorld = resolveWorldCollisions2D(overlapWorldStepped);
+        const overlapA = overlapResolvedWorld.bodies.find(
+          (body) => body.id === "overlap-a"
+        );
+
   return (
     <Panel title="Physics / Simulation Engine Smoke Test">
       <div className="physicsSmokeGrid">
@@ -2689,6 +2731,20 @@ function PhysicsSmokePanel() {
             no-gravity pos [
             {noGravityBody?.position.x.toFixed(2) ?? "0.00"},{" "}
             {noGravityBody?.position.y.toFixed(2) ?? "0.00"}]
+          </code>
+        </div>
+      
+        <div className="physicsSmokeCard">
+          <strong>Rigid Body 2D</strong>
+          <span>impulse + collision resolution</span>
+          <code>
+            impulse velocity [{impulseBody.velocity.x.toFixed(2)},{" "}
+            {impulseBody.velocity.y.toFixed(2)}]
+          </code>
+          <code>
+            resolved overlap-a pos [
+            {overlapA?.position.x.toFixed(2) ?? "0.00"},{" "}
+            {overlapA?.position.y.toFixed(2) ?? "0.00"}]
           </code>
         </div>
       </div>

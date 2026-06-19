@@ -2,6 +2,7 @@ export * from "./collision2d";
 export * from "./expressions";
 export * from "./forces";
 export * from "./kinematics";
+export * from "./rigidBody2d";
 export * from "./simulationStep";
 export * from "./units";
 export * from "./vector2";
