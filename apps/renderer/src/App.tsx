@@ -4,6 +4,16 @@ import "./app.css";
 import { Modal } from "./components/Modal";
 import { CollapsiblePanel } from "./components/CollapsiblePanel";
 import { Button, Panel, Toolbar, WorkspaceHeader } from "./components/pl-ui";
+import {
+  applyGravity2D,
+  convertDistance,
+  createKinematicBody2D,
+  evaluateNumericExpression,
+  findAabbCollisions2D,
+  magnitudePhysicsVec2,
+  physicsVec2,
+  stepKinematicBody2D,
+} from "./engines";
 
 declare global {
   interface Window {
@@ -2037,6 +2047,8 @@ useEffect(() => {
         )}
       </CollapsiblePanel>
 
+      <PhysicsSmokePanel />
+
       <CollapsiblePanel
         title="Assets"
         defaultOpen={false}
@@ -2501,7 +2513,83 @@ useEffect(() => {
 );
 }
 
-    
+function PhysicsSmokePanel() {
+  const expressionResult = evaluateNumericExpression("2 + 3 * 4");
+
+  const metersFromFeet = convertDistance(10, "ft", "m");
+
+  const vector = physicsVec2(3, 4);
+  const vectorMagnitude = magnitudePhysicsVec2(vector);
+
+  const body = createKinematicBody2D("smoke-body", physicsVec2(0, 0));
+  const gravityBody = applyGravity2D(body);
+  const steppedBody = stepKinematicBody2D(gravityBody, 1);
+
+  const collisions = findAabbCollisions2D([
+    {
+      id: "box-a",
+      position: physicsVec2(0, 0),
+      size: physicsVec2(10, 10),
+    },
+    {
+      id: "box-b",
+      position: physicsVec2(5, 5),
+      size: physicsVec2(10, 10),
+    },
+  ]);
+
+  return (
+    <Panel title="Physics / Simulation Engine Smoke Test">
+      <div className="physicsSmokeGrid">
+        <div className="physicsSmokeCard">
+          <strong>Expression</strong>
+          <span>2 + 3 * 4</span>
+          <code>
+            {expressionResult.ok
+              ? String(expressionResult.value)
+              : expressionResult.error}
+          </code>
+        </div>
+
+        <div className="physicsSmokeCard">
+          <strong>Unit Conversion</strong>
+          <span>10 ft → meters</span>
+          <code>{metersFromFeet.toFixed(4)} m</code>
+        </div>
+
+        <div className="physicsSmokeCard">
+          <strong>Vector Magnitude</strong>
+          <span>Vec2(3, 4)</span>
+          <code>{vectorMagnitude.toFixed(2)}</code>
+        </div>
+
+        <div className="physicsSmokeCard">
+          <strong>Gravity Step</strong>
+          <span>body stepped for 1 second</span>
+          <code>
+            pos [{steppedBody.position.x.toFixed(2)},{" "}
+            {steppedBody.position.y.toFixed(2)}]
+          </code>
+          <code>
+            vel [{steppedBody.velocity.x.toFixed(2)},{" "}
+            {steppedBody.velocity.y.toFixed(2)}]
+          </code>
+        </div>
+
+        <div className="physicsSmokeCard">
+          <strong>Collision</strong>
+          <span>box-a vs box-b</span>
+          <code>
+            {collisions.length > 0
+              ? `${collisions.length} collision detected`
+              : "no collision"}
+          </code>
+        </div>
+      </div>
+    </Panel>
+  );
+}
+
 type WorkspaceProps = {
   active: AppId;
   projectRoot: string;
