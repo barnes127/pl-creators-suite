@@ -2515,6 +2515,13 @@ useEffect(() => {
 
 function PhysicsSmokePanel() {
   const expressionResult = evaluateNumericExpression("2 + 3 * 4");
+  const variableExpressionResult = evaluateNumericExpression(
+    "mass * gravity",
+    {
+      mass: 5,
+      gravity: 9.80665,
+    }
+  );
 
   const metersFromFeet = convertDistance(10, "ft", "m");
 
@@ -2555,6 +2562,16 @@ function PhysicsSmokePanel() {
           <strong>Unit Conversion</strong>
           <span>10 ft → meters</span>
           <code>{metersFromFeet.toFixed(4)} m</code>
+        </div>
+
+        <div className="physicsSmokeCard">
+          <strong>Variable Expression</strong>
+          <span>mass * gravity, mass=5, gravity=9.80665</span>
+          <code>
+            {variableExpressionResult.ok
+              ? String(variableExpressionResult.value.toFixed(4))
+              : variableExpressionResult.error}
+          </code>
         </div>
 
         <div className="physicsSmokeCard">
