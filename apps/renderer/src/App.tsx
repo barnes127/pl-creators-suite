@@ -31,6 +31,8 @@ import {
   interpolateVec2,
   sampleNumericKeyframes,
   sampleVec2Keyframes,
+  resetWorld2D,
+  type SimulationWorld2D
 } from "./engines";
 
 declare global {
@@ -278,6 +280,9 @@ export default function App() {
   const [docContent, setDocContent] = useState("");
   const [copilotDrawerOpen, setCopilotDrawerOpen] = useState(() =>
     readStoredBoolean("pl.layout.copilotDrawerOpen", true)
+  );
+  const [physicsDrawerOpen, setPhysicsDrawerOpen] = useState(() =>
+    readStoredBoolean("pl.layout.physicsDrawerOpen", false)
   );
   const [assets, setAssets] = useState<AssetInfo[]>([]);
   const [docDirty, setDocDirty] = useState(false);
@@ -1921,6 +1926,17 @@ useEffect(() => {
 }, [copilotDrawerOpen]);
 
 useEffect(() => {
+  try {
+    window.localStorage.setItem(
+      "pl.layout.physicsDrawerOpen",
+      String(physicsDrawerOpen)
+    );
+  } catch {
+    // ignore localStorage failures
+  }
+}, [physicsDrawerOpen]);
+
+useEffect(() => {
   const unsubscribe = window.plMenu?.onMenuAction?.((channel) => {
     if (channel === "menu:new-project") {
       handleNewProject();
@@ -2064,8 +2080,6 @@ useEffect(() => {
           <div className="emptyState">Loading system status...</div>
         )}
       </CollapsiblePanel>
-
-      <PhysicsSmokePanel />
 
       <CollapsiblePanel
         title="Assets"
@@ -2405,6 +2419,29 @@ useEffect(() => {
             ) : (
               <div className="emptyState">No response yet</div>
             )}
+          </div>
+        )}
+      </section>
+
+      <section className={`physicsDrawer ${physicsDrawerOpen ? "open" : "closed"}`}>
+        <div className="physicsDrawerHeader">
+          <button
+            className="panelTitle"
+            type="button"
+            onClick={() => setPhysicsDrawerOpen((value) => !value)}
+          >
+            {physicsDrawerOpen ? "▼" : "▲"} Physics Engine
+          </button>
+
+          <div className="physicsDrawerMeta">
+            Simulation / math engine tools
+          </div>
+        </div>
+
+        {physicsDrawerOpen && (
+          <div className="physicsDrawerBody">
+            <PhysicsSmokePanel />
+            <PhysicsPlaygroundPanel />
           </div>
         )}
       </section>
@@ -2814,6 +2851,195 @@ function PhysicsSmokePanel() {
             sampled vec2 @ 1s = [{sampledVec2Keyframe.x.toFixed(2)},{" "}
             {sampledVec2Keyframe.y.toFixed(2)}]
           </code>
+        </div>
+      </div>
+    </Panel>
+  );
+}
+
+function createPlaygroundWorld(): SimulationWorld2D {
+  const baseWorld = createSimulationWorld2D(
+    "physics-playground",
+    "Physics Playground"
+  );
+
+  const worldWithBall = addBodyToWorld2D(
+    baseWorld,
+    {
+      ...createSimulationBody2D(
+        "playground-ball",
+        "Falling Body",
+        physicsVec2(4, 0),
+        physicsVec2(4, 4)
+      ),
+      velocity: physicsVec2(8, 0),
+      restitution: 0.35,
+      friction: 0.35,
+    }
+  );
+
+  return addBodyToWorld2D(
+    worldWithBall,
+    {
+      ...createSimulationBody2D(
+        "playground-floor",
+        "Static Floor",
+        physicsVec2(0, 28),
+        physicsVec2(42, 4)
+      ),
+      isStatic: true,
+      restitution: 0.15,
+      friction: 0.8,
+    }
+  );
+}
+
+function PhysicsPlaygroundPanel() {
+  const [world, setWorld] = useState<SimulationWorld2D>(() =>
+    createPlaygroundWorld()
+  );
+
+  const dynamicBodies = world.bodies.filter((body) => !body.isStatic);
+  const staticBodies = world.bodies.filter((body) => body.isStatic);
+
+  function handleStep() {
+    setWorld((current) => stepWorldOnce2D(current, 1 / 30));
+  }
+
+  function handleStepTen() {
+    setWorld((current) => {
+      let nextWorld = current;
+
+      for (let index = 0; index < 10; index += 1) {
+        nextWorld = stepWorldOnce2D(nextWorld, 1 / 30);
+      }
+
+      return nextWorld;
+    });
+  }
+
+  function handleReset() {
+    setWorld(createPlaygroundWorld());
+  }
+
+  function handleToggleGravity() {
+    setWorld((current) =>
+      setWorldGravityEnabled2D(current, !current.settings.gravityEnabled)
+    );
+  }
+
+  function handleAddBody() {
+    setWorld((current) => {
+      const bodyNumber = current.bodies.length + 1;
+      const id = `playground-body-${Date.now()}`;
+
+      return addBodyToWorld2D(
+        current,
+        {
+          ...createSimulationBody2D(
+            id,
+            `Body ${bodyNumber}`,
+            physicsVec2(2 + bodyNumber * 2, 0),
+            physicsVec2(3, 3)
+          ),
+          velocity: physicsVec2(2 + bodyNumber, 0),
+          restitution: 0.3,
+          friction: 0.4,
+        }
+      );
+    });
+  }
+
+  function handleResetMotion() {
+    setWorld((current) => resetWorld2D(current));
+  }
+
+  return (
+    <Panel title="Physics Playground">
+      <div className="physicsPlayground">
+        <div className="physicsPlaygroundToolbar">
+          <button className="btn" type="button" onClick={handleStep}>
+            Step
+          </button>
+
+          <button className="btn" type="button" onClick={handleStepTen}>
+            Step x10
+          </button>
+
+          <button className="btn" type="button" onClick={handleToggleGravity}>
+            Gravity: {world.settings.gravityEnabled ? "On" : "Off"}
+          </button>
+
+          <button className="btn" type="button" onClick={handleAddBody}>
+            Add Body
+          </button>
+
+          <button className="btn" type="button" onClick={handleResetMotion}>
+            Reset Motion
+          </button>
+
+          <button className="btn" type="button" onClick={handleReset}>
+            Reset World
+          </button>
+        </div>
+
+        <div className="physicsPlaygroundStats">
+          <span>time: {world.timeSeconds.toFixed(2)}s</span>
+          <span>dynamic: {dynamicBodies.length}</span>
+          <span>static: {staticBodies.length}</span>
+          <span>collisions: {world.collisions.length}</span>
+          <span>
+            gravity: [{world.settings.gravity.x.toFixed(2)},{" "}
+            {world.settings.gravity.y.toFixed(2)}]
+          </span>
+        </div>
+
+        <div className="physicsPlaygroundViewport">
+          {world.bodies.map((body) => {
+            const left = body.position.x * 10;
+            const top = body.position.y * 10;
+            const width = Math.max(8, body.size.x * 10);
+            const height = Math.max(8, body.size.y * 10);
+
+            return (
+              <div
+                className={
+                  body.isStatic
+                    ? "physicsPlaygroundBody physicsPlaygroundBodyStatic"
+                    : "physicsPlaygroundBody"
+                }
+                key={body.id}
+                style={{
+                  left,
+                  top,
+                  width,
+                  height,
+                }}
+                title={`${body.name} pos [${body.position.x.toFixed(
+                  2
+                )}, ${body.position.y.toFixed(2)}]`}
+              >
+                {body.isStatic ? "static" : body.name}
+              </div>
+            );
+          })}
+        </div>
+
+        <div className="physicsPlaygroundBodyList">
+          {world.bodies.map((body) => (
+            <div className="physicsPlaygroundBodyRow" key={body.id}>
+              <strong>{body.name}</strong>
+              <span>{body.isStatic ? "static" : "dynamic"}</span>
+              <code>
+                pos [{body.position.x.toFixed(2)},{" "}
+                {body.position.y.toFixed(2)}]
+              </code>
+              <code>
+                vel [{body.velocity.x.toFixed(2)},{" "}
+                {body.velocity.y.toFixed(2)}]
+              </code>
+            </div>
+          ))}
         </div>
       </div>
     </Panel>

@@ -300,6 +300,33 @@ html, body, #root {
   white-space: pre-wrap;
 }
 
+.physicsDrawer {
+  border-top: 1px solid #262626;
+  background: #0b0b0d;
+}
+
+.physicsDrawerHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 6px 10px;
+  border-bottom: 1px solid #262626;
+}
+
+.physicsDrawerMeta {
+  font-size: 12px;
+  opacity: 0.75;
+}
+
+.physicsDrawerBody {
+  display: grid;
+  gap: 10px;
+  max-height: 420px;
+  overflow: auto;
+  padding: 10px;
+}
+
 .btn-primary {
   font-weight: 700;
 }
@@ -764,6 +791,91 @@ html, body, #root {
 
 .physicsSmokeCard code {
   display: block;
+  padding: 4px 6px;
+  border-radius: 6px;
+  background: #0d0d0d;
+  border: 1px solid #2a2a2a;
+  overflow-wrap: anywhere;
+}
+
+.physicsPlayground {
+  display: grid;
+  gap: 10px;
+}
+
+.physicsPlaygroundToolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.physicsPlaygroundStats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  font-size: 12px;
+  opacity: 0.85;
+}
+
+.physicsPlaygroundStats span {
+  padding: 4px 6px;
+  border: 1px solid #303030;
+  border-radius: 6px;
+  background: #111;
+}
+
+.physicsPlaygroundViewport {
+  position: relative;
+  min-height: 260px;
+  max-height: 320px;
+  border: 1px solid #333;
+  border-radius: 8px;
+  overflow: hidden;
+  background:
+    linear-gradient(#161616 1px, transparent 1px),
+    linear-gradient(90deg, #161616 1px, transparent 1px);
+  background-size: 20px 20px;
+  background-color: #0d0d0d;
+}
+
+.physicsPlaygroundBody {
+  position: absolute;
+  display: grid;
+  place-items: center;
+  border: 1px solid #666;
+  border-radius: 6px;
+  background: rgba(90, 90, 120, 0.75);
+  color: #f2f2f2;
+  font-size: 10px;
+  overflow: hidden;
+  transition:
+    left 120ms linear,
+    top 120ms linear;
+}
+
+.physicsPlaygroundBodyStatic {
+  background: rgba(100, 80, 55, 0.8);
+  border-color: #806344;
+}
+
+.physicsPlaygroundBodyList {
+  display: grid;
+  gap: 8px;
+}
+
+.physicsPlaygroundBodyRow {
+  display: grid;
+  grid-template-columns: 1fr 80px 160px 160px;
+  gap: 8px;
+  align-items: center;
+  padding: 8px;
+  border: 1px solid #333;
+  border-radius: 8px;
+  background: rgba(20, 20, 20, 0.9);
+  font-size: 12px;
+}
+
+.physicsPlaygroundBodyRow code {
   padding: 4px 6px;
   border-radius: 6px;
   background: #0d0d0d;
