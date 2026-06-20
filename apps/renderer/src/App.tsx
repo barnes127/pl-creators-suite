@@ -201,6 +201,9 @@ type ModelObject = {
   scale: [number, number, number];
 };
 
+type ModelVectorField = "position" | "rotation" | "scale";
+type ModelVectorAxis = 0 | 1 | 2;
+
 type ModelData = {
   version: number;
   name: string;
@@ -1413,6 +1416,36 @@ function handleUpdateModelField<K extends keyof ModelData>(
   setModelDirty(true);
 }
 
+function handleUpdateModelObjectVector(
+  objectId: string,
+  field: ModelVectorField,
+  axis: ModelVectorAxis,
+  value: number
+) {
+  const safeValue = Number.isFinite(value) ? value : 0;
+
+  setModelData((current) => {
+    if (!current) return current;
+
+    return {
+      ...current,
+      objects: current.objects.map((object) => {
+        if (object.id !== objectId) return object;
+
+        const nextVector: [number, number, number] = [...object[field]];
+        nextVector[axis] = field === "scale" ? Math.max(0.01, safeValue) : safeValue;
+
+        return {
+          ...object,
+          [field]: nextVector,
+        };
+      }),
+    };
+  });
+
+  setModelDirty(true);
+}
+
 function handleAddModelObject() {
   if (!modelData) {
     setStatus("Open a model scene before adding objects");
@@ -2353,6 +2386,7 @@ useEffect(() => {
           onSaveModel={handleSaveModel}
           onCloseModel={handleCloseModel}
           onUpdateModelField={handleUpdateModelField}
+          onUpdateModelObjectVector={handleUpdateModelObjectVector}
           onAddModelObject={handleAddModelObject}
           gamesList={gamesList}
           newGameName={newGameName}
@@ -3219,6 +3253,12 @@ type WorkspaceProps = {
   onOpenModel: (name: string) => Promise<void>;
   onSaveModel: () => Promise<void>;
   onCloseModel: () => void;
+  onUpdateModelObjectVector: (
+    objectId: string,
+    field: ModelVectorField,
+    axis: ModelVectorAxis,
+    value: number
+  ) => void;
   onUpdateModelField: <K extends keyof ModelData>(
     field: K,
     value: ModelData[K]
@@ -3332,6 +3372,7 @@ function Workspace({
   onSaveModel,
   onCloseModel,
   onUpdateModelField,
+  onUpdateModelObjectVector,
   onAddModelObject,
   gamesList,
   newGameName,
@@ -4885,26 +4926,95 @@ function Workspace({
                       <div className="emptyState">No modeling scene loaded.</div>
                     )}
 
-                    <div className="modelViewportSelection">
-                      <strong>Selected Object</strong>
+                    <div className="modelTransformInspector">
+                      <div className="modelTransformInspectorHeader">
+                        <strong>Transform Inspector</strong>
+                        {selectedModelObject ? (
+                          <span>
+                            {selectedModelObject.name} · {selectedModelObject.primitive}
+                          </span>
+                        ) : (
+                          <span>No object selected</span>
+                        )}
+                      </div>
 
                       {selectedModelObject ? (
-                        <div className="modelViewportSelectionGrid">
-                          <span>{selectedModelObject.name}</span>
-                          <span>{selectedModelObject.primitive}</span>
-                          <span>
-                            pos [{selectedModelObject.transform.position.x.toFixed(2)},{" "}
-                            {selectedModelObject.transform.position.y.toFixed(2)},{" "}
-                            {selectedModelObject.transform.position.z.toFixed(2)}]
-                          </span>
-                          <span>
-                            scale [{selectedModelObject.transform.scale.x.toFixed(2)},{" "}
-                            {selectedModelObject.transform.scale.y.toFixed(2)},{" "}
-                            {selectedModelObject.transform.scale.z.toFixed(2)}]
-                          </span>
-                        </div>
+                        <>
+                          <div className="modelTransformInspectorGrid">
+                            {(["position", "rotation", "scale"] as ModelVectorField[]).map((field) => (
+                              <div className="modelTransformGroup" key={field}>
+                                <strong>{field}</strong>
+
+                                {(["X", "Y", "Z"] as const).map((axisLabel, axisIndex) => {
+                                  const axis = axisIndex as ModelVectorAxis;
+                                  const axisKey = axisLabel.toLowerCase() as "x" | "y" | "z";
+                                  const value = selectedModelObject.transform[field][axisKey];
+
+                                  return (
+                                    <label key={`${field}-${axisLabel}`}>
+                                      {axisLabel}
+                                      <input
+                                        className="input"
+                                        type="number"
+                                        step={field === "rotation" ? 5 : 0.1}
+                                        min={field === "scale" ? 0.01 : undefined}
+                                        value={value}
+                                        onChange={(event) =>
+                                          onUpdateModelObjectVector(
+                                            selectedModelObject.id,
+                                            field,
+                                            axis,
+                                            Number(event.target.value)
+                                          )
+                                        }
+                                      />
+                                    </label>
+                                  );
+                                })}
+                              </div>
+                            ))}
+                          </div>
+
+                          <div className="modelTransformQuickActions">
+                            <button
+                              className="btn btn-ghost"
+                              type="button"
+                              onClick={() => {
+                                onUpdateModelObjectVector(selectedModelObject.id, "position", 0, 0);
+                                onUpdateModelObjectVector(selectedModelObject.id, "position", 1, 0);
+                                onUpdateModelObjectVector(selectedModelObject.id, "position", 2, 0);
+                              }}
+                            >
+                              Center Position
+                            </button>
+
+                            <button
+                              className="btn btn-ghost"
+                              type="button"
+                              onClick={() => {
+                                onUpdateModelObjectVector(selectedModelObject.id, "rotation", 0, 0);
+                                onUpdateModelObjectVector(selectedModelObject.id, "rotation", 1, 0);
+                                onUpdateModelObjectVector(selectedModelObject.id, "rotation", 2, 0);
+                              }}
+                            >
+                              Reset Rotation
+                            </button>
+
+                            <button
+                              className="btn btn-ghost"
+                              type="button"
+                              onClick={() => {
+                                onUpdateModelObjectVector(selectedModelObject.id, "scale", 0, 1);
+                                onUpdateModelObjectVector(selectedModelObject.id, "scale", 1, 1);
+                                onUpdateModelObjectVector(selectedModelObject.id, "scale", 2, 1);
+                              }}
+                            >
+                              Reset Scale
+                            </button>
+                          </div>
+                        </>
                       ) : (
-                        <span className="emptyState">Click an object in the viewport.</span>
+                        <div className="emptyState">Click an object in the viewport or object list.</div>
                       )}
                     </div>
                   </div>
