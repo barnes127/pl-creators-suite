@@ -943,3 +943,126 @@ html, body, #root {
   border-color: #7b7bff;
   background: rgba(80, 80, 140, 0.22);
 }
+
+.movieTimelineActivitySummary {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  font-size: 12px;
+}
+
+.movieTimelineActivitySummary span {
+  padding: 4px 6px;
+  border: 1px solid #303030;
+  border-radius: 6px;
+  background: #111;
+}
+
+.movieTimelineRuler {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  font-size: 11px;
+  opacity: 0.7;
+  padding: 4px 0;
+}
+
+.movieTimelineRuler span:nth-child(2) {
+  text-align: center;
+}
+
+.movieTimelineRuler span:nth-child(3) {
+  text-align: right;
+}
+
+.movieTimelineLayout {
+  position: relative;
+  display: grid;
+  gap: 8px;
+  padding: 8px;
+  border: 1px solid #2f2f2f;
+  border-radius: 8px;
+  background:
+    linear-gradient(90deg, rgba(255, 255, 255, 0.05) 1px, transparent 1px),
+    #0d0d0d;
+  background-size: 10% 100%;
+  overflow: hidden;
+}
+
+.movieTimelinePlayhead {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background: #f2f2f2;
+  opacity: 0.8;
+  z-index: 5;
+}
+
+.movieTrackLayoutRow {
+  display: grid;
+  grid-template-columns: 150px 1fr;
+  gap: 8px;
+  min-height: 42px;
+  align-items: stretch;
+}
+
+.movieTrackLabel {
+  display: grid;
+  align-content: center;
+  gap: 2px;
+  padding: 6px;
+  border: 1px solid #303030;
+  border-radius: 6px;
+  background: #111;
+  font-size: 12px;
+}
+
+.movieTrackLabel span {
+  opacity: 0.7;
+}
+
+.movieTrackLane {
+  position: relative;
+  min-height: 42px;
+  border: 1px solid #303030;
+  border-radius: 6px;
+  background: rgba(20, 20, 20, 0.8);
+  overflow: hidden;
+}
+
+.movieClipBlock {
+  position: absolute;
+  top: 5px;
+  bottom: 5px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+  min-width: 56px;
+  padding: 4px 6px;
+  border: 1px solid #555;
+  border-radius: 6px;
+  background: rgba(70, 70, 90, 0.85);
+  font-size: 11px;
+  overflow: hidden;
+}
+
+.movieClipBlock span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.movieClipBlock-past {
+  opacity: 0.55;
+}
+
+.movieClipBlock-active {
+  border-color: #7b7bff;
+  background: rgba(80, 80, 150, 0.95);
+  opacity: 1;
+}
+
+.movieClipBlock-upcoming {
+  opacity: 0.9;
+}

@@ -39,13 +39,14 @@ import {
   advanceMoviePlayback,
   calculateTimelineDuration,
   createMoviePlaybackState,
-  getActiveMovieClips,
   getMoviePlaybackFrame,
   pauseMovieTimeline,
   playMovieTimeline,
   seekMovieTimeline,
   stage3MovieToEngineTimeline,
   stopMovieTimeline,
+  getMovieTimelineActivity,
+  getMovieTimelineLayout,
 } from "./engines";
 
 declare global {
@@ -3389,9 +3390,15 @@ function Workspace({
     return () => window.clearInterval(timer);
   }, [moviePlayback.status]);
 
-  const movieActiveClips = movieTimeline
-    ? getActiveMovieClips(movieTimeline, moviePlayback.currentTimeSeconds)
-    : [];
+  const movieTimelineActivity = movieTimeline
+    ? getMovieTimelineActivity(movieTimeline, moviePlayback.currentTimeSeconds)
+    : null;
+
+  const movieTimelineLayout = movieTimeline
+    ? getMovieTimelineLayout(movieTimeline, moviePlayback.currentTimeSeconds)
+    : null;
+
+  const movieActiveClips = movieTimelineActivity?.activeClips ?? [];
 
   const movieFrame = getMoviePlaybackFrame(moviePlayback);
 
@@ -4049,6 +4056,33 @@ function Workspace({
                     </div>
 
                     <div className="moviePreviewState">
+                      <div className="movieTimelineActivitySummary">
+                        <span>
+                          Previous start:{" "}
+                          {movieTimelineActivity?.previousClipStartSeconds === null ||
+                          movieTimelineActivity?.previousClipStartSeconds === undefined
+                            ? "none"
+                            : `${movieTimelineActivity.previousClipStartSeconds.toFixed(2)}s`}
+                        </span>
+
+                        <span>
+                          Next start:{" "}
+                          {movieTimelineActivity?.nextClipStartSeconds === null ||
+                          movieTimelineActivity?.nextClipStartSeconds === undefined
+                            ? "none"
+                            : `${movieTimelineActivity.nextClipStartSeconds.toFixed(2)}s`}
+                        </span>
+
+                        <span>
+                          Active tracks:{" "}
+                          {movieTimelineActivity
+                            ? movieTimelineActivity.trackActivities.filter(
+                                (trackActivity) =>
+                                  trackActivity.activeClips.length > 0
+                              ).length
+                            : 0}
+                        </span>
+                      </div>
                       <div className="moviePreviewBox">
                         <strong>Active Clips</strong>
 
@@ -4078,44 +4112,81 @@ function Workspace({
                   </div>
 
                   <div className="movieTimelinePreview">
-                    <div className="movieTimelineHeader">Timeline Tracks</div>
+                    <div className="movieTimelineHeader">
+                      Timeline Tracks ·{" "}
+                      {movieTimelineLayout
+                        ? `${movieTimelineLayout.durationSeconds.toFixed(2)}s`
+                        : "0.00s"}
+                    </div>
 
-                    {movieData.tracks.map((track) => (
-                      <div className="movieTrackBlock" key={track.id}>
-                        <div className="movieTrack">
-                          <span>{track.name}</span>
-                          <span>{track.type}</span>
-                          <span>{track.clips.length} clips</span>
-                        </div>
+                    <div className="movieTimelineRuler">
+                      <span>0s</span>
+                      <span>
+                        {movieTimelineLayout
+                          ? `${Math.floor(movieTimelineLayout.durationSeconds / 2)}s`
+                          : "0s"}
+                      </span>
+                      <span>
+                        {movieTimelineLayout
+                          ? `${movieTimelineLayout.durationSeconds.toFixed(0)}s`
+                          : "0s"}
+                      </span>
+                    </div>
 
-                        {track.clips.length > 0 && (
-                          <div className="movieClips">
-                            {track.clips.map((clip) => (
+                    <div className="movieTimelineLayout">
+                      {movieTimelineLayout && (
+                        <div
+                          className="movieTimelinePlayhead"
+                          style={{
+                            left: `${movieTimelineLayout.playheadPercent}%`,
+                          }}
+                        />
+                      )}
+
+                      {movieTimelineLayout?.tracks.map((trackLayout) => (
+                        <div className="movieTrackLayoutRow" key={trackLayout.track.id}>
+                          <div className="movieTrackLabel">
+                            <strong>{trackLayout.track.name}</strong>
+                            <span>
+                              {trackLayout.track.type} ·{" "}
+                              {trackLayout.track.clips.length} clips
+                            </span>
+                          </div>
+
+                          <div className="movieTrackLane">
+                            {trackLayout.clips.map((clipLayout) => (
                               <div
-                                className={
-                                  movieActiveClips.some((activeClip) => activeClip.clip.id === clip.id)
-                                    ? "movieClip movieClipActive"
-                                    : "movieClip"
-                                }
-                                key={clip.id}
+                                className={`movieClipBlock movieClipBlock-${clipLayout.status}`}
+                                key={clipLayout.clip.id}
+                                style={{
+                                  left: `${clipLayout.leftPercent}%`,
+                                  width: `${clipLayout.widthPercent}%`,
+                                }}
+                                title={`${clipLayout.clip.name} ${clipLayout.clip.startSeconds}s-${(
+                                  clipLayout.clip.startSeconds +
+                                  clipLayout.clip.durationSeconds
+                                ).toFixed(2)}s`}
                               >
-                                <span>{clip.name}</span>
-                                <span>start {clip.startSeconds}s</span>
-                                <span>{clip.durationSeconds}s</span>
+                                <span>{clipLayout.clip.name}</span>
 
                                 <button
                                   className="btn btn-ghost"
                                   type="button"
-                                  onClick={() => onDeleteMovieClip(track.id, clip.id)}
+                                  onClick={() =>
+                                    onDeleteMovieClip(
+                                      trackLayout.track.id,
+                                      clipLayout.clip.id
+                                    )
+                                  }
                                 >
                                   Delete
                                 </button>
                               </div>
                             ))}
                           </div>
-                        )}
-                      </div>
-                    ))}
+                        </div>
+                      ))}
+                    </div>
                   </div>
 
                   <label className="movieNotes">
