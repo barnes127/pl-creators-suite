@@ -47,6 +47,8 @@ import {
   stopMovieTimeline,
   getMovieTimelineActivity,
   getMovieTimelineLayout,
+  createDemoMovieAnimationChannels,
+  sampleMovieAnimationChannels,
 } from "./engines";
 
 declare global {
@@ -3402,6 +3404,16 @@ function Workspace({
 
   const movieFrame = getMoviePlaybackFrame(moviePlayback);
 
+  const movieDemoAnimationChannels = useMemo(
+    () => createDemoMovieAnimationChannels(),
+    []
+  );
+
+  const movieTransformSample = sampleMovieAnimationChannels(
+    movieDemoAnimationChannels,
+    moviePlayback.currentTimeSeconds
+  );
+
   switch (active) {
     case "code":
       return (
@@ -4107,6 +4119,36 @@ function Workspace({
                             </div>
                           ))
                         )}
+                      </div>
+
+                      <div className="moviePreviewBox">
+                        <strong>Transform Sample</strong>
+
+                        <div className="movieTransformSampleGrid">
+                          <span>
+                            position [{movieTransformSample.position.x.toFixed(2)},{" "}
+                            {movieTransformSample.position.y.toFixed(2)}]
+                          </span>
+
+                          <span>
+                            scale [{movieTransformSample.scale.x.toFixed(2)},{" "}
+                            {movieTransformSample.scale.y.toFixed(2)}]
+                          </span>
+
+                          <span>
+                            opacity {movieTransformSample.opacity.toFixed(2)}
+                          </span>
+
+                          <span>
+                            rotation {movieTransformSample.rotation.toFixed(2)}°
+                          </span>
+
+                          <span>
+                            brightness {movieTransformSample.brightness.toFixed(2)}
+                          </span>
+
+                          <span>blur {movieTransformSample.blur.toFixed(2)}</span>
+                        </div>
                       </div>
                     </div>
                   </div>

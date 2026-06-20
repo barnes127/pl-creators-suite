@@ -1066,3 +1066,17 @@ html, body, #root {
 .movieClipBlock-upcoming {
   opacity: 0.9;
 }
+
+.movieTransformSampleGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+  font-size: 12px;
+}
+
+.movieTransformSampleGrid span {
+  padding: 6px 8px;
+  border: 1px solid #303030;
+  border-radius: 6px;
+  background: #111;
+}
