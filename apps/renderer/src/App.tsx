@@ -36,6 +36,16 @@ import {
   gameEntityToPhysicsBody2D,
   modelObjectToPhysicsBody2D,
   sampleAnimationMotion2D,
+  advanceMoviePlayback,
+  calculateTimelineDuration,
+  createMoviePlaybackState,
+  getActiveMovieClips,
+  getMoviePlaybackFrame,
+  pauseMovieTimeline,
+  playMovieTimeline,
+  seekMovieTimeline,
+  stage3MovieToEngineTimeline,
+  stopMovieTimeline,
 } from "./engines";
 
 declare global {
@@ -3343,6 +3353,48 @@ function Workspace({
   onDeleteGameEntity,
   onDeleteGameScene,
 }: WorkspaceProps) {
+  const movieTimeline = useMemo(() => {
+    if (!movieData) return null;
+
+    return stage3MovieToEngineTimeline(movieData);
+  }, [movieData]);
+
+  const [moviePlayback, setMoviePlayback] = useState(() =>
+    createMoviePlaybackState(0, 24)
+  );
+
+  useEffect(() => {
+    if (!movieTimeline) {
+      setMoviePlayback(createMoviePlaybackState(0, 24));
+      return;
+    }
+
+    const durationSeconds = calculateTimelineDuration(movieTimeline);
+
+    setMoviePlayback((current) => ({
+      ...current,
+      durationSeconds,
+      fps: movieTimeline.fps,
+      currentTimeSeconds: Math.min(current.currentTimeSeconds, durationSeconds),
+    }));
+  }, [movieTimeline]);
+
+  useEffect(() => {
+    if (moviePlayback.status !== "playing") return;
+
+    const timer = window.setInterval(() => {
+      setMoviePlayback((current) => advanceMoviePlayback(current, 0.1));
+    }, 100);
+
+    return () => window.clearInterval(timer);
+  }, [moviePlayback.status]);
+
+  const movieActiveClips = movieTimeline
+    ? getActiveMovieClips(movieTimeline, moviePlayback.currentTimeSeconds)
+    : [];
+
+  const movieFrame = getMoviePlaybackFrame(moviePlayback);
+
   switch (active) {
     case "code":
       return (
@@ -3934,6 +3986,97 @@ function Workspace({
                     </div>
                   </div>
 
+                  <div className="movieEnginePanel">
+                    <div className="movieEngineHeader">
+                      <strong>Timeline Engine</strong>
+                      <span>
+                        {moviePlayback.status} · frame {movieFrame} ·{" "}
+                        {moviePlayback.currentTimeSeconds.toFixed(2)}s /{" "}
+                        {moviePlayback.durationSeconds.toFixed(2)}s
+                      </span>
+                    </div>
+
+                    <div className="moviePlaybackControls">
+                      <button
+                        className="btn"
+                        type="button"
+                        onClick={() =>
+                          setMoviePlayback((current) =>
+                            playMovieTimeline(current)
+                          )
+                        }
+                      >
+                        Play
+                      </button>
+
+                      <button
+                        className="btn"
+                        type="button"
+                        onClick={() =>
+                          setMoviePlayback((current) =>
+                            pauseMovieTimeline(current)
+                          )
+                        }
+                      >
+                        Pause
+                      </button>
+
+                      <button
+                        className="btn"
+                        type="button"
+                        onClick={() =>
+                          setMoviePlayback((current) =>
+                            stopMovieTimeline(current)
+                          )
+                        }
+                      >
+                        Stop
+                      </button>
+
+                      <input
+                        className="movieScrubber"
+                        type="range"
+                        min={0}
+                        max={moviePlayback.durationSeconds || 1}
+                        step={1 / Math.max(moviePlayback.fps, 1)}
+                        value={moviePlayback.currentTimeSeconds}
+                        onChange={(e) =>
+                          setMoviePlayback((current) =>
+                            seekMovieTimeline(current, Number(e.target.value))
+                          )
+                        }
+                      />
+                    </div>
+
+                    <div className="moviePreviewState">
+                      <div className="moviePreviewBox">
+                        <strong>Active Clips</strong>
+
+                        {movieActiveClips.length === 0 ? (
+                          <span className="emptyState">
+                            No clips active at current time
+                          </span>
+                        ) : (
+                          movieActiveClips.map((activeClip) => (
+                            <div
+                              className="movieActiveClip"
+                              key={`${activeClip.track.id}-${activeClip.clip.id}`}
+                            >
+                              <span>{activeClip.clip.name}</span>
+                              <span>{activeClip.track.name}</span>
+                              <span>
+                                local {activeClip.localTimeSeconds.toFixed(2)}s
+                              </span>
+                              <span>
+                                {(activeClip.progress * 100).toFixed(0)}%
+                              </span>
+                            </div>
+                          ))
+                        )}
+                      </div>
+                    </div>
+                  </div>
+
                   <div className="movieTimelinePreview">
                     <div className="movieTimelineHeader">Timeline Tracks</div>
 
@@ -3948,7 +4091,14 @@ function Workspace({
                         {track.clips.length > 0 && (
                           <div className="movieClips">
                             {track.clips.map((clip) => (
-                              <div className="movieClip" key={clip.id}>
+                              <div
+                                className={
+                                  movieActiveClips.some((activeClip) => activeClip.clip.id === clip.id)
+                                    ? "movieClip movieClipActive"
+                                    : "movieClip"
+                                }
+                                key={clip.id}
+                              >
                                 <span>{clip.name}</span>
                                 <span>start {clip.startSeconds}s</span>
                                 <span>{clip.durationSeconds}s</span>

@@ -882,3 +882,64 @@ html, body, #root {
   border: 1px solid #2a2a2a;
   overflow-wrap: anywhere;
 }
+
+.movieEnginePanel {
+  display: grid;
+  gap: 10px;
+  margin-bottom: 14px;
+  padding: 10px;
+  border: 1px solid #333;
+  border-radius: 8px;
+  background: rgba(15, 15, 15, 0.9);
+}
+
+.movieEngineHeader {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  font-size: 12px;
+}
+
+.movieEngineHeader span {
+  opacity: 0.8;
+}
+
+.moviePlaybackControls {
+  display: grid;
+  grid-template-columns: auto auto auto 1fr;
+  gap: 8px;
+  align-items: center;
+}
+
+.movieScrubber {
+  width: 100%;
+}
+
+.moviePreviewState {
+  display: grid;
+  gap: 8px;
+}
+
+.moviePreviewBox {
+  display: grid;
+  gap: 8px;
+  padding: 8px;
+  border: 1px solid #2c2c2c;
+  border-radius: 8px;
+  background: #0d0d0d;
+}
+
+.movieActiveClip {
+  display: grid;
+  grid-template-columns: 1fr 120px 110px 60px;
+  gap: 8px;
+  padding: 6px 8px;
+  border: 1px solid #383838;
+  border-radius: 6px;
+  font-size: 12px;
+}
+
+.movieClipActive {
+  border-color: #7b7bff;
+  background: rgba(80, 80, 140, 0.22);
+}
