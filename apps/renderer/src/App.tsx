@@ -2,6 +2,7 @@ import { useEffect,  useMemo, useState } from "react";
 import { rpc } from "./rpc";
 import "./app.css";
 import { Modal } from "./components/Modal";
+import { ThreeModelViewport } from "./components/modeling";
 import { CollapsiblePanel } from "./components/CollapsiblePanel";
 import { Button, Panel, Toolbar, WorkspaceHeader } from "./components/pl-ui";
 import {
@@ -50,6 +51,7 @@ import {
   createDemoMovieAnimationChannels,
   sampleMovieAnimationChannels,
   createMovieRenderPreviewState,
+  stage3ModelToModelingScene,
 } from "./engines";
 
 declare global {
@@ -3424,6 +3426,35 @@ function Workspace({
       )
     : null;
 
+  const [selectedModelObjectId, setSelectedModelObjectId] = useState<string | null>(
+    null
+  );
+
+  const modelingScene = useMemo(() => {
+    if (!modelData) return null;
+
+    return stage3ModelToModelingScene(modelData);
+  }, [modelData]);
+
+  useEffect(() => {
+    if (!modelingScene) {
+      setSelectedModelObjectId(null);
+      return;
+    }
+
+    const selectedStillExists = modelingScene.objects.some(
+      (object) => object.id === selectedModelObjectId
+    );
+
+    if (!selectedStillExists) {
+      setSelectedModelObjectId(modelingScene.objects[0]?.id ?? null);
+    }
+  }, [modelingScene, selectedModelObjectId]);
+
+  const selectedModelObject =
+    modelingScene?.objects.find((object) => object.id === selectedModelObjectId) ??
+    null;
+
   switch (active) {
     case "code":
       return (
@@ -4761,11 +4792,26 @@ function Workspace({
                         <div className="emptyState">No objects yet</div>
                       ) : (
                         modelData.objects.map((object) => (
-                          <div className="modelObjectCard" key={object.id}>
+                          <div 
+                            className={
+                              selectedModelObjectId === object.id
+                                ? "modelObject modelObjectSelected"
+                                : "modelObject"
+                            }
+                            key={object.id}
+                          >
                             <strong>{object.name}</strong>
                             <span>{object.primitive}</span>
                             <span>pos [{object.position.join(", ")}]</span>
                             <span>scale [{object.scale.join(", ")}]</span>
+
+                            <button
+                              className="btn btn-ghost"
+                              type="button"
+                              onClick={() => setSelectedModelObjectId(object.id)}
+                            >
+                              Select
+                            </button>
 
                             <button
                               className="btn btn-ghost"
@@ -4816,6 +4862,50 @@ function Workspace({
                       >
                         Add Object
                       </button>
+                    </div>
+                  </div>
+
+                  <div className="modelViewportPanel">
+                    <div className="modelViewportHeader">
+                      <strong>3D Viewport</strong>
+                      <span>
+                        {modelingScene
+                          ? `${modelingScene.objects.length} objects · ${modelingScene.units}`
+                          : "No scene"}
+                      </span>
+                    </div>
+
+                    {modelingScene ? (
+                      <ThreeModelViewport
+                        scene={modelingScene}
+                        selectedObjectId={selectedModelObjectId}
+                        onSelectObject={setSelectedModelObjectId}
+                      />
+                    ) : (
+                      <div className="emptyState">No modeling scene loaded.</div>
+                    )}
+
+                    <div className="modelViewportSelection">
+                      <strong>Selected Object</strong>
+
+                      {selectedModelObject ? (
+                        <div className="modelViewportSelectionGrid">
+                          <span>{selectedModelObject.name}</span>
+                          <span>{selectedModelObject.primitive}</span>
+                          <span>
+                            pos [{selectedModelObject.transform.position.x.toFixed(2)},{" "}
+                            {selectedModelObject.transform.position.y.toFixed(2)},{" "}
+                            {selectedModelObject.transform.position.z.toFixed(2)}]
+                          </span>
+                          <span>
+                            scale [{selectedModelObject.transform.scale.x.toFixed(2)},{" "}
+                            {selectedModelObject.transform.scale.y.toFixed(2)},{" "}
+                            {selectedModelObject.transform.scale.z.toFixed(2)}]
+                          </span>
+                        </div>
+                      ) : (
+                        <span className="emptyState">Click an object in the viewport.</span>
+                      )}
                     </div>
                   </div>
 

@@ -1243,3 +1243,52 @@ html, body, #root {
   width: 100%;
   height: 100%;
 }
+
+.modelViewportPanel {
+  display: grid;
+  gap: 10px;
+  margin-bottom: 14px;
+  padding: 10px;
+  border: 1px solid #333;
+  border-radius: 8px;
+  background: rgba(15, 15, 15, 0.9);
+}
+
+.modelViewportHeader {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  font-size: 12px;
+}
+
+.modelViewportHeader span {
+  opacity: 0.75;
+}
+
+.modelViewportSelection {
+  display: grid;
+  gap: 8px;
+  padding: 8px;
+  border: 1px solid #303030;
+  border-radius: 8px;
+  background: #0d0d0d;
+}
+
+.modelViewportSelectionGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+  font-size: 12px;
+}
+
+.modelViewportSelectionGrid span {
+  padding: 6px 8px;
+  border: 1px solid #303030;
+  border-radius: 6px;
+  background: #111;
+}
+
+.modelObjectSelected {
+  border-color: #ffcc66;
+  background: rgba(255, 204, 102, 0.12);
+}
