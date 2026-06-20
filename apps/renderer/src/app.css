@@ -1080,3 +1080,100 @@ html, body, #root {
   border-radius: 6px;
   background: #111;
 }
+.movieRenderPreview {
+  display: grid;
+  gap: 8px;
+  padding: 8px;
+  border: 1px solid #303030;
+  border-radius: 8px;
+  background: #0d0d0d;
+}
+
+.movieRenderPreviewHeader {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  font-size: 12px;
+}
+
+.movieRenderPreviewHeader span {
+  opacity: 0.75;
+}
+
+.movieRenderViewport {
+  position: relative;
+  min-height: 220px;
+  border: 1px solid #333;
+  border-radius: 8px;
+  overflow: hidden;
+  background:
+    linear-gradient(45deg, rgba(255, 255, 255, 0.04) 25%, transparent 25%),
+    linear-gradient(-45deg, rgba(255, 255, 255, 0.04) 25%, transparent 25%),
+    #080808;
+  background-size: 24px 24px;
+}
+
+.movieRenderLayer {
+  position: absolute;
+  display: grid;
+  gap: 2px;
+  min-width: 110px;
+  min-height: 58px;
+  place-items: center;
+  padding: 8px;
+  border: 1px solid #666;
+  border-radius: 8px;
+  background: rgba(70, 70, 95, 0.9);
+  color: #f1f1f1;
+  font-size: 11px;
+  transform-origin: center;
+  transition:
+    left 120ms linear,
+    top 120ms linear,
+    opacity 120ms linear,
+    transform 120ms linear;
+}
+
+.movieRenderLayer span {
+  opacity: 0.75;
+}
+
+.movieRenderLayer-video {
+  border-color: #5f75ff;
+}
+
+.movieRenderLayer-animation {
+  border-color: #a970ff;
+}
+
+.movieRenderLayer-effects {
+  border-color: #ffb75f;
+}
+
+.movieRenderLayer-audio {
+  border-color: #5fff9f;
+}
+
+.movieRenderEmpty {
+  display: grid;
+  min-height: 220px;
+  place-items: center;
+  color: #aaa;
+  font-size: 12px;
+}
+
+.moviePreviewLayerList {
+  display: grid;
+  gap: 6px;
+}
+
+.moviePreviewLayerRow {
+  display: grid;
+  grid-template-columns: 1fr 120px 90px 110px;
+  gap: 8px;
+  padding: 6px 8px;
+  border: 1px solid #303030;
+  border-radius: 6px;
+  background: #111;
+  font-size: 12px;
+}

@@ -49,6 +49,7 @@ import {
   getMovieTimelineLayout,
   createDemoMovieAnimationChannels,
   sampleMovieAnimationChannels,
+  createMovieRenderPreviewState,
 } from "./engines";
 
 declare global {
@@ -3414,6 +3415,13 @@ function Workspace({
     moviePlayback.currentTimeSeconds
   );
 
+  const movieRenderPreviewState = movieTimeline
+    ? createMovieRenderPreviewState(
+        movieTimeline,
+        moviePlayback.currentTimeSeconds
+      )
+    : null;
+
   switch (active) {
     case "code":
       return (
@@ -4067,6 +4075,66 @@ function Workspace({
                       />
                     </div>
 
+                    <div className="movieRenderPreview">
+                      <div className="movieRenderPreviewHeader">
+                        <strong>Preview</strong>
+                        <span>
+                          {movieRenderPreviewState
+                            ? `${movieRenderPreviewState.width}×${movieRenderPreviewState.height} @ ${movieRenderPreviewState.fps}fps`
+                            : "No preview"}
+                        </span>
+                      </div>
+
+                      <div className="movieRenderViewport">
+                        {movieRenderPreviewState &&
+                        movieRenderPreviewState.layers.length > 0 ? (
+                          movieRenderPreviewState.layers.map((layer, index) => (
+                            <div
+                              className={`movieRenderLayer movieRenderLayer-${layer.type}`}
+                              key={`${layer.trackId}-${layer.id}`}
+                              style={{
+                                left: `${Math.min(
+                                  Math.max(
+                                    10 +
+                                      layer.transform.position.x /
+                                        Math.max(movieRenderPreviewState.width, 1) *
+                                        60,
+                                    0
+                                  ),
+                                  80
+                                )}%`,
+                                top: `${Math.min(
+                                  Math.max(
+                                    12 +
+                                      layer.transform.position.y /
+                                        Math.max(movieRenderPreviewState.height, 1) *
+                                        60,
+                                    0
+                                  ),
+                                  80
+                                )}%`,
+                                opacity: Math.min(
+                                  Math.max(layer.transform.opacity, 0),
+                                  1
+                                ),
+                                transform: `scale(${layer.transform.scale.x}) rotate(${layer.transform.rotation}deg)`,
+                                zIndex: index + 1,
+                              }}
+                              title={`${layer.name} · ${layer.trackName}`}
+                            >
+                              <strong>{layer.name}</strong>
+                              <span>{layer.type}</span>
+                              <span>{(layer.progress * 100).toFixed(0)}%</span>
+                            </div>
+                          ))
+                        ) : (
+                          <div className="movieRenderEmpty">
+                            No active preview layers at current time
+                          </div>
+                        )}
+                      </div>
+                    </div>
+
                     <div className="moviePreviewState">
                       <div className="movieTimelineActivitySummary">
                         <span>
@@ -4149,6 +4217,31 @@ function Workspace({
 
                           <span>blur {movieTransformSample.blur.toFixed(2)}</span>
                         </div>
+                      </div>
+
+                      <div className="moviePreviewBox">
+                        <strong>Preview Layers</strong>
+
+                        {movieRenderPreviewState &&
+                        movieRenderPreviewState.layers.length > 0 ? (
+                          <div className="moviePreviewLayerList">
+                            {movieRenderPreviewState.layers.map((layer) => (
+                              <div
+                                className="moviePreviewLayerRow"
+                                key={`${layer.trackId}-${layer.id}`}
+                              >
+                                <span>{layer.name}</span>
+                                <span>{layer.trackName}</span>
+                                <span>{layer.type}</span>
+                                <span>
+                                  local {layer.localTimeSeconds.toFixed(2)}s
+                                </span>
+                              </div>
+                            ))}
+                          </div>
+                        ) : (
+                          <span className="emptyState">No active layers</span>
+                        )}
                       </div>
                     </div>
                   </div>
