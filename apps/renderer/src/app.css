@@ -1227,3 +1227,19 @@ html, body, #root {
   text-overflow: ellipsis;
   white-space: nowrap;
 }
+
+.threeModelViewport {
+  position: relative;
+  min-height: 420px;
+  width: 100%;
+  border: 1px solid #333;
+  border-radius: 8px;
+  overflow: hidden;
+  background: #08080a;
+}
+
+.threeModelViewport canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
