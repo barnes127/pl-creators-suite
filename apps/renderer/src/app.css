@@ -886,11 +886,6 @@ html, body, #root {
 .movieEnginePanel {
   display: grid;
   gap: 10px;
-  margin-bottom: 14px;
-  padding: 10px;
-  border: 1px solid #333;
-  border-radius: 8px;
-  background: rgba(15, 15, 15, 0.9);
 }
 
 .movieEngineHeader {
@@ -1176,4 +1171,59 @@ html, body, #root {
   border-radius: 6px;
   background: #111;
   font-size: 12px;
+}
+
+.movieEngineDrawer {
+  display: grid;
+  gap: 0;
+  margin-bottom: 14px;
+  border: 1px solid #333;
+  border-radius: 8px;
+  background: rgba(15, 15, 15, 0.9);
+  overflow: hidden;
+}
+
+.movieEngineDrawerHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 8px 10px;
+  border-bottom: 1px solid #303030;
+  background: #111;
+}
+
+.movieEngineDrawerMeta {
+  font-size: 12px;
+  opacity: 0.75;
+}
+
+.movieEngineDrawerBody {
+  display: grid;
+  gap: 10px;
+  padding: 10px;
+}
+
+.movieEngineDrawer.closed .movieEngineDrawerHeader {
+  border-bottom: none;
+}
+
+.movieRenderPreview {
+  min-width: 0;
+}
+
+.movieRenderViewport {
+  min-width: 0;
+}
+
+.moviePreviewLayerRow,
+.movieActiveClip {
+  min-width: 0;
+}
+
+.moviePreviewLayerRow span,
+.movieActiveClip span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }

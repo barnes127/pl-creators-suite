@@ -3367,6 +3367,8 @@ function Workspace({
     createMoviePlaybackState(0, 24)
   );
 
+  const [movieEngineDrawerOpen, setMovieEngineDrawerOpen] = useState(true);
+
   useEffect(() => {
     if (!movieTimeline) {
       setMoviePlayback(createMoviePlaybackState(0, 24));
@@ -4013,15 +4015,25 @@ function Workspace({
                     </div>
                   </div>
 
-                  <div className="movieEnginePanel">
-                    <div className="movieEngineHeader">
-                      <strong>Timeline Engine</strong>
-                      <span>
+                  <div className={`movieEngineDrawer ${movieEngineDrawerOpen ? "open" : "closed"}`}>
+                    <div className="movieEngineDrawerHeader">
+                      <button
+                        className="panelTitle"
+                        type="button"
+                        onClick={() => setMovieEngineDrawerOpen((value) => !value)}
+                      >
+                        {movieEngineDrawerOpen ? "▼" : "▲"} Timeline Engine / Preview
+                      </button>
+
+                      <div className="movieEngineDrawerMeta">
                         {moviePlayback.status} · frame {movieFrame} ·{" "}
                         {moviePlayback.currentTimeSeconds.toFixed(2)}s /{" "}
                         {moviePlayback.durationSeconds.toFixed(2)}s
-                      </span>
+                      </div>
                     </div>
+
+                    {movieEngineDrawerOpen && (
+                      <div className="movieEngineDrawerBody">
 
                     <div className="moviePlaybackControls">
                       <button
@@ -4245,121 +4257,123 @@ function Workspace({
                       </div>
                     </div>
                   </div>
+                )}
+              </div>
 
-                  <div className="movieTimelinePreview">
-                    <div className="movieTimelineHeader">
-                      Timeline Tracks ·{" "}
-                      {movieTimelineLayout
-                        ? `${movieTimelineLayout.durationSeconds.toFixed(2)}s`
-                        : "0.00s"}
-                    </div>
+              <div className="movieTimelinePreview">
+                <div className="movieTimelineHeader">
+                  Timeline Tracks ·{" "}
+                  {movieTimelineLayout
+                    ? `${movieTimelineLayout.durationSeconds.toFixed(2)}s`
+                    : "0.00s"}
+                </div>
 
-                    <div className="movieTimelineRuler">
-                      <span>0s</span>
-                      <span>
-                        {movieTimelineLayout
-                          ? `${Math.floor(movieTimelineLayout.durationSeconds / 2)}s`
-                          : "0s"}
-                      </span>
-                      <span>
-                        {movieTimelineLayout
-                          ? `${movieTimelineLayout.durationSeconds.toFixed(0)}s`
-                          : "0s"}
-                      </span>
-                    </div>
+                <div className="movieTimelineRuler">
+                  <span>0s</span>
+                  <span>
+                    {movieTimelineLayout
+                      ? `${Math.floor(movieTimelineLayout.durationSeconds / 2)}s`
+                      : "0s"}
+                  </span>
+                  <span>
+                    {movieTimelineLayout
+                      ? `${movieTimelineLayout.durationSeconds.toFixed(0)}s`
+                      : "0s"}
+                  </span>
+                </div>
 
-                    <div className="movieTimelineLayout">
-                      {movieTimelineLayout && (
-                        <div
-                          className="movieTimelinePlayhead"
-                          style={{
-                            left: `${movieTimelineLayout.playheadPercent}%`,
-                          }}
-                        />
-                      )}
-
-                      {movieTimelineLayout?.tracks.map((trackLayout) => (
-                        <div className="movieTrackLayoutRow" key={trackLayout.track.id}>
-                          <div className="movieTrackLabel">
-                            <strong>{trackLayout.track.name}</strong>
-                            <span>
-                              {trackLayout.track.type} ·{" "}
-                              {trackLayout.track.clips.length} clips
-                            </span>
-                          </div>
-
-                          <div className="movieTrackLane">
-                            {trackLayout.clips.map((clipLayout) => (
-                              <div
-                                className={`movieClipBlock movieClipBlock-${clipLayout.status}`}
-                                key={clipLayout.clip.id}
-                                style={{
-                                  left: `${clipLayout.leftPercent}%`,
-                                  width: `${clipLayout.widthPercent}%`,
-                                }}
-                                title={`${clipLayout.clip.name} ${clipLayout.clip.startSeconds}s-${(
-                                  clipLayout.clip.startSeconds +
-                                  clipLayout.clip.durationSeconds
-                                ).toFixed(2)}s`}
-                              >
-                                <span>{clipLayout.clip.name}</span>
-
-                                <button
-                                  className="btn btn-ghost"
-                                  type="button"
-                                  onClick={() =>
-                                    onDeleteMovieClip(
-                                      trackLayout.track.id,
-                                      clipLayout.clip.id
-                                    )
-                                  }
-                                >
-                                  Delete
-                                </button>
-                              </div>
-                            ))}
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-
-                  <label className="movieNotes">
-                    Notes
-                    <textarea
-                      className="docsEditor"
-                      value={movieData.notes}
-                      onChange={(e) =>
-                        onUpdateMovieField("notes", e.target.value)
-                      }
+                <div className="movieTimelineLayout">
+                  {movieTimelineLayout && (
+                    <div
+                      className="movieTimelinePlayhead"
+                      style={{
+                        left: `${movieTimelineLayout.playheadPercent}%`,
+                      }}
                     />
-                  </label>
+                  )}
 
-                  <div className="docsEditorActions">
-                    <button
-                      className="btn"
-                      type="button"
-                      onClick={() => onCloseMovie()}
-                    >
-                      Close Movie
-                    </button>
+                  {movieTimelineLayout?.tracks.map((trackLayout) => (
+                    <div className="movieTrackLayoutRow" key={trackLayout.track.id}>
+                      <div className="movieTrackLabel">
+                        <strong>{trackLayout.track.name}</strong>
+                        <span>
+                          {trackLayout.track.type} ·{" "}
+                          {trackLayout.track.clips.length} clips
+                        </span>
+                      </div>
 
-                    <button
-                      className="btn"
-                      type="button"
-                      onClick={() => void onSaveMovie()}
-                    >
-                      Save Movie
-                    </button>
-                  </div>
-                </>
-              ) : (
-                <div className="emptyState">Create or open a movie.</div>
-              )}
-            </Panel>
-          </section>
-        </div>
-      );
+                      <div className="movieTrackLane">
+                        {trackLayout.clips.map((clipLayout) => (
+                          <div
+                            className={`movieClipBlock movieClipBlock-${clipLayout.status}`}
+                            key={clipLayout.clip.id}
+                            style={{
+                              left: `${clipLayout.leftPercent}%`,
+                              width: `${clipLayout.widthPercent}%`,
+                            }}
+                            title={`${clipLayout.clip.name} ${clipLayout.clip.startSeconds}s-${(
+                              clipLayout.clip.startSeconds +
+                              clipLayout.clip.durationSeconds
+                            ).toFixed(2)}s`}
+                          >
+                            <span>{clipLayout.clip.name}</span>
+
+                            <button
+                              className="btn btn-ghost"
+                              type="button"
+                              onClick={() =>
+                                onDeleteMovieClip(
+                                  trackLayout.track.id,
+                                  clipLayout.clip.id
+                                )
+                              }
+                            >
+                              Delete
+                            </button>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              <label className="movieNotes">
+                Notes
+                <textarea
+                  className="docsEditor"
+                  value={movieData.notes}
+                  onChange={(e) =>
+                    onUpdateMovieField("notes", e.target.value)
+                  }
+                />
+              </label>
+
+              <div className="docsEditorActions">
+                <button
+                  className="btn"
+                  type="button"
+                  onClick={() => onCloseMovie()}
+                >
+                  Close Movie
+                </button>
+
+                <button
+                  className="btn"
+                  type="button"
+                  onClick={() => void onSaveMovie()}
+                >
+                  Save Movie
+                </button>
+              </div>
+            </>
+          ) : (
+            <div className="emptyState">Create or open a movie.</div>
+          )}
+        </Panel>
+      </section>
+    </div>
+  );
     case "docs":
       return (
         <div className="workspaceSplit">
