@@ -1339,3 +1339,50 @@ html, body, #root {
   flex-wrap: wrap;
   gap: 8px;
 }
+
+.modelCameraControls {
+  display: grid;
+  gap: 8px;
+  padding: 8px;
+  border: 1px solid #303030;
+  border-radius: 8px;
+  background: #0d0d0d;
+}
+
+.modelCameraMeta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  font-size: 12px;
+}
+
+.modelCameraMeta span {
+  padding: 4px 6px;
+  border: 1px solid #303030;
+  border-radius: 6px;
+  background: #111;
+}
+
+.modelCameraButtons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.modelCameraNudgeGrid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 90px));
+  gap: 8px;
+}
+
+.threeModelViewportFallback {
+  display: grid;
+  min-height: 420px;
+  place-items: center;
+  padding: 16px;
+  color: #ddd;
+  background: #08080a;
+  border: 1px solid #333;
+  border-radius: 8px;
+  text-align: center;
+}

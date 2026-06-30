@@ -52,6 +52,13 @@ import {
   sampleMovieAnimationChannels,
   createMovieRenderPreviewState,
   stage3ModelToModelingScene,
+  createModelingCamera,
+  physicsVec3,
+  setModelingCameraPosition,
+  setModelingCameraTarget,
+  setModelingCameraZoom,
+  toggleModelingCameraMode,
+  type ModelingCamera,
 } from "./engines";
 
 declare global {
@@ -3471,6 +3478,9 @@ function Workspace({
     null
   );
 
+  const [modelViewportCamera, setModelViewportCamera] =
+    useState<ModelingCamera>(() => createModelingCamera());
+
   const modelingScene = useMemo(() => {
     if (!modelData) return null;
 
@@ -3492,10 +3502,124 @@ function Workspace({
     }
   }, [modelingScene, selectedModelObjectId]);
 
+  useEffect(() => {
+    if (!modelingScene) {
+      setModelViewportCamera(createModelingCamera());
+      return;
+    }
+
+    setModelViewportCamera(modelingScene.camera);
+  }, [modelingScene?.id]);
+
   const selectedModelObject =
     modelingScene?.objects.find((object) => object.id === selectedModelObjectId) ??
     null;
 
+  const modelingViewportScene = useMemo(() => {
+    if (!modelingScene) return null;
+
+    return {
+      ...modelingScene,
+      camera: modelViewportCamera,
+    };
+  }, [modelingScene, modelViewportCamera]);
+
+function handleZoomModelViewport(delta: number) {
+  setModelViewportCamera((current) =>
+    setModelingCameraZoom(current, current.zoom + delta)
+  );
+}
+
+function handleResetModelViewportCamera() {
+  if (!modelingScene) {
+    setModelViewportCamera(createModelingCamera());
+    return;
+  }
+
+  setModelViewportCamera(modelingScene.camera);
+}
+
+function handleToggleModelViewportCameraMode() {
+  setModelViewportCamera((current) => toggleModelingCameraMode(current));
+}
+
+function handleNudgeModelViewportCamera(dx: number, dy: number, dz = 0) {
+  setModelViewportCamera((current) => {
+    const nextZ = Math.max(current.target.z + 2, current.position.z + dz);
+
+    return setModelingCameraTarget(
+      setModelingCameraPosition(
+        current,
+        physicsVec3(
+          current.position.x + dx,
+          current.position.y + dy,
+          nextZ
+        )
+      ),
+      physicsVec3(
+        current.target.x + dx,
+        current.target.y + dy,
+        current.target.z
+      )
+    );
+  });
+}
+
+function handleSetModelViewportView(view: "front" | "top" | "right") {
+  const target = selectedModelObject?.transform.position ?? physicsVec3(0, 0, 0);
+
+  if (view === "top") {
+    setModelViewportCamera((current) =>
+      setModelingCameraTarget(
+        setModelingCameraPosition(
+          current,
+          physicsVec3(target.x, target.y + 12, target.z)
+        ),
+        physicsVec3(target.x, target.y, target.z)
+      )
+    );
+    return;
+  }
+
+  if (view === "right") {
+    setModelViewportCamera((current) =>
+      setModelingCameraTarget(
+        setModelingCameraPosition(
+          current,
+          physicsVec3(target.x + 12, target.y, target.z)
+        ),
+        physicsVec3(target.x, target.y, target.z)
+      )
+    );
+    return;
+  }
+
+  setModelViewportCamera((current) =>
+    setModelingCameraTarget(
+      setModelingCameraPosition(
+        current,
+        physicsVec3(target.x, target.y, target.z + 12)
+      ),
+      physicsVec3(target.x, target.y, target.z)
+    )
+  );
+}
+
+function handleFrameSelectedModelObject() {
+  if (!selectedModelObject) return;
+
+  const target = selectedModelObject.transform.position;
+
+  setModelViewportCamera((current) =>
+    setModelingCameraTarget(
+      setModelingCameraPosition(
+        current,
+        physicsVec3(target.x, target.y, target.z + 12)
+      ),
+      physicsVec3(target.x, target.y, target.z)
+    )
+  );
+}
   switch (active) {
     case "code":
       return (
@@ -4916,9 +5040,143 @@ function Workspace({
                       </span>
                     </div>
 
-                    {modelingScene ? (
+                   <div className="modelCameraControls">
+                     <div className="modelCameraMeta">
+                       <span>mode: {modelViewportCamera.mode}</span>
+                       <span>zoom: {modelViewportCamera.zoom.toFixed(2)}</span>
+                       <span>
+                         pos [{modelViewportCamera.position.x.toFixed(2)},{" "}
+                         {modelViewportCamera.position.y.toFixed(2)},{" "}
+                         {modelViewportCamera.position.z.toFixed(2)}]
+                       </span>
+                       <span>
+                         target [{modelViewportCamera.target.x.toFixed(2)},{" "}
+                         {modelViewportCamera.target.y.toFixed(2)},{" "}
+                         {modelViewportCamera.target.z.toFixed(2)}]
+                       </span>
+                     </div>
+
+                     <div className="modelCameraButtons">
+                       <button
+                         className="btn btn-ghost"
+                         type="button"
+                         onClick={() => handleZoomModelViewport(0.2)}
+                       >
+                         Zoom In
+                       </button>
+
+                       <button
+                         className="btn btn-ghost"
+                         type="button"
+                         onClick={() => handleZoomModelViewport(-0.2)}
+                       >
+                         Zoom Out
+                       </button>
+
+                       <button
+                         className="btn btn-ghost"
+                         type="button"
+                         onClick={handleToggleModelViewportCameraMode}
+                       >
+                         Toggle {modelViewportCamera.mode === "perspective" ? "Ortho" : "Perspective"}
+                       </button>
+
+                       <button
+                         className="btn btn-ghost"
+                         type="button"
+                         onClick={handleResetModelViewportCamera}
+                       >
+                         Reset Camera
+                       </button>
+
+                       <button
+                         className="btn btn-ghost"
+                         type="button"
+                         onClick={() => handleSetModelViewportView("front")}
+                       >
+                         Front View
+                       </button>
+
+                       <button
+                         className="btn btn-ghost"
+                         type="button"
+                         onClick={() => handleSetModelViewportView("top")}
+                       >
+                         Top View
+                       </button>
+
+                       <button
+                         className="btn btn-ghost"
+                         type="button"
+                         onClick={() => handleSetModelViewportView("right")}
+                       >
+                         Right View
+                       </button>
+
+                       <button
+                         className="btn btn-ghost"
+                         type="button"
+                         onClick={handleFrameSelectedModelObject}
+                         disabled={!selectedModelObject}
+                       >
+                         Frame Selected
+                       </button>
+                     </div>
+
+                     <div className="modelCameraNudgeGrid">
+                       <button
+                         className="btn btn-ghost"
+                         type="button"
+                         onClick={() => handleNudgeModelViewportCamera(0, 1)}
+                       >
+                         Up
+                       </button>
+
+                       <button
+                         className="btn btn-ghost"
+                         type="button"
+                         onClick={() => handleNudgeModelViewportCamera(-1, 0)}
+                       >
+                         Left
+                       </button>
+
+                       <button
+                         className="btn btn-ghost"
+                         type="button"
+                         onClick={() => handleNudgeModelViewportCamera(1, 0)}
+                       >
+                         Right
+                       </button>
+
+                       <button
+                         className="btn btn-ghost"
+                         type="button"
+                         onClick={() => handleNudgeModelViewportCamera(0, -1)}
+                       >
+                         Down
+                       </button>
+
+                       <button
+                         className="btn btn-ghost"
+                         type="button"
+                         onClick={() => handleNudgeModelViewportCamera(0, 0, 1)}
+                       >
+                         Back
+                       </button>
+
+                       <button
+                         className="btn btn-ghost"
+                         type="button"
+                         onClick={() => handleNudgeModelViewportCamera(0, 0, -1)}
+                       >
+                         Forward
+                       </button>
+                     </div>
+                   </div>
+
+                    {modelingViewportScene ? (
                       <ThreeModelViewport
-                        scene={modelingScene}
+                        scene={modelingViewportScene}
                         selectedObjectId={selectedModelObjectId}
                         onSelectObject={setSelectedModelObjectId}
                       />

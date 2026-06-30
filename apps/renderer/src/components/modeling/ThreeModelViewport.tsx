@@ -40,6 +40,7 @@ export function ThreeModelViewport({
     null
   );
   const objectGroupRef = useRef<THREE.Group | null>(null);
+  const gridRef = useRef<THREE.GridHelper | null>(null);
   const raycasterRef = useRef(new THREE.Raycaster());
   const pointerRef = useRef(new THREE.Vector2());
 
@@ -50,33 +51,42 @@ export function ThreeModelViewport({
     const threeScene = new THREE.Scene();
     threeScene.background = new THREE.Color("#08080a");
 
-    const renderer = new THREE.WebGLRenderer({
-      antialias: true,
-      alpha: false,
-    });
+    let renderer: THREE.WebGLRenderer;
+
+    try {
+      renderer = new THREE.WebGLRenderer({
+        antialias: true,
+        alpha: false,
+      });
+    } catch (error) {
+      console.error("Failed to create Three.js renderer", error);
+
+      const fallback = document.createElement("div");
+      fallback.className = "threeModelViewportFallback";
+      fallback.textContent =
+        "3D viewport failed to initialize. Check WebGL / GPU support.";
+      host.appendChild(fallback);
+
+      return () => {
+        if (fallback.parentElement === host) {
+          host.removeChild(fallback);
+        }
+      };
+    }
 
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     renderer.setSize(host.clientWidth, host.clientHeight);
     host.appendChild(renderer.domElement);
 
     const camera = new THREE.PerspectiveCamera(
-      scene.camera.fovDegrees,
+      60,
       Math.max(host.clientWidth / Math.max(host.clientHeight, 1), 0.1),
       0.1,
       1000
     );
 
-    camera.position.set(
-      scene.camera.position.x,
-      scene.camera.position.y,
-      scene.camera.position.z
-    );
-
-    camera.lookAt(
-      scene.camera.target.x,
-      scene.camera.target.y,
-      scene.camera.target.z
-    );
+    camera.position.set(0, 0, 12);
+    camera.lookAt(0, 0, 0);
 
     const ambient = new THREE.AmbientLight("#ffffff", 0.55);
     const directional = new THREE.DirectionalLight("#ffffff", 0.85);
@@ -84,6 +94,7 @@ export function ThreeModelViewport({
 
     const grid = new THREE.GridHelper(20, 20, "#444444", "#222222");
     grid.visible = scene.viewport.gridEnabled;
+    gridRef.current = grid;
 
     const objectGroup = new THREE.Group();
 
@@ -109,6 +120,16 @@ export function ThreeModelViewport({
 
       if (activeCamera instanceof THREE.PerspectiveCamera) {
         activeCamera.aspect = width / height;
+        activeCamera.updateProjectionMatrix();
+      }
+
+      if (activeCamera instanceof THREE.OrthographicCamera) {
+        const aspect = width / height;
+
+        activeCamera.left = -8 * aspect;
+        activeCamera.right = 8 * aspect;
+        activeCamera.top = 8;
+        activeCamera.bottom = -8;
         activeCamera.updateProjectionMatrix();
       }
     }
@@ -148,14 +169,92 @@ export function ThreeModelViewport({
         }
       });
 
-      host.removeChild(renderer.domElement);
+      if (renderer.domElement.parentElement === host) {
+        host.removeChild(renderer.domElement);
+      }
 
       rendererRef.current = null;
       threeSceneRef.current = null;
       cameraRef.current = null;
       objectGroupRef.current = null;
+      gridRef.current = null;
     };
-  }, [scene.camera.fovDegrees, scene.camera.position.x, scene.camera.position.y, scene.camera.position.z, scene.camera.target.x, scene.camera.target.y, scene.camera.target.z, scene.viewport.gridEnabled]);
+  }, []);
+
+  useEffect(() => {
+    const host = hostRef.current;
+    const oldCamera = cameraRef.current;
+    const threeScene = threeSceneRef.current;
+
+    if (!host || !oldCamera || !threeScene) return;
+
+    const width = Math.max(host.clientWidth, 1);
+    const height = Math.max(host.clientHeight, 1);
+    const aspect = Math.max(width / height, 0.1);
+
+    const nextCamera =
+      scene.camera.mode === "orthographic"
+        ? new THREE.OrthographicCamera(
+            -8 * aspect,
+            8 * aspect,
+            8,
+            -8,
+            0.1,
+            1000
+          )
+        : new THREE.PerspectiveCamera(
+            scene.camera.fovDegrees,
+            aspect,
+            0.1,
+            1000
+          );
+
+    nextCamera.position.set(
+      scene.camera.position.x,
+      scene.camera.position.y,
+      scene.camera.position.z
+    );
+
+    nextCamera.zoom = scene.camera.zoom;
+
+    const cameraDirection = new THREE.Vector3(
+      scene.camera.target.x - scene.camera.position.x,
+      scene.camera.target.y - scene.camera.position.y,
+      scene.camera.target.z - scene.camera.position.z
+    ).normalize();
+
+    if (Math.abs(cameraDirection.y) > 0.95) {
+      nextCamera.up.set(0, 0, -1);
+    } else {
+      nextCamera.up.set(0, 1, 0);
+    }
+
+    nextCamera.lookAt(
+      scene.camera.target.x,
+      scene.camera.target.y,
+      scene.camera.target.z
+    );
+
+    nextCamera.updateProjectionMatrix();
+
+    cameraRef.current = nextCamera;
+  }, [
+    scene.camera.mode,
+    scene.camera.zoom,
+    scene.camera.fovDegrees,
+    scene.camera.position.x,
+    scene.camera.position.y,
+    scene.camera.position.z,
+    scene.camera.target.x,
+    scene.camera.target.y,
+    scene.camera.target.z,
+  ]);
+
+  useEffect(() => {
+    if (!gridRef.current) return;
+
+    gridRef.current.visible = scene.viewport.gridEnabled;
+  }, [scene.viewport.gridEnabled]);
 
   useEffect(() => {
     const objectGroup = objectGroupRef.current;
