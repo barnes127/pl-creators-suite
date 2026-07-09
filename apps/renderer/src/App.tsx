@@ -60,6 +60,19 @@ import {
   toggleModelingCameraMode,
   type ModelingCamera,
   createModelingViewportState,
+  createGameRuntimeEngine,
+  createGameRuntimeProject,
+  createGameTransform2D,
+  createGameVec2,
+  createSprite2DComponent,
+  createTransform2DComponent,
+  pauseGamePreview,
+  resumeGamePreview,
+  startGamePreview,
+  stepGamePreviewFrame,
+  stopGamePreview,
+  type GameRuntimeProject,
+  type GameRuntimeState,
 } from "./engines";
 
 declare global {
@@ -3638,6 +3651,80 @@ function handleFrameSelectedModelObject() {
     )
   );
 }
+  const gameRuntimeProject = useMemo<GameRuntimeProject | null>(() => {
+    if (!gameData) return null;
+
+    return createGameRuntimeProject({
+      id: activeGameName || gameData.name,
+      title: gameData.title,
+      targetPlatform: gameData.targetPlatform,
+      genre: gameData.genre,
+      scenes: gameData.scenes.map((scene) => ({
+        id: scene.id,
+        name: scene.name,
+        entities: scene.entities.map((entity) => ({
+          id: entity.id,
+          name: entity.name,
+          type: entity.type,
+          active: true,
+          tags: [entity.type],
+          layer: "default",
+          components: [
+            {
+              ...createTransform2DComponent(`component-transform-${entity.id}`),
+              transform: createGameTransform2D(
+                createGameVec2(entity.x, entity.y)
+              ),
+            },
+            createSprite2DComponent(`component-sprite-${entity.id}`),
+          ],
+        })),
+      })),
+    });
+  }, [activeGameName, gameData]);
+
+  const gameRuntimeEngine = useMemo(() => {
+    if (!gameRuntimeProject) return null;
+
+    return createGameRuntimeEngine(gameRuntimeProject);
+  }, [gameRuntimeProject]);
+
+  const [gameRuntimeState, setGameRuntimeState] =
+    useState<GameRuntimeState | null>(null);
+
+  useEffect(() => {
+    setGameRuntimeState(gameRuntimeEngine?.getState() ?? null);
+  }, [gameRuntimeEngine]);
+
+  function handleStartGamePreview() {
+    if (!gameRuntimeEngine) return;
+
+    setGameRuntimeState(startGamePreview(gameRuntimeEngine));
+  }
+
+  function handlePauseGamePreview() {
+    if (!gameRuntimeEngine) return;
+
+    setGameRuntimeState(pauseGamePreview(gameRuntimeEngine));
+  }
+
+  function handleResumeGamePreview() {
+    if (!gameRuntimeEngine) return;
+
+    setGameRuntimeState(resumeGamePreview(gameRuntimeEngine));
+  }
+
+  function handleStopGamePreview() {
+    if (!gameRuntimeEngine) return;
+
+    setGameRuntimeState(stopGamePreview(gameRuntimeEngine));
+  }
+
+  function handleStepGamePreviewFrame() {
+    if (!gameRuntimeEngine) return;
+
+    setGameRuntimeState(stepGamePreviewFrame(gameRuntimeEngine));
+  }
   switch (active) {
     case "code":
       return (
@@ -3823,6 +3910,93 @@ function handleFrameSelectedModelObject() {
                     <span className={gameDirty ? "docsDirty" : "docsSaved"}>
                       {gameDirty ? "Unsaved changes" : "Saved"}
                     </span>
+                  </div>
+
+                  <div className="gameSceneForm">
+                    <div className="gameSectionTitle">Runtime Preview</div>
+
+                    {gameRuntimeState ? (
+                      <>
+                        <div className="gameMeta">
+                          <span>
+                            Mode: {gameRuntimeState.clock.mode} · Status:{" "}
+                            {gameRuntimeState.clock.status}
+                          </span>
+
+                          <span>
+                            Time:{" "}
+                            {gameRuntimeState.clock.currentTimeSeconds.toFixed(2)}s
+                            {" "}· Frame: {gameRuntimeState.clock.frame}
+                          </span>
+                        </div>
+
+                        <div className="gameMeta">
+                          <span>
+                            Runtime scenes:{" "}
+                            {gameRuntimeState.diagnostics.sceneCount} · Runtime
+                            entities: {gameRuntimeState.diagnostics.entityCount}
+                          </span>
+
+                          <span>
+                            Components:{" "}
+                            {gameRuntimeState.diagnostics.componentCount}
+                          </span>
+                        </div>
+
+                        <div className="docsEditorActions">
+                          <button
+                            className="btn"
+                            type="button"
+                            onClick={handleStartGamePreview}
+                          >
+                            Preview
+                          </button>
+
+                          <button
+                            className="btn"
+                            type="button"
+                            onClick={handlePauseGamePreview}
+                          >
+                            Pause
+                          </button>
+
+                          <button
+                            className="btn"
+                            type="button"
+                            onClick={handleResumeGamePreview}
+                          >
+                            Resume
+                          </button>
+
+                          <button
+                            className="btn"
+                            type="button"
+                            onClick={handleStepGamePreviewFrame}
+                          >
+                            Step Frame
+                          </button>
+
+                          <button
+                            className="btn"
+                            type="button"
+                            onClick={handleStopGamePreview}
+                          >
+                            Stop
+                          </button>
+                        </div>
+
+                        {gameRuntimeState.diagnostics.warnings.length > 0 && (
+                          <div className="emptyState">
+                            Runtime warnings:{" "}
+                            {gameRuntimeState.diagnostics.warnings.join(" ")}
+                          </div>
+                        )}
+                      </>
+                    ) : (
+                      <div className="emptyState">
+                        Open or create a game to initialize the runtime.
+                      </div>
+                    )}
                   </div>
 
                   <div className="gameFormGrid">
