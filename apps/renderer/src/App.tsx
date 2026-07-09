@@ -3692,9 +3692,26 @@ function handleFrameSelectedModelObject() {
   const [gameRuntimeState, setGameRuntimeState] =
     useState<GameRuntimeState | null>(null);
 
+  const [gameEngineDrawerOpen, setGameEngineDrawerOpen] = useState(true);
+
   useEffect(() => {
     setGameRuntimeState(gameRuntimeEngine?.getState() ?? null);
   }, [gameRuntimeEngine]);
+
+  const selectedGameRuntimeScene =
+    gameRuntimeState?.project.scenes.find(
+      (scene) => scene.id === gameRuntimeState.selection.sceneId
+    ) ?? null;
+
+  const selectedGameRuntimeEntity =
+    selectedGameRuntimeScene?.entities.find(
+      (entity) => entity.id === gameRuntimeState?.selection.entityId
+    ) ?? null;
+
+  const activeGameRuntimeScene =
+    gameRuntimeState?.project.scenes.find(
+      (scene) => scene.id === gameRuntimeState.activeSceneId
+    ) ?? null;
 
   function handleStartGamePreview() {
     if (!gameRuntimeEngine) return;
@@ -3999,6 +4016,140 @@ function handleFrameSelectedModelObject() {
                     )}
                   </div>
 
+                  <div className="gameSceneForm">
+                    <button
+                      className="panelTitle"
+                      type="button"
+                      onClick={() =>
+                        setGameEngineDrawerOpen((current) => !current)
+                      }
+                    >
+                      {gameEngineDrawerOpen ? "▼" : "▲"} Game Runtime Debug
+                    </button>
+
+                    {gameEngineDrawerOpen && gameRuntimeState ? (
+                      <div className="recentList">
+                        <div className="recentItem">
+                          <strong>Runtime</strong>
+                          <span>
+                            Mode: {gameRuntimeState.clock.mode} · Status:{" "}
+                            {gameRuntimeState.clock.status}
+                          </span>
+                          <span>
+                            Time:{" "}
+                            {gameRuntimeState.clock.currentTimeSeconds.toFixed(3)}
+                            s · Delta:{" "}
+                            {gameRuntimeState.clock.deltaSeconds.toFixed(3)}s
+                          </span>
+                          <span>
+                            Frame: {gameRuntimeState.clock.frame} · Time Scale:{" "}
+                            {gameRuntimeState.clock.timeScale}
+                          </span>
+                        </div>
+
+                        <div className="recentItem">
+                          <strong>Scene State</strong>
+                          <span>
+                            Active Scene:{" "}
+                            {activeGameRuntimeScene
+                              ? activeGameRuntimeScene.name
+                              : "(none)"}
+                          </span>
+                          <span>
+                            Selected Scene:{" "}
+                            {selectedGameRuntimeScene
+                              ? selectedGameRuntimeScene.name
+                              : "(none)"}
+                          </span>
+                          <span>
+                            Selected Entity:{" "}
+                            {selectedGameRuntimeEntity
+                              ? selectedGameRuntimeEntity.name
+                              : "(none)"}
+                          </span>
+                        </div>
+
+                        <div className="recentItem">
+                          <strong>Diagnostics</strong>
+                          <span>
+                            Scenes: {gameRuntimeState.diagnostics.sceneCount}
+                          </span>
+                          <span>
+                            Entities: {gameRuntimeState.diagnostics.entityCount}
+                          </span>
+                          <span>
+                            Active Entities:{" "}
+                            {gameRuntimeState.diagnostics.activeEntityCount}
+                          </span>
+                          <span>
+                            Components:{" "}
+                            {gameRuntimeState.diagnostics.componentCount}
+                          </span>
+                          <span>
+                            Enabled Components:{" "}
+                            {
+                              gameRuntimeState.diagnostics
+                                .enabledComponentCount
+                            }
+                          </span>
+                        </div>
+
+                        <div className="recentItem">
+                          <strong>Runtime Scene Graph</strong>
+                          {gameRuntimeState.project.scenes.length === 0 ? (
+                            <span>No runtime scenes</span>
+                          ) : (
+                            gameRuntimeState.project.scenes.map((scene) => (
+                              <span key={scene.id}>
+                                {scene.name}: {scene.entities.length} entities
+                              </span>
+                            ))
+                          )}
+                        </div>
+
+                        {selectedGameRuntimeEntity && (
+                          <div className="recentItem">
+                            <strong>Selected Entity Components</strong>
+                            <span>ID: {selectedGameRuntimeEntity.id}</span>
+                            <span>Type: {selectedGameRuntimeEntity.type}</span>
+                            <span>
+                              Layer: {selectedGameRuntimeEntity.layer}
+                            </span>
+                            <span>
+                              Tags:{" "}
+                              {selectedGameRuntimeEntity.tags.length > 0
+                                ? selectedGameRuntimeEntity.tags.join(", ")
+                                : "(none)"}
+                            </span>
+                            <span>
+                              Components:{" "}
+                              {selectedGameRuntimeEntity.components
+                                .map((component) => component.kind)
+                                .join(", ")}
+                            </span>
+                          </div>
+                        )}
+
+                        {gameRuntimeState.diagnostics.warnings.length > 0 && (
+                          <div className="recentItem">
+                            <strong>Warnings</strong>
+                            {gameRuntimeState.diagnostics.warnings.map(
+                              (warning) => (
+                                <span key={warning}>{warning}</span>
+                              )
+                            )}
+                          </div>
+                        )}
+                      </div>
+                    ) : (
+                      <div className="emptyState">
+                        {gameRuntimeState
+                          ? "Runtime debug drawer is closed."
+                          : "Open or create a game to inspect runtime state."}
+                      </div>
+                    )}
+                  </div>
+
                   <div className="gameFormGrid">
                     <label>
                       Title
@@ -4141,12 +4292,20 @@ function handleFrameSelectedModelObject() {
                         ) : (
                           <div className="gameEntityList">
                             {scene.entities.map((entity) => (
-                              <div className="gameEntityCard" key={entity.id}>
-                                <strong>{entity.name}</strong>
-                                <span>{entity.type}</span>
-                                <span>
-                                  pos [{entity.x}, {entity.y}]
-                                </span>
+                              <div
+                                className="gameEntityCard"
+                                key={entity.id}
+                                onClick={() => {
+                                  if (!gameRuntimeEngine) return;
+                              
+                                  setGameRuntimeState(
+                                    gameRuntimeEngine.selectEntity({
+                                      sceneId: scene.id,
+                                      entityId: entity.id,
+                                    })
+                                  );
+                                }}
+                              >
 
                                 <button
                                   className="btn btn-ghost"
