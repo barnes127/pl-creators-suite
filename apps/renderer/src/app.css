@@ -1386,3 +1386,85 @@ html, body, #root {
   border-radius: 8px;
   text-align: center;
 }
+
+.modelEngineDrawer {
+  display: grid;
+  gap: 0;
+  margin-bottom: 14px;
+  border: 1px solid #333;
+  border-radius: 8px;
+  background: rgba(15, 15, 15, 0.9);
+  overflow: hidden;
+}
+
+.modelEngineDrawerHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 8px 10px;
+  border-bottom: 1px solid #303030;
+  background: #111;
+}
+
+.modelEngineDrawer.closed .modelEngineDrawerHeader {
+  border-bottom: none;
+}
+
+.modelEngineDrawerMeta {
+  font-size: 12px;
+  opacity: 0.75;
+}
+
+.modelEngineDrawerBody {
+  display: grid;
+  gap: 10px;
+  padding: 10px;
+}
+
+.modelEngineDebugGrid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.modelEngineDebugCard {
+  display: grid;
+  gap: 6px;
+  padding: 8px;
+  border: 1px solid #303030;
+  border-radius: 8px;
+  background: #0d0d0d;
+  font-size: 12px;
+}
+
+.modelEngineDebugCard span {
+  opacity: 0.8;
+  overflow-wrap: anywhere;
+}
+
+.modelEngineProjectedList {
+  display: grid;
+  gap: 8px;
+  padding: 8px;
+  border: 1px solid #303030;
+  border-radius: 8px;
+  background: #0d0d0d;
+  font-size: 12px;
+}
+
+.modelEngineProjectedRow {
+  display: grid;
+  grid-template-columns: 1fr 100px 150px 150px 80px;
+  gap: 8px;
+  padding: 6px 8px;
+  border: 1px solid #303030;
+  border-radius: 6px;
+  background: #111;
+}
+
+.modelEngineProjectedRow span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}

@@ -59,6 +59,7 @@ import {
   setModelingCameraZoom,
   toggleModelingCameraMode,
   type ModelingCamera,
+  createModelingViewportState,
 } from "./engines";
 
 declare global {
@@ -3478,6 +3479,8 @@ function Workspace({
     null
   );
 
+  const [modelEngineDrawerOpen, setModelEngineDrawerOpen] = useState(true);
+
   const [modelViewportCamera, setModelViewportCamera] =
     useState<ModelingCamera>(() => createModelingCamera());
 
@@ -3523,6 +3526,21 @@ function Workspace({
       camera: modelViewportCamera,
     };
   }, [modelingScene, modelViewportCamera]);
+
+  const modelingViewportState = useMemo(() => {
+    if (!modelingViewportScene) return null;
+
+    return createModelingViewportState(
+      modelingViewportScene,
+      selectedModelObjectId
+    );
+  }, [modelingViewportScene, selectedModelObjectId]);
+
+  const visibleModelObjects =
+    modelingScene?.objects.filter((object) => object.visible).length ?? 0;
+
+  const lockedModelObjects =
+    modelingScene?.objects.filter((object) => object.locked).length ?? 0;
 
 function handleZoomModelViewport(delta: number) {
   setModelViewportCamera((current) =>
@@ -5231,6 +5249,106 @@ function handleFrameSelectedModelObject() {
                                 })}
                               </div>
                             ))}
+                          </div>
+
+                          <div className={`modelEngineDrawer ${modelEngineDrawerOpen ? "open" : "closed"}`}>
+                            <div className="modelEngineDrawerHeader">
+                              <button
+                                className="panelTitle"
+                                type="button"
+                                onClick={() => setModelEngineDrawerOpen((value) => !value)}
+                              >
+                                {modelEngineDrawerOpen ? "▼" : "▲"} Modeling Engine
+                              </button>
+
+                              <div className="modelEngineDrawerMeta">
+                                {modelingScene
+                                  ? `${modelingScene.objects.length} objects · ${modelViewportCamera.mode}`
+                                  : "No scene"}
+                              </div>
+                            </div>
+
+                            {modelEngineDrawerOpen && (
+                              <div className="modelEngineDrawerBody">
+                                <div className="modelEngineDebugGrid">
+                                  <div className="modelEngineDebugCard">
+                                    <strong>Scene</strong>
+                                    <span>id: {modelingScene?.id ?? "none"}</span>
+                                    <span>title: {modelingScene?.title ?? "none"}</span>
+                                    <span>units: {modelingScene?.units ?? "none"}</span>
+                                    <span>materials: {modelingScene?.materials.length ?? 0}</span>
+                                  </div>
+
+                                  <div className="modelEngineDebugCard">
+                                    <strong>Objects</strong>
+                                    <span>total: {modelingScene?.objects.length ?? 0}</span>
+                                    <span>visible: {visibleModelObjects}</span>
+                                    <span>locked: {lockedModelObjects}</span>
+                                    <span>
+                                      selected: {selectedModelObject ? selectedModelObject.name : "none"}
+                                    </span>
+                                  </div>
+
+                                  <div className="modelEngineDebugCard">
+                                    <strong>Camera</strong>
+                                    <span>mode: {modelViewportCamera.mode}</span>
+                                    <span>zoom: {modelViewportCamera.zoom.toFixed(2)}</span>
+                                    <span>
+                                      pos [{modelViewportCamera.position.x.toFixed(2)},{" "}
+                                      {modelViewportCamera.position.y.toFixed(2)},{" "}
+                                      {modelViewportCamera.position.z.toFixed(2)}]
+                                    </span>
+                                    <span>
+                                      target [{modelViewportCamera.target.x.toFixed(2)},{" "}
+                                      {modelViewportCamera.target.y.toFixed(2)},{" "}
+                                      {modelViewportCamera.target.z.toFixed(2)}]
+                                    </span>
+                                  </div>
+
+                                  <div className="modelEngineDebugCard">
+                                    <strong>Viewport</strong>
+                                    <span>
+                                      size: {modelingViewportState?.viewport.width ?? 0}×
+                                      {modelingViewportState?.viewport.height ?? 0}
+                                    </span>
+                                    <span>
+                                      grid: {modelingViewportState?.viewport.gridEnabled ? "on" : "off"}
+                                    </span>
+                                    <span>
+                                      snap: {modelingViewportState?.viewport.snapEnabled ? "on" : "off"}
+                                    </span>
+                                    <span>
+                                      projected: {modelingViewportState?.projectedObjects.length ?? 0}
+                                    </span>
+                                  </div>
+                                </div>
+
+                                <div className="modelEngineProjectedList">
+                                  <strong>Projected Objects</strong>
+
+                                  {modelingViewportState &&
+                                  modelingViewportState.projectedObjects.length > 0 ? (
+                                    modelingViewportState.projectedObjects.map((projected) => (
+                                      <div className="modelEngineProjectedRow" key={projected.object.id}>
+                                        <span>{projected.object.name}</span>
+                                        <span>{projected.object.primitive}</span>
+                                        <span>
+                                          screen [{projected.screenPosition.x.toFixed(1)},{" "}
+                                          {projected.screenPosition.y.toFixed(1)}]
+                                        </span>
+                                        <span>
+                                          size [{projected.screenSize.x.toFixed(1)},{" "}
+                                          {projected.screenSize.y.toFixed(1)}]
+                                        </span>
+                                        <span>{projected.selected ? "selected" : "idle"}</span>
+                                      </div>
+                                    ))
+                                  ) : (
+                                    <span className="emptyState">No projected objects</span>
+                                  )}
+                                </div>
+                              </div>
+                            )}
                           </div>
 
                           <div className="modelTransformQuickActions">
