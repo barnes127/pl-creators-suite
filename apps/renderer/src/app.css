@@ -1501,3 +1501,561 @@ html, body, #root {
 .dangerBtn {
   border-color: rgba(255, 90, 90, 0.7);
 }
+
+
+/* -------------------------------------------------------------------------- */
+/* Stage 6 Wave 34 — Praecursor Labs branded theme foundation                 */
+/* -------------------------------------------------------------------------- */
+
+:root {
+  color-scheme: dark;
+
+  --pl-bg-void: #05070a;
+  --pl-bg-app: #080b10;
+  --pl-bg-shell: #0b1017;
+  --pl-bg-panel: #0f1620;
+  --pl-bg-panel-2: #121b27;
+  --pl-bg-card: rgba(16, 25, 36, 0.92);
+  --pl-bg-card-soft: rgba(20, 31, 44, 0.72);
+  --pl-bg-input: #081018;
+
+  --pl-border: rgba(143, 178, 204, 0.18);
+  --pl-border-strong: rgba(143, 225, 255, 0.38);
+  --pl-border-soft: rgba(255, 255, 255, 0.08);
+
+  --pl-text: #eef7ff;
+  --pl-text-soft: #b7c6d7;
+  --pl-text-muted: #7f91a6;
+
+  --pl-cyan: #5ee7ff;
+  --pl-cyan-strong: #83f1ff;
+  --pl-teal: #38f8c4;
+  --pl-purple: #a78bfa;
+  --pl-magenta: #f472b6;
+  --pl-amber: #f6c76b;
+  --pl-green: #7ee787;
+  --pl-red: #ff6b7a;
+
+  --pl-shadow-soft: 0 16px 50px rgba(0, 0, 0, 0.32);
+  --pl-shadow-glow: 0 0 32px rgba(94, 231, 255, 0.12);
+
+  --pl-radius-xs: 6px;
+  --pl-radius-sm: 9px;
+  --pl-radius-md: 12px;
+  --pl-radius-lg: 18px;
+
+  --pl-space-1: 4px;
+  --pl-space-2: 8px;
+  --pl-space-3: 12px;
+  --pl-space-4: 16px;
+  --pl-space-5: 20px;
+
+  --pl-font-ui: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
+    "Segoe UI", sans-serif;
+  --pl-font-mono: "JetBrains Mono", "Fira Code", ui-monospace, SFMono-Regular,
+    Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+}
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(94, 231, 255, 0.42) rgba(255, 255, 255, 0.04);
+}
+
+*::selection {
+  color: #031014;
+  background: rgba(94, 231, 255, 0.82);
+}
+
+html,
+body,
+#root {
+  background:
+    radial-gradient(circle at top left, rgba(94, 231, 255, 0.08), transparent 32%),
+    radial-gradient(circle at bottom right, rgba(167, 139, 250, 0.08), transparent 34%),
+    var(--pl-bg-void);
+}
+
+body {
+  font-family: var(--pl-font-ui);
+  letter-spacing: 0.01em;
+}
+
+/* App shell */
+
+.shell {
+  background:
+    linear-gradient(135deg, rgba(94, 231, 255, 0.035), transparent 28%),
+    linear-gradient(315deg, rgba(167, 139, 250, 0.035), transparent 28%),
+    var(--pl-bg-app);
+  color: var(--pl-text);
+  font-family: var(--pl-font-ui);
+}
+
+.sidebar {
+  background:
+    linear-gradient(180deg, rgba(94, 231, 255, 0.06), transparent 22%),
+    linear-gradient(0deg, rgba(167, 139, 250, 0.035), transparent 30%),
+    var(--pl-bg-shell);
+  border-right: 1px solid var(--pl-border);
+  box-shadow: inset -1px 0 0 rgba(255, 255, 255, 0.03);
+}
+
+.main {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.018), transparent 12%),
+    var(--pl-bg-app);
+}
+
+.topbar {
+  background:
+    linear-gradient(90deg, rgba(94, 231, 255, 0.045), transparent 42%),
+    rgba(10, 15, 22, 0.94);
+  border-bottom: 1px solid var(--pl-border);
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.025);
+}
+
+.statusbar {
+  background: rgba(7, 10, 15, 0.96);
+  border-top: 1px solid var(--pl-border);
+  color: var(--pl-text-muted);
+}
+
+/* Brand/nav polish */
+
+.brandTitle {
+  color: var(--pl-text);
+  font-size: 17px;
+  letter-spacing: 0.02em;
+}
+
+.brandTitle::after {
+  content: "";
+  display: block;
+  width: 54px;
+  height: 2px;
+  margin-top: 8px;
+  border-radius: 999px;
+  background: linear-gradient(90deg, var(--pl-cyan), var(--pl-purple));
+  box-shadow: var(--pl-shadow-glow);
+}
+
+.brandSub {
+  color: var(--pl-text-soft);
+}
+
+.nav {
+  gap: 8px;
+}
+
+.navItem {
+  position: relative;
+  overflow: hidden;
+  border: 1px solid var(--pl-border);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.035), transparent),
+    var(--pl-bg-card-soft);
+  color: var(--pl-text);
+  border-radius: var(--pl-radius-md);
+  transition:
+    border-color 140ms ease,
+    background 140ms ease,
+    transform 140ms ease,
+    box-shadow 140ms ease;
+}
+
+.navItem::before {
+  content: "";
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 3px;
+  background: transparent;
+  transition: background 140ms ease;
+}
+
+.navItem:hover {
+  border-color: var(--pl-border-strong);
+  background:
+    linear-gradient(180deg, rgba(94, 231, 255, 0.055), transparent),
+    var(--pl-bg-panel-2);
+  transform: translateY(-1px);
+}
+
+.navItem.active {
+  border-color: rgba(94, 231, 255, 0.62);
+  background:
+    linear-gradient(135deg, rgba(94, 231, 255, 0.14), rgba(167, 139, 250, 0.07)),
+    var(--pl-bg-panel-2);
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 255, 255, 0.035),
+    0 0 24px rgba(94, 231, 255, 0.08);
+}
+
+.navItem.active::before {
+  background: linear-gradient(180deg, var(--pl-cyan), var(--pl-purple));
+}
+
+.navLabel {
+  color: var(--pl-text);
+}
+
+.navHint,
+.tiny,
+.activeSub,
+.workspaceSubtitle,
+.muted {
+  color: var(--pl-text-muted);
+}
+
+/* Shared panels/cards */
+
+.card,
+.modalPanel,
+.recentItem,
+.physicsSmokeCard,
+.physicsPlaygroundBodyRow,
+.moviePreviewBox,
+.movieClip,
+.movieActiveClip,
+.movieTrackLabel,
+.movieTrackLane,
+.movieRenderPreview,
+.moviePreviewLayerRow,
+.modelViewportPanel,
+.modelViewportSelection,
+.modelTransformInspector,
+.modelTransformGroup,
+.modelCameraControls,
+.modelEngineDebugCard,
+.modelEngineProjectedList,
+.gameEntityCard {
+  border-color: var(--pl-border);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.035), transparent),
+    var(--pl-bg-card);
+  border-radius: var(--pl-radius-md);
+}
+
+.card,
+.modalPanel,
+.modelViewportPanel,
+.gameSceneForm,
+.gameEntityForm,
+.gameSceneList,
+.movieClipForm,
+.movieTimelinePreview,
+.modelPreviewBox,
+.modelObjectForm,
+.movieEngineDrawer,
+.modelEngineDrawer {
+  box-shadow: var(--pl-shadow-soft);
+}
+
+.cardTitle,
+.workspaceTitle,
+.activeTitle,
+.modalTitle,
+.gameSectionTitle,
+.modelSectionTitle,
+.modelPreviewTitle,
+.movieTimelineHeader,
+.movieEngineDrawerHeader,
+.modelEngineDrawerHeader {
+  color: var(--pl-text);
+  letter-spacing: 0.015em;
+}
+
+.workspace {
+  background:
+    radial-gradient(circle at top right, rgba(94, 231, 255, 0.035), transparent 32%),
+    radial-gradient(circle at bottom left, rgba(167, 139, 250, 0.025), transparent 30%);
+}
+
+.workspaceHeader {
+  border-bottom-color: var(--pl-border);
+  background:
+    linear-gradient(90deg, rgba(255, 255, 255, 0.025), transparent),
+    rgba(10, 15, 22, 0.55);
+}
+
+/* Buttons */
+
+.btn {
+  border: 1px solid var(--pl-border);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.07), rgba(255, 255, 255, 0.015)),
+    #101925;
+  color: var(--pl-text);
+  border-radius: var(--pl-radius-sm);
+  font-weight: 700;
+  transition:
+    border-color 140ms ease,
+    background 140ms ease,
+    transform 140ms ease,
+    box-shadow 140ms ease,
+    opacity 140ms ease;
+}
+
+.btn:hover {
+  border-color: rgba(94, 231, 255, 0.62);
+  background:
+    linear-gradient(180deg, rgba(94, 231, 255, 0.12), rgba(255, 255, 255, 0.025)),
+    #132233;
+  box-shadow: 0 0 18px rgba(94, 231, 255, 0.08);
+  transform: translateY(-1px);
+}
+
+.btn:active {
+  transform: translateY(0);
+}
+
+.btn:disabled {
+  cursor: not-allowed;
+  opacity: 0.52;
+  transform: none;
+  box-shadow: none;
+}
+
+.btn-primary {
+  border-color: rgba(94, 231, 255, 0.68);
+  background:
+    linear-gradient(135deg, rgba(94, 231, 255, 0.28), rgba(56, 248, 196, 0.12)),
+    #102233;
+}
+
+.btn-ghost {
+  background: rgba(255, 255, 255, 0.025);
+  border-color: var(--pl-border);
+}
+
+.dangerBtn {
+  border-color: rgba(255, 107, 122, 0.58);
+  color: #ffd6db;
+}
+
+/* Inputs/editors */
+
+.input,
+select,
+textarea,
+.docsEditor,
+.codeEditor,
+.sheetCell {
+  border-color: var(--pl-border);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.025), transparent),
+    var(--pl-bg-input);
+  color: var(--pl-text);
+  border-radius: var(--pl-radius-sm);
+}
+
+.input:focus,
+select:focus,
+textarea:focus,
+.docsEditor:focus,
+.codeEditor:focus,
+.sheetCell:focus {
+  outline: none;
+  border-color: rgba(94, 231, 255, 0.7);
+  box-shadow: 0 0 0 3px rgba(94, 231, 255, 0.08);
+}
+
+.docsEditor,
+.codeEditor {
+  font-family: var(--pl-font-mono);
+  background:
+    linear-gradient(180deg, rgba(94, 231, 255, 0.025), transparent),
+    #071017;
+}
+
+/* Lists and utility panels */
+
+.recentList {
+  gap: 8px;
+}
+
+.recentItem {
+  color: var(--pl-text-soft);
+}
+
+.recentItem strong {
+  color: var(--pl-text);
+}
+
+.sidebarFooter {
+  border-top-color: var(--pl-border);
+}
+
+.errorBox {
+  border-color: rgba(255, 107, 122, 0.46);
+  background: rgba(255, 107, 122, 0.08);
+  color: #ffd6db;
+}
+
+/* Drawers / advanced tools */
+
+.copilotDrawer,
+.physicsDrawer {
+  border-top: 1px solid var(--pl-border);
+  background:
+    linear-gradient(180deg, rgba(94, 231, 255, 0.035), transparent),
+    rgba(7, 10, 15, 0.96);
+}
+
+.copilotDrawerHeader,
+.physicsDrawerHeader {
+  border-bottom-color: var(--pl-border);
+  background: rgba(12, 18, 26, 0.96);
+}
+
+.copilotResponse,
+.physicsPlaygroundStats span,
+.movieTimelineActivitySummary span,
+.modelCameraMeta span,
+.modelViewportSelectionGrid span,
+.movieTransformSampleGrid span {
+  border-color: var(--pl-border);
+  background: rgba(8, 16, 24, 0.86);
+}
+
+/* Tables/grids/viewports */
+
+.sheetGridWrap,
+.movieTimelinePreview,
+.modelPreviewBox,
+.modelObjectForm,
+.gameSceneForm,
+.gameEntityForm,
+.gameSceneList,
+.modelEngineDrawer,
+.movieEngineDrawer {
+  border-color: var(--pl-border);
+  background: var(--pl-bg-card-soft);
+  border-radius: var(--pl-radius-md);
+}
+
+.sheetGrid th {
+  background: rgba(18, 30, 44, 0.96);
+  color: var(--pl-text-soft);
+  border-color: var(--pl-border);
+}
+
+.sheetGrid td {
+  border-color: var(--pl-border-soft);
+}
+
+.sheetCell:hover {
+  background: rgba(94, 231, 255, 0.035);
+}
+
+.threeModelViewport,
+.threeModelViewportFallback,
+.movieRenderViewport,
+.physicsPlaygroundViewport,
+.modelPreviewGrid {
+  border-color: var(--pl-border-strong);
+  background-color: #05090f;
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 255, 255, 0.025),
+    inset 0 0 42px rgba(94, 231, 255, 0.035);
+}
+
+.modelPreviewGrid,
+.physicsPlaygroundViewport {
+  background:
+    linear-gradient(rgba(94, 231, 255, 0.06) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(94, 231, 255, 0.06) 1px, transparent 1px),
+    #060c12;
+}
+
+.movieTimelineLayout {
+  border-color: var(--pl-border);
+  background:
+    linear-gradient(90deg, rgba(94, 231, 255, 0.08) 1px, transparent 1px),
+    #071017;
+}
+
+.movieClipBlock,
+.physicsPlaygroundBody {
+  border-color: rgba(94, 231, 255, 0.45);
+  background:
+    linear-gradient(135deg, rgba(94, 231, 255, 0.22), rgba(167, 139, 250, 0.16)),
+    rgba(18, 30, 44, 0.9);
+}
+
+.movieClipBlock-active,
+.movieClipActive,
+.modelObjectSelected {
+  border-color: var(--pl-amber);
+  background: rgba(246, 199, 107, 0.13);
+}
+
+/* Status colors */
+
+.docsDirty {
+  color: var(--pl-amber);
+}
+
+.docsSaved {
+  color: var(--pl-green);
+}
+
+/* Better wrapping defaults */
+
+.workspaceSplitMain,
+.workspaceSplitSide,
+.card,
+.recentItem,
+.gameEntityCard,
+.movieClip,
+.movieActiveClip,
+.modelEngineProjectedRow,
+.physicsPlaygroundBodyRow {
+  min-width: 0;
+}
+
+.recentItem,
+.cardBody,
+.workspaceSubtitle,
+.activeSub,
+.tiny {
+  overflow-wrap: anywhere;
+}
+
+/* Scrollbars for Chromium/Electron */
+
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.035);
+}
+
+::-webkit-scrollbar-thumb {
+  background:
+    linear-gradient(180deg, rgba(94, 231, 255, 0.42), rgba(167, 139, 250, 0.35));
+  border: 2px solid rgba(5, 7, 10, 0.85);
+  border-radius: 999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background:
+    linear-gradient(180deg, rgba(94, 231, 255, 0.72), rgba(167, 139, 250, 0.56));
+}
+
+/* Small/laptop safety */
+
+@media (max-width: 1100px) {
+  .shell {
+    grid-template-columns: 280px 1fr;
+  }
+
+  .workspace {
+    padding: 12px;
+  }
+
+  .topbar {
+    padding: 10px 12px;
+  }
+}
