@@ -1468,3 +1468,36 @@ html, body, #root {
   text-overflow: ellipsis;
   white-space: nowrap;
 }
+
+.workflowPanel {
+  max-height: 560px;
+  overflow-y: auto;
+  padding-right: 6px;
+}
+
+.workflowPanel .recentItem {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
+.workflowPanel .docsEditorActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.workflowPanel .btn {
+  max-width: 100%;
+  white-space: normal;
+}
+
+.workflowPanel .input {
+  max-width: 100%;
+}
+
+.dangerBtn {
+  border-color: rgba(255, 90, 90, 0.7);
+}

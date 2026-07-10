@@ -80,6 +80,12 @@ import {
   describeWorkflowTrigger,
   workflowHasTrigger,
   type WorkflowTriggerKind,
+  BUILT_IN_WORKFLOW_PACKS,
+  BUILT_IN_WORKFLOW_TEMPLATES,
+  createWorkflowFromTemplate,
+  hydrateWorkflowPack,
+  searchWorkflowTemplates,
+  type WorkflowTemplate,
 } from "./engines";
 
 declare global {
@@ -388,6 +394,7 @@ export default function App() {
   const [workflowRunResult, setWorkflowRunResult] =
     useState<WorkflowRunResult | null>(null);
   const [workflowBusy, setWorkflowBusy] = useState(false);
+  const [workflowTemplateSearch, setWorkflowTemplateSearch] = useState("");
 
 async function handleOpenProject() {
   try {
@@ -1849,6 +1856,15 @@ function handleDeleteGameScene(sceneId: string) {
   setStatus("Deleted game scene");
 }
 
+  const visibleWorkflowTemplates = searchWorkflowTemplates(
+    workflowTemplateSearch,
+    BUILT_IN_WORKFLOW_TEMPLATES
+  );
+
+  const visibleWorkflowPacks = BUILT_IN_WORKFLOW_PACKS.map((pack) =>
+    hydrateWorkflowPack(pack, BUILT_IN_WORKFLOW_TEMPLATES)
+  );
+
 async function refreshWorkflows(root = projectRoot) {
   try {
     if (!root) {
@@ -1905,6 +1921,41 @@ async function handleCreateWorkflow() {
   }
 }
 
+async function handleCreateWorkflowFromTemplate(template: WorkflowTemplate) {
+  try {
+    if (!projectRoot) {
+      setStatus("Open a project before creating workflows");
+      return;
+    }
+
+    const workflow = createWorkflowFromTemplate({
+      template,
+      name: template.name,
+      enabled: true,
+    });
+
+    const fileName = `${template.id}-${Date.now()}.plworkflow.json`;
+
+    const saved = await rpc<{
+      name: string;
+      path: string;
+      workflow: WorkflowGraph;
+    }>("workflows.save", {
+      projectRoot,
+      name: fileName,
+      workflow,
+    });
+
+    setActiveWorkflowName(saved.name);
+    setActiveWorkflow(saved.workflow);
+    setWorkflowRunResult(null);
+    await refreshWorkflows(projectRoot);
+    setStatus(`Created workflow from template: ${template.name}`);
+  } catch (e: any) {
+    setStatus(`Workflow template create error: ${e.message || String(e)}`);
+  }
+}
+
 async function handleOpenWorkflow(name: string) {
   try {
     if (!projectRoot) {
@@ -1958,6 +2009,39 @@ async function handleSaveWorkflow() {
     setStatus(`Saved workflow: ${saved.name}`);
   } catch (e: any) {
     setStatus(`Workflow save error: ${e.message || String(e)}`);
+  }
+}
+
+async function handleDeleteWorkflow() {
+  try {
+    if (!projectRoot) {
+      setStatus("Open a project before deleting workflows");
+      return;
+    }
+
+    if (!activeWorkflowName) {
+      setStatus("Open a workflow before deleting");
+      return;
+    }
+
+    const confirmed = window.confirm(
+      `Delete workflow "${activeWorkflowName}"? This cannot be undone.`
+    );
+
+    if (!confirmed) return;
+
+    await rpc("workflows.delete", {
+      projectRoot,
+      name: activeWorkflowName,
+    });
+
+    setActiveWorkflowName("");
+    setActiveWorkflow(null);
+    setWorkflowRunResult(null);
+    await refreshWorkflows(projectRoot);
+    setStatus(`Deleted workflow: ${activeWorkflowName}`);
+  } catch (e: any) {
+    setStatus(`Workflow delete error: ${e.message || String(e)}`);
   }
 }
 
@@ -2481,9 +2565,62 @@ useEffect(() => {
         storageKey="pl.layout.panel.workflows"
       >
         {projectRoot ? (
-          <div className="recentList">
+          <div className="recentList workflowPanel">
             <div className="recentItem">Workflow Registry: Ready</div>
             <div className="recentItem">Workflows: {workflowsList.length}</div>
+
+            <div className="recentItem">
+              <strong>Template Packs</strong>
+              <span>Packs: {visibleWorkflowPacks.length}</span>
+              {visibleWorkflowPacks.map((pack) => (
+                <span key={pack.id}>
+                  {pack.name} · {pack.templates.length} template(s) ·{" "}
+                  {pack.pricingKind}
+                </span>
+              ))}
+            </div>
+
+            <div className="recentItem">
+              <strong>Templates</strong>
+
+              <input
+                className="input"
+                value={workflowTemplateSearch}
+                onChange={(e) => setWorkflowTemplateSearch(e.target.value)}
+                placeholder="Search templates"
+              />
+
+              <span>
+                Showing {visibleWorkflowTemplates.length} of{" "}
+                {BUILT_IN_WORKFLOW_TEMPLATES.length}
+              </span>
+
+              {visibleWorkflowTemplates.length === 0 ? (
+                <span>No templates matched your search.</span>
+              ) : (
+                visibleWorkflowTemplates.map((template) => (
+                  <div className="recentItem" key={template.id}>
+                    <strong>{template.name}</strong>
+                    <span>
+                      {template.category} · {template.triggers.length} trigger(s)
+                      · {template.actions.length} action(s)
+                    </span>
+                    <span>{template.description}</span>
+                    <span>Tags: {template.tags.join(", ")}</span>
+
+                    <button
+                      className="btn"
+                      type="button"
+                      onClick={() =>
+                        void handleCreateWorkflowFromTemplate(template)
+                      }
+                    >
+                      Use Template
+                    </button>
+                  </div>
+                ))
+              )}
+            </div>
 
             <input
               className="input"
@@ -2596,6 +2733,15 @@ useEffect(() => {
                     disabled={workflowBusy}
                   >
                     Save Workflow
+                  </button>
+
+                  <button
+                    className="btn dangerBtn"
+                    type="button"
+                    onClick={() => void handleDeleteWorkflow()}
+                    disabled={workflowBusy}
+                  >
+                    Delete Workflow
                   </button>
                 </div>
               </div>
