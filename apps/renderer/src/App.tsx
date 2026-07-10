@@ -4421,7 +4421,7 @@ function handleFrameSelectedModelObject() {
       return (
         <div className="workspaceSplit">
           <aside className="workspaceSplitSide">
-            <Panel title="Games">
+            <Panel title="Game Projects">
               {!projectRoot && (
                 <div className="emptyState">Open a project to use Game Studio.</div>
               )}
@@ -4436,7 +4436,7 @@ function handleFrameSelectedModelObject() {
                   />
 
                   <button
-                    className="btn"
+                    className="btn btn-primary"
                     type="button"
                     onClick={() => void onCreateGame()}
                   >
@@ -4450,17 +4450,17 @@ function handleFrameSelectedModelObject() {
                       gamesList.map((game) => (
                         <button
                           key={game.name}
-                          className="btn"
+                          className={`listButton ${
+                            activeGameName === game.name ? "listButtonActive" : ""
+                          }`}
                           type="button"
-                          style={{
-                            width: "100%",
-                            marginBottom: 6,
-                            textAlign: "left",
-                          }}
                           onClick={() => void onOpenGame(game.name)}
                         >
-                          {game.name}
-                          {activeGameName === game.name ? " ✓" : ""}
+                          <strong>
+                            {game.name}
+                            {activeGameName === game.name ? " ✓" : ""}
+                          </strong>
+                          <span className="listButtonMeta">Game project</span>
                         </button>
                       ))
                     )}
@@ -4590,7 +4590,7 @@ function handleFrameSelectedModelObject() {
                         setGameEngineDrawerOpen((current) => !current)
                       }
                     >
-                      {gameEngineDrawerOpen ? "▼" : "▲"} Game Runtime Debug
+                      {gameEngineDrawerOpen ? "▼" : "▲"} Advanced Runtime Diagnostics
                     </button>
 
                     {gameEngineDrawerOpen && gameRuntimeState ? (
@@ -4710,7 +4710,7 @@ function handleFrameSelectedModelObject() {
                     ) : (
                       <div className="emptyState">
                         {gameRuntimeState
-                          ? "Runtime debug drawer is closed."
+                          ? "Advanced runtime diagnostics are closed."
                           : "Open or create a game to inspect runtime state."}
                       </div>
                     )}
@@ -4835,7 +4835,7 @@ function handleFrameSelectedModelObject() {
                   </div>
 
                   <div className="gameSceneList">
-                    <div className="gameSectionTitle">Scene Graph Stub</div>
+                    <div className="gameSectionTitle">Scene Graph</div>
 
                     {gameData.scenes.map((scene) => (
                       <div className="gameSceneBlock" key={scene.id}>
@@ -4845,7 +4845,7 @@ function handleFrameSelectedModelObject() {
                           <span>{scene.entities.length} entities</span>
 
                           <button
-                            className="btn btn-ghost"
+                            className="btn btn-danger"
                             type="button"
                             onClick={() => onDeleteGameScene(scene.id)}
                           >
@@ -4874,7 +4874,7 @@ function handleFrameSelectedModelObject() {
                               >
 
                                 <button
-                                  className="btn btn-ghost"
+                                  className="btn btn-danger"
                                   type="button"
                                   onClick={() => onDeleteGameEntity(scene.id, entity.id)}
                                 >
@@ -4901,7 +4901,7 @@ function handleFrameSelectedModelObject() {
 
                   <div className="docsEditorActions">
                     <button
-                      className="btn"
+                      className="btn btn-subtle"
                       type="button"
                       onClick={() => onCloseGame()}
                     >
@@ -4909,7 +4909,7 @@ function handleFrameSelectedModelObject() {
                     </button>
 
                     <button
-                      className="btn"
+                      className="btn btn-primary"
                       type="button"
                       onClick={() => void onSaveGame()}
                     >
@@ -4928,7 +4928,7 @@ function handleFrameSelectedModelObject() {
       return (
         <div className="workspaceSplit">
           <aside className="workspaceSplitSide">
-            <Panel title="Movies">
+            <Panel title="Movie Projects">
               {!projectRoot && (
                 <div className="emptyState">Open a project to use Movie Studio.</div>
               )}
@@ -4943,11 +4943,11 @@ function handleFrameSelectedModelObject() {
                   />
 
                   <button
-                    className="btn"
+                    className="btn btn-primary"
                     type="button"
                     onClick={() => void onCreateMovie()}
                   >
-                    Create
+                    New Movie
                   </button>
 
                   <div style={{ marginTop: 12 }}>
@@ -4957,17 +4957,17 @@ function handleFrameSelectedModelObject() {
                       moviesList.map((movie) => (
                         <button
                           key={movie.name}
-                          className="btn"
+                          className={`listButton ${
+                            activeMovieName === movie.name ? "listButtonActive" : ""
+                          }`}
                           type="button"
-                          style={{
-                            width: "100%",
-                            marginBottom: 6,
-                            textAlign: "left",
-                          }}
                           onClick={() => void onOpenMovie(movie.name)}
                         >
-                          {movie.name}
-                          {activeMovieName === movie.name ? " ✓" : ""}
+                          <strong>
+                            {movie.name}
+                            {activeMovieName === movie.name ? " ✓" : ""}
+                          </strong>
+                          <span className="listButtonMeta">Movie timeline</span>
                         </button>
                       ))
                     )}
@@ -5135,7 +5135,7 @@ function handleFrameSelectedModelObject() {
                         type="button"
                         onClick={() => setMovieEngineDrawerOpen((value) => !value)}
                       >
-                        {movieEngineDrawerOpen ? "▼" : "▲"} Timeline Engine / Preview
+                        {movieEngineDrawerOpen ? "▼" : "▲"} Timeline Diagnostics
                       </button>
 
                       <div className="movieEngineDrawerMeta">
@@ -5432,7 +5432,7 @@ function handleFrameSelectedModelObject() {
                             <span>{clipLayout.clip.name}</span>
 
                             <button
-                              className="btn btn-ghost"
+                              className="btn btn-danger"
                               type="button"
                               onClick={() =>
                                 onDeleteMovieClip(
@@ -5464,7 +5464,7 @@ function handleFrameSelectedModelObject() {
 
               <div className="docsEditorActions">
                 <button
-                  className="btn"
+                  className="btn btn-subtle"
                   type="button"
                   onClick={() => onCloseMovie()}
                 >
@@ -5472,7 +5472,7 @@ function handleFrameSelectedModelObject() {
                 </button>
 
                 <button
-                  className="btn"
+                  className="btn btn-primary"
                   type="button"
                   onClick={() => void onSaveMovie()}
                 >
@@ -5759,7 +5759,7 @@ function handleFrameSelectedModelObject() {
       return (
         <div className="workspaceSplit">
           <aside className="workspaceSplitSide">
-            <Panel title="Model Scenes">
+            <Panel title="Model Library">
               {!projectRoot && (
                 <div className="emptyState">Open a project to use Modeling Studio.</div>
               )}
@@ -5774,11 +5774,11 @@ function handleFrameSelectedModelObject() {
                   />
 
                   <button
-                    className="btn"
+                    className="btn btn-primary"
                     type="button"
                     onClick={() => void onCreateModel()}
                   >
-                    Create
+                    New Scene
                   </button>
 
                   <div style={{ marginTop: 12 }}>
@@ -5788,17 +5788,17 @@ function handleFrameSelectedModelObject() {
                       modelsList.map((model) => (
                         <button
                           key={model.name}
-                          className="btn"
+                          className={`listButton ${
+                            activeModelName === model.name ? "listButtonActive" : ""
+                          }`}
                           type="button"
-                          style={{
-                            width: "100%",
-                            marginBottom: 6,
-                            textAlign: "left",
-                          }}
                           onClick={() => void onOpenModel(model.name)}
                         >
-                          {model.name}
-                          {activeModelName === model.name ? " ✓" : ""}
+                          <strong>
+                            {model.name}
+                            {activeModelName === model.name ? " ✓" : ""}
+                          </strong>
+                          <span className="listButtonMeta">3D scene</span>
                         </button>
                       ))
                     )}
@@ -5869,7 +5869,7 @@ function handleFrameSelectedModelObject() {
                   </div>
 
                   <div className="modelPreviewBox">
-                    <div className="modelPreviewTitle">Viewport Stub</div>
+                    <div className="modelPreviewTitle">Viewport</div>
                     <div className="modelPreviewGrid">
                       {modelData.objects.length === 0 ? (
                         <div className="emptyState">No objects yet</div>
@@ -5897,7 +5897,7 @@ function handleFrameSelectedModelObject() {
                             </button>
 
                             <button
-                              className="btn btn-ghost"
+                              className="btn btn-danger"
                               type="button"
                               onClick={() => onDeleteModelObject(object.id)}
                             >
@@ -6314,7 +6314,7 @@ function handleFrameSelectedModelObject() {
 
                   <div className="docsEditorActions">
                     <button
-                      className="btn"
+                      className="btn btn-subtle"
                       type="button"
                       onClick={() => onCloseModel()}
                     >
@@ -6322,7 +6322,7 @@ function handleFrameSelectedModelObject() {
                     </button>
 
                     <button
-                      className="btn"
+                      className="btn btn-primary"
                       type="button"
                       onClick={() => void onSaveModel()}
                     >

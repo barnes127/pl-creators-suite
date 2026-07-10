@@ -562,6 +562,9 @@ html, body, #root {
   border-bottom: 1px solid #333;
   font-size: 12px;
   font-weight: 700;
+  color: var(--pl-text);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
 }
 
 .movieTrack {
@@ -670,6 +673,9 @@ html, body, #root {
   border-bottom: 1px solid #333;
   font-size: 12px;
   font-weight: 700;
+  color: var(--pl-text);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
 }
 
 .modelPreviewGrid {
@@ -725,6 +731,9 @@ html, body, #root {
   border-radius: 8px;
   overflow: hidden;
   margin-bottom: 14px;
+  border-color: var(--pl-border);
+  border-radius: var(--pl-radius-md);
+  background: var(--pl-bg-card-soft);
 }
 
 .gameSectionTitle {
@@ -733,6 +742,9 @@ html, body, #root {
   border-bottom: 1px solid #333;
   font-size: 12px;
   font-weight: 700;
+  color: var(--pl-text);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
 }
 
 .gameSceneBlock {
@@ -1257,6 +1269,8 @@ html, body, #root {
   border: 1px solid #333;
   border-radius: 8px;
   background: rgba(15, 15, 15, 0.9);
+    border-color: var(--pl-border);
+  border-radius: var(--pl-radius-md);
 }
 
 .modelViewportHeader {
