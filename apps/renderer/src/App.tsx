@@ -76,6 +76,10 @@ import {
   runWorkflowGraph,
   type WorkflowGraph,
   type WorkflowRunResult,
+  createWorkflowTriggerEvent,
+  describeWorkflowTrigger,
+  workflowHasTrigger,
+  type WorkflowTriggerKind,
 } from "./engines";
 
 declare global {
@@ -1997,6 +2001,64 @@ async function handleRunWorkflowManual() {
   }
 }
 
+async function handleSimulateWorkflowTrigger(kind: WorkflowTriggerKind) {
+  try {
+    if (!activeWorkflow) {
+      setStatus("Open a workflow before simulating a trigger");
+      return;
+    }
+
+    const event = createWorkflowTriggerEvent(kind, {
+      projectRoot,
+      appId: active,
+      eventName: kind,
+      source: "workflow-panel",
+      metadata: {
+        activeWorkflowName,
+      },
+    });
+
+    if (!workflowHasTrigger(activeWorkflow, event)) {
+      setStatus(
+        `Workflow "${activeWorkflow.name}" does not match ${kind} trigger`
+      );
+      return;
+    }
+
+    setWorkflowBusy(true);
+    setWorkflowRunResult(null);
+    setStatus(`Simulating ${kind} trigger: ${activeWorkflow.name}`);
+
+    const result = await runWorkflowGraph(activeWorkflow, {
+      context: {
+        projectRoot,
+        appId: active,
+        sourceEvent: kind,
+        variables: {
+          projectRoot,
+          activeApp: active,
+          triggerKind: kind,
+        },
+      },
+      rpcExecutor: async (method, params) => {
+        return rpc(method, params ?? {});
+      },
+      stopOnFailure: true,
+    });
+
+    setWorkflowRunResult(result);
+    setStatus(
+      result.status === "completed"
+        ? `Workflow completed from ${kind}: ${result.workflowName}`
+        : `Workflow ${kind} simulation finished: ${result.status}`
+    );
+  } catch (e: any) {
+    setStatus(`Workflow trigger simulation error: ${e.message || String(e)}`);
+  } finally {
+    setWorkflowBusy(false);
+  }
+}
+
 async function refreshAssets(root = projectRoot) {
   try {
     if (!root) {
@@ -2477,6 +2539,18 @@ useEffect(() => {
                   {activeWorkflow.actions.length} action(s)
                 </span>
                 <span>{activeWorkflow.description || "No description"}</span>
+               
+                <strong>Triggers</strong>
+                {activeWorkflow.triggers.length === 0 ? (
+                  <span>No triggers configured</span>
+                ) : (
+                  activeWorkflow.triggers.map((trigger) => (
+                    <span key={trigger.id}>
+                      {trigger.enabled ? "on" : "off"} ·{" "}
+                      {describeWorkflowTrigger(trigger)}
+                    </span>
+                  ))
+                )}
 
                 <div className="docsEditorActions">
                   <button
@@ -2486,6 +2560,33 @@ useEffect(() => {
                     disabled={workflowBusy}
                   >
                     {workflowBusy ? "Running..." : "Run Manual"}
+                  </button>
+
+                  <button
+                    className="btn"
+                    type="button"
+                    onClick={() => void handleSimulateWorkflowTrigger("manual")}
+                    disabled={workflowBusy}
+                  >
+                    Sim Manual
+                  </button>
+
+                  <button
+                    className="btn"
+                    type="button"
+                    onClick={() => void handleSimulateWorkflowTrigger("onSave")}
+                    disabled={workflowBusy}
+                  >
+                    Sim onSave
+                  </button>
+
+                  <button
+                    className="btn"
+                    type="button"
+                    onClick={() => void handleSimulateWorkflowTrigger("onExport")}
+                    disabled={workflowBusy}
+                  >
+                    Sim onExport
                   </button>
 
                   <button
