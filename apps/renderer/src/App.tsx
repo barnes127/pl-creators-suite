@@ -3075,7 +3075,13 @@ useEffect(() => {
 
         {physicsDrawerOpen && (
           <div className="physicsDrawerBody">
-            <PhysicsSmokePanel />
+            <div className="recentItem">
+              <strong>Simulation Playground</strong>
+              <span>
+                Local physics and motion tools for testing creator-suite engine behavior.
+              </span>
+            </div>
+
             <PhysicsPlaygroundPanel />
           </div>
         )}
