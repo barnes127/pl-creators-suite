@@ -73,6 +73,9 @@ import {
   stopGamePreview,
   type GameRuntimeProject,
   type GameRuntimeState,
+  runWorkflowGraph,
+  type WorkflowGraph,
+  type WorkflowRunResult,
 } from "./engines";
 
 declare global {
@@ -269,6 +272,11 @@ type GameData = {
   updatedAt: string;
 };
 
+type WorkflowInfo = {
+  name: string;
+  path: string;
+};
+
 function readStoredBoolean(key: string, fallback: boolean) {
   try {
     const raw = window.localStorage.getItem(key);
@@ -368,6 +376,14 @@ export default function App() {
   const [newGameEntityName, setNewGameEntityName] = useState("");
   const [newGameEntityType, setNewGameEntityType] = useState("object");
   const [newGameEntitySceneId, setNewGameEntitySceneId] = useState("");
+
+  const [workflowsList, setWorkflowsList] = useState<WorkflowInfo[]>([]);
+  const [newWorkflowName, setNewWorkflowName] = useState("");
+  const [activeWorkflowName, setActiveWorkflowName] = useState("");
+  const [activeWorkflow, setActiveWorkflow] = useState<WorkflowGraph | null>(null);
+  const [workflowRunResult, setWorkflowRunResult] =
+    useState<WorkflowRunResult | null>(null);
+  const [workflowBusy, setWorkflowBusy] = useState(false);
 
 async function handleOpenProject() {
   try {
@@ -1829,6 +1845,158 @@ function handleDeleteGameScene(sceneId: string) {
   setStatus("Deleted game scene");
 }
 
+async function refreshWorkflows(root = projectRoot) {
+  try {
+    if (!root) {
+      setWorkflowsList([]);
+      setActiveWorkflowName("");
+      setActiveWorkflow(null);
+      setWorkflowRunResult(null);
+      return;
+    }
+
+    await rpc("workflows.ensure", { projectRoot: root });
+
+    const result = await rpc<{ workflows: WorkflowInfo[] }>("workflows.list", {
+      projectRoot: root,
+    });
+
+    setWorkflowsList(result.workflows);
+  } catch (e: any) {
+    setStatus(`Workflow error: ${e.message || String(e)}`);
+  }
+}
+
+async function handleCreateWorkflow() {
+  try {
+    if (!projectRoot) {
+      setStatus("Open a project before creating workflows");
+      return;
+    }
+
+    const name = newWorkflowName.trim();
+
+    if (!name) {
+      setStatus("Workflow name is required");
+      return;
+    }
+
+    const created = await rpc<{
+      name: string;
+      path: string;
+      workflow: WorkflowGraph;
+    }>("workflows.create", {
+      projectRoot,
+      name,
+    });
+
+    setActiveWorkflowName(created.name);
+    setActiveWorkflow(created.workflow);
+    setWorkflowRunResult(null);
+    setNewWorkflowName("");
+    await refreshWorkflows(projectRoot);
+    setStatus(`Created workflow: ${created.name}`);
+  } catch (e: any) {
+    setStatus(`Workflow create error: ${e.message || String(e)}`);
+  }
+}
+
+async function handleOpenWorkflow(name: string) {
+  try {
+    if (!projectRoot) {
+      setStatus("Open a project before opening workflows");
+      return;
+    }
+
+    const opened = await rpc<{
+      name: string;
+      path: string;
+      workflow: WorkflowGraph;
+    }>("workflows.read", {
+      projectRoot,
+      name,
+    });
+
+    setActiveWorkflowName(opened.name);
+    setActiveWorkflow(opened.workflow);
+    setWorkflowRunResult(null);
+    setStatus(`Opened workflow: ${opened.name}`);
+  } catch (e: any) {
+    setStatus(`Workflow open error: ${e.message || String(e)}`);
+  }
+}
+
+async function handleSaveWorkflow() {
+  try {
+    if (!projectRoot) {
+      setStatus("Open a project before saving workflows");
+      return;
+    }
+
+    if (!activeWorkflowName || !activeWorkflow) {
+      setStatus("Open a workflow before saving");
+      return;
+    }
+
+    const saved = await rpc<{
+      name: string;
+      path: string;
+      workflow: WorkflowGraph;
+    }>("workflows.save", {
+      projectRoot,
+      name: activeWorkflowName,
+      workflow: activeWorkflow,
+    });
+
+    setActiveWorkflowName(saved.name);
+    setActiveWorkflow(saved.workflow);
+    await refreshWorkflows(projectRoot);
+    setStatus(`Saved workflow: ${saved.name}`);
+  } catch (e: any) {
+    setStatus(`Workflow save error: ${e.message || String(e)}`);
+  }
+}
+
+async function handleRunWorkflowManual() {
+  try {
+    if (!activeWorkflow) {
+      setStatus("Open a workflow before running it");
+      return;
+    }
+
+    setWorkflowBusy(true);
+    setWorkflowRunResult(null);
+    setStatus(`Running workflow: ${activeWorkflow.name}`);
+
+    const result = await runWorkflowGraph(activeWorkflow, {
+      context: {
+        projectRoot,
+        appId: active,
+        sourceEvent: "manual",
+        variables: {
+          projectRoot,
+          activeApp: active,
+        },
+      },
+      rpcExecutor: async (method, params) => {
+        return rpc(method, params ?? {});
+      },
+      stopOnFailure: true,
+    });
+
+    setWorkflowRunResult(result);
+    setStatus(
+      result.status === "completed"
+        ? `Workflow completed: ${result.workflowName}`
+        : `Workflow finished: ${result.status}`
+    );
+  } catch (e: any) {
+    setStatus(`Workflow run error: ${e.message || String(e)}`);
+  } finally {
+    setWorkflowBusy(false);
+  }
+}
+
 async function refreshAssets(root = projectRoot) {
   try {
     if (!root) {
@@ -1984,6 +2152,11 @@ useEffect(() => {
 
 useEffect(() => {
   void refreshGames(projectRoot);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+}, [projectRoot]);
+
+useEffect(() => {
+  void refreshWorkflows(projectRoot);
   // eslint-disable-next-line react-hooks/exhaustive-deps
 }, [projectRoot]);
 
@@ -2237,6 +2410,115 @@ useEffect(() => {
           </div>
         ) : (
           <div className="emptyState">Open a project to view assets</div>
+        )}
+      </CollapsiblePanel>
+
+      <CollapsiblePanel
+        title="Workflows"
+        defaultOpen={false}
+        storageKey="pl.layout.panel.workflows"
+      >
+        {projectRoot ? (
+          <div className="recentList">
+            <div className="recentItem">Workflow Registry: Ready</div>
+            <div className="recentItem">Workflows: {workflowsList.length}</div>
+
+            <input
+              className="input"
+              value={newWorkflowName}
+              onChange={(e) => setNewWorkflowName(e.target.value)}
+              placeholder="daily-export"
+            />
+
+            <button
+              className="btn"
+              type="button"
+              onClick={() => void handleCreateWorkflow()}
+            >
+              Create Workflow
+            </button>
+
+            <button
+              className="btn"
+              type="button"
+              onClick={() => void refreshWorkflows(projectRoot)}
+            >
+              Refresh Workflows
+            </button>
+
+            {workflowsList.length === 0 ? (
+              <div className="emptyState">No workflows yet</div>
+            ) : (
+              workflowsList.map((workflow) => (
+                <button
+                  className="btn"
+                  key={workflow.name}
+                  type="button"
+                  style={{
+                    width: "100%",
+                    marginBottom: 6,
+                    textAlign: "left",
+                  }}
+                  onClick={() => void handleOpenWorkflow(workflow.name)}
+                  title={workflow.path}
+                >
+                  {workflow.name}
+                  {activeWorkflowName === workflow.name ? " ✓" : ""}
+                </button>
+              ))
+            )}
+
+            {activeWorkflow ? (
+              <div className="recentItem">
+                <strong>{activeWorkflow.name}</strong>
+                <span>
+                  {activeWorkflow.enabled ? "Enabled" : "Disabled"} ·{" "}
+                  {activeWorkflow.triggers.length} trigger(s) ·{" "}
+                  {activeWorkflow.actions.length} action(s)
+                </span>
+                <span>{activeWorkflow.description || "No description"}</span>
+
+                <div className="docsEditorActions">
+                  <button
+                    className="btn"
+                    type="button"
+                    onClick={() => void handleRunWorkflowManual()}
+                    disabled={workflowBusy}
+                  >
+                    {workflowBusy ? "Running..." : "Run Manual"}
+                  </button>
+
+                  <button
+                    className="btn"
+                    type="button"
+                    onClick={() => void handleSaveWorkflow()}
+                    disabled={workflowBusy}
+                  >
+                    Save Workflow
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <div className="emptyState">Open a workflow to run it.</div>
+            )}
+
+            {workflowRunResult && (
+              <div className="recentItem">
+                <strong>Last Run</strong>
+                <span>Status: {workflowRunResult.status}</span>
+                <span>{workflowRunResult.message}</span>
+                <span>Steps: {workflowRunResult.steps.length}</span>
+
+                {workflowRunResult.steps.map((step) => (
+                  <span key={step.actionId}>
+                    {step.status}: {step.actionName} — {step.message}
+                  </span>
+                ))}
+              </div>
+            )}
+          </div>
+        ) : (
+          <div className="emptyState">Open a project to use workflows.</div>
         )}
       </CollapsiblePanel>
 
