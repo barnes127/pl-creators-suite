@@ -3209,7 +3209,7 @@ useEffect(() => {
 );
 }
 
-function PhysicsSmokePanel() {
+export function PhysicsSmokePanel() {
   const expressionResult = evaluateNumericExpression("2 + 3 * 4");
   const variableExpressionResult = evaluateNumericExpression(
     "mass * gravity",

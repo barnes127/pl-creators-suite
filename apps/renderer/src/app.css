@@ -2224,3 +2224,425 @@ textarea:focus,
   color: var(--pl-text);
   font-weight: 800;
 }
+
+/* -------------------------------------------------------------------------- */
+/* Stage 6 Wave 36 — Shared UI element polish                                 */
+/* -------------------------------------------------------------------------- */
+
+/* Shared panel foundation */
+
+.panel {
+  display: grid;
+  gap: 10px;
+  min-width: 0;
+  padding: 12px;
+  border: 1px solid var(--pl-border);
+  border-radius: var(--pl-radius-md);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.035), transparent),
+    var(--pl-bg-card);
+  box-shadow: var(--pl-shadow-soft);
+}
+
+.panelTitle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  color: var(--pl-text);
+  font-size: 12px;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.panelTitle::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  min-width: 24px;
+  background: linear-gradient(90deg, rgba(94, 231, 255, 0.35), transparent);
+}
+
+/* Shared badges/chips */
+
+.badge,
+.chip,
+.metaPill {
+  display: inline-flex;
+  align-items: center;
+  width: fit-content;
+  max-width: 100%;
+  gap: 6px;
+  padding: 4px 8px;
+  border: 1px solid var(--pl-border);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.035);
+  color: var(--pl-text-soft);
+  font-size: 11px;
+  font-weight: 800;
+  line-height: 1;
+  letter-spacing: 0.035em;
+  white-space: nowrap;
+}
+
+.badge-info {
+  border-color: rgba(94, 231, 255, 0.44);
+  background: rgba(94, 231, 255, 0.08);
+  color: var(--pl-cyan-strong);
+}
+
+.badge-success {
+  border-color: rgba(126, 231, 135, 0.42);
+  background: rgba(126, 231, 135, 0.08);
+  color: var(--pl-green);
+}
+
+.badge-warning {
+  border-color: rgba(246, 199, 107, 0.46);
+  background: rgba(246, 199, 107, 0.09);
+  color: var(--pl-amber);
+}
+
+.badge-danger {
+  border-color: rgba(255, 107, 122, 0.46);
+  background: rgba(255, 107, 122, 0.09);
+  color: var(--pl-red);
+}
+
+.badge-muted {
+  color: var(--pl-text-muted);
+}
+
+/* Shared buttons */
+
+.btn-subtle {
+  border-color: rgba(255, 255, 255, 0.07);
+  background: rgba(255, 255, 255, 0.025);
+  color: var(--pl-text-soft);
+}
+
+.btn-danger,
+.dangerBtn {
+  border-color: rgba(255, 107, 122, 0.62);
+  background:
+    linear-gradient(180deg, rgba(255, 107, 122, 0.14), rgba(255, 255, 255, 0.015)),
+    rgba(38, 14, 19, 0.9);
+  color: #ffd6db;
+}
+
+.btn-danger:hover,
+.dangerBtn:hover {
+  border-color: rgba(255, 107, 122, 0.82);
+  background:
+    linear-gradient(180deg, rgba(255, 107, 122, 0.22), rgba(255, 255, 255, 0.015)),
+    rgba(48, 16, 22, 0.95);
+  box-shadow: 0 0 18px rgba(255, 107, 122, 0.1);
+}
+
+/* Shared toolbar polish */
+
+.toolbar,
+.workspaceActions,
+.topbarRight,
+.row,
+.docsEditorActions,
+.modelCameraButtons,
+.modelTransformQuickActions,
+.physicsPlaygroundToolbar,
+.sheetToolbar,
+.copilotActions {
+  gap: 8px;
+}
+
+.toolbar {
+  padding: 4px;
+  border: 1px solid var(--pl-border-soft);
+  border-radius: var(--pl-radius-md);
+  background: rgba(255, 255, 255, 0.025);
+}
+
+/* Better form polish */
+
+.fieldRow,
+.movieFormGrid label,
+.movieClipFormGrid label,
+.modelFormGrid label,
+.modelObjectFormGrid label,
+.gameFormGrid label,
+.modelTransformGroup label {
+  color: var(--pl-text-soft);
+}
+
+.label {
+  color: var(--pl-text-muted);
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.input,
+select,
+textarea {
+  width: 100%;
+}
+
+.input::placeholder,
+textarea::placeholder {
+  color: rgba(183, 198, 215, 0.42);
+}
+
+select.input {
+  appearance: none;
+  background-image:
+    linear-gradient(45deg, transparent 50%, var(--pl-text-muted) 50%),
+    linear-gradient(135deg, var(--pl-text-muted) 50%, transparent 50%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.025), transparent);
+  background-position:
+    calc(100% - 16px) 50%,
+    calc(100% - 11px) 50%,
+    0 0;
+  background-size:
+    5px 5px,
+    5px 5px,
+    100% 100%;
+  background-repeat: no-repeat;
+  padding-right: 32px;
+}
+
+/* Empty states */
+
+.emptyState {
+  display: grid;
+  gap: 6px;
+  padding: 12px;
+  border: 1px dashed rgba(143, 178, 204, 0.24);
+  border-radius: var(--pl-radius-md);
+  background:
+    radial-gradient(circle at top left, rgba(94, 231, 255, 0.055), transparent 44%),
+    rgba(255, 255, 255, 0.018);
+  color: var(--pl-text-muted);
+  font-size: 12px;
+  line-height: 1.45;
+}
+
+.emptyStateCard {
+  min-height: 150px;
+  place-items: center;
+  text-align: center;
+  padding: 22px;
+}
+
+.emptyStateIcon {
+  display: grid;
+  place-items: center;
+  width: 38px;
+  height: 38px;
+  border: 1px solid rgba(94, 231, 255, 0.32);
+  border-radius: 14px;
+  background: rgba(94, 231, 255, 0.07);
+  color: var(--pl-cyan);
+  font-size: 18px;
+  box-shadow: 0 0 22px rgba(94, 231, 255, 0.08);
+}
+
+.emptyStateTitle {
+  color: var(--pl-text);
+  font-size: 14px;
+  font-weight: 900;
+}
+
+.emptyStateDescription {
+  max-width: 460px;
+  color: var(--pl-text-muted);
+}
+
+.emptyStateActions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 6px;
+}
+
+/* Shared section headers */
+
+.sectionHeader {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 10px;
+}
+
+.sectionTitle {
+  color: var(--pl-text);
+  font-size: 14px;
+  font-weight: 900;
+}
+
+.sectionSubtitle {
+  margin-top: 3px;
+  color: var(--pl-text-muted);
+  font-size: 12px;
+  line-height: 1.4;
+}
+
+/* Shared list/button cards */
+
+.listButton,
+.sidebar .recentItem,
+.recentItem {
+  min-width: 0;
+}
+
+.listButton {
+  width: 100%;
+  display: grid;
+  gap: 3px;
+  text-align: left;
+  padding: 9px 10px;
+  border: 1px solid var(--pl-border);
+  border-radius: var(--pl-radius-sm);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.035), transparent),
+    rgba(8, 16, 24, 0.66);
+  color: var(--pl-text-soft);
+  cursor: pointer;
+}
+
+.listButton:hover {
+  border-color: rgba(94, 231, 255, 0.52);
+  background:
+    linear-gradient(180deg, rgba(94, 231, 255, 0.08), transparent),
+    rgba(12, 24, 34, 0.78);
+}
+
+.listButtonActive {
+  border-color: rgba(94, 231, 255, 0.72);
+  color: var(--pl-text);
+  background:
+    linear-gradient(135deg, rgba(94, 231, 255, 0.13), rgba(167, 139, 250, 0.07)),
+    rgba(12, 24, 34, 0.9);
+}
+
+/* Shared metric/status rows */
+
+.metricRow,
+.statusChipRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.metricCard {
+  display: grid;
+  gap: 3px;
+  min-width: 96px;
+  padding: 8px 10px;
+  border: 1px solid var(--pl-border);
+  border-radius: var(--pl-radius-sm);
+  background: rgba(8, 16, 24, 0.72);
+}
+
+.metricLabel {
+  color: var(--pl-text-muted);
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+}
+
+.metricValue {
+  color: var(--pl-text);
+  font-size: 14px;
+  font-weight: 900;
+}
+
+/* Workspace header refinement */
+
+.workspaceHeader {
+  border: 1px solid var(--pl-border);
+  border-radius: var(--pl-radius-lg);
+  margin-bottom: 14px;
+  box-shadow: var(--pl-shadow-soft);
+}
+
+.workspaceTitle {
+  text-transform: capitalize;
+}
+
+.workspaceSubtitle {
+  max-width: 780px;
+  line-height: 1.4;
+}
+
+/* Modal refinement */
+
+.modalOverlay {
+  backdrop-filter: blur(10px);
+}
+
+.modalPanel {
+  box-shadow:
+    0 30px 90px rgba(0, 0, 0, 0.5),
+    0 0 50px rgba(94, 231, 255, 0.08);
+}
+
+.modalHeader {
+  border-bottom-color: var(--pl-border);
+}
+
+/* Statusbar refinement */
+
+.statusbar {
+  gap: 12px;
+}
+
+.statusLeft,
+.statusRight {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.statusLeft {
+  color: var(--pl-text-soft);
+}
+
+.statusRight {
+  color: var(--pl-text-muted);
+}
+
+/* Small-screen safety */
+
+@media (max-width: 900px) {
+  .workspaceHeader {
+    display: grid;
+  }
+
+  .workspaceActions {
+    width: 100%;
+  }
+
+  .workspaceActions .toolbar {
+    width: 100%;
+  }
+
+  .workspaceActions .btn {
+    flex: 1;
+  }
+
+  .moviePlaybackControls {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .modelTransformInspectorGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .modelEngineDebugGrid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
