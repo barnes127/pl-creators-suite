@@ -4329,7 +4329,7 @@ function handleFrameSelectedModelObject() {
                   />
 
                   <button
-                    className="btn"
+                    className="btn btn-primary"
                     type="button"
                     onClick={() => void onCreateCodeFile()}
                   >
@@ -4343,20 +4343,17 @@ function handleFrameSelectedModelObject() {
                       codeFiles.map((file) => (
                         <button
                           key={file.name}
-                          className="btn"
+                          className={`listNutton ${
+                            activeCodeFileName === file.name ? "listButtonActive" : ""
+                          }`}
                           type="button"
-                          style={{
-                            width: "100%",
-                            marginBottom: 6,
-                            textAlign: "left",
-                          }}
                           onClick={() => void onOpenCodeFile(file.name)}
                         >
-                          {file.name}
-                          {activeCodeFileName === file.name ? " ✓" : ""}
-                          <span style={{ display: "block", opacity: 0.7 }}>
-                            {file.language}
-                          </span>
+                          <strong>
+                            {file.name}
+                            {activeCodeFileName === file.name ? " ✓" : ""}
+                          </strong>                          
+                          <span className="listButtonMeta">{file.language}</span>
                         </button>
                       ))
                     )}
@@ -4395,7 +4392,7 @@ function handleFrameSelectedModelObject() {
 
                   <div className="docsEditorActions">
                     <button
-                      className="btn"
+                      className="btn btn-subtle"
                       type="button"
                       onClick={() => onCloseCodeFile()}
                     >
@@ -4403,7 +4400,7 @@ function handleFrameSelectedModelObject() {
                     </button>
 
                     <button
-                      className="btn"
+                      className="btn btn-primary"
                       type="button"
                       onClick={() => void onSaveCodeFile()}
                     >
@@ -4412,7 +4409,9 @@ function handleFrameSelectedModelObject() {
                   </div>
                 </>
               ) : (
-                <div className="emptyState">Create or open a code file.</div>
+                <div className="emptyState">
+                  No code file open. Create a new file from the sidebar or open an existing project file to start editing.
+                </div>
               )}
             </Panel>
           </section>
@@ -5492,7 +5491,7 @@ function handleFrameSelectedModelObject() {
       return (
         <div className="workspaceSplit">
           <aside className="workspaceSplitSide">
-            <Panel title="Documents">
+            <Panel title="Document Library">
               {!projectRoot && <div className="emptyState">Open a project to use Docs.</div>}
 
               {projectRoot && (
@@ -5504,8 +5503,8 @@ function handleFrameSelectedModelObject() {
                     placeholder="new-doc.md"
                   />
 
-                  <button className="btn" type="button" onClick={() => void onCreateDoc()}>
-                    Create
+                  <button className="btn btn-primary" type="button" onClick={() => void onCreateDoc()}>
+                    New Document
                   </button>
 
                   <div style={{ marginTop: 12 }}>
@@ -5515,17 +5514,17 @@ function handleFrameSelectedModelObject() {
                       docsList.map((doc) => (
                         <button
                           key={doc.name}
-                          className="btn"
+                          className={`listButton ${
+                            activeDocName === doc.name ? "ListButtonActive" : ""
+                          }`}
                           type="button"
-                          style={{
-                            width: "100%",
-                            marginBottom: 6,
-                            textAlign: "left",
-                          }}
                           onClick={() => void onOpenDoc(doc.name)}
                         >
-                          {doc.name}
-                          {activeDocName === doc.name ? " ✓" : ""}
+                          <strong>
+                            {doc.name}
+                            {activeDocName === doc.name ? " ✓" : ""}
+                          </strong>
+                          <span className="listButtonMeta">Document</span>                       
                         </button>
                       ))
                     )}
@@ -5556,12 +5555,9 @@ function handleFrameSelectedModelObject() {
                   />
 
                   <div className="docsEditorActions">
-                    <span className={docDirty ? "docsDirty" : "docsSaved"}>
-                      {docDirty ? "Unsaved changes" : "Saved"}
-                    </span>
 
                     <button
-                      className="btn"
+                      className="btn btn-subtle"
                       type="button"
                       onClick={() => onCloseDoc()}
                     >
@@ -5569,7 +5565,7 @@ function handleFrameSelectedModelObject() {
                     </button>
 
                     <button
-                      className="btn"
+                      className="btn btn-primary"
                       type="button"
                       onClick={() => void onSaveDoc()}
                     >
@@ -5578,7 +5574,9 @@ function handleFrameSelectedModelObject() {
                   </div>
                 </>
               ) : (
-                <div className="emptyState">Create or open a document.</div>
+                <div className="emptyState">
+                  No document open. Create a new document from the sidebar or open an existing one to start writing.
+                </div>
               )}
             </Panel>
           </section>
@@ -5588,7 +5586,7 @@ function handleFrameSelectedModelObject() {
       return (
         <div className="workspaceSplit">
           <aside className="workspaceSplitSide">
-            <Panel title="Sheets">
+            <Panel title="Sheet Library">
               {!projectRoot && (
                 <div className="emptyState">Open a project to use Sheets.</div>
               )}
@@ -5603,11 +5601,11 @@ function handleFrameSelectedModelObject() {
                   />
 
                   <button
-                    className="btn"
+                    className="btn btn-primary"
                     type="button"
                     onClick={() => void onCreateSheet()}
                   >
-                    Create
+                    New Sheet
                   </button>
 
                   <div style={{ marginTop: 12 }}>
@@ -5617,17 +5615,17 @@ function handleFrameSelectedModelObject() {
                       sheetsList.map((sheet) => (
                         <button
                           key={sheet.name}
-                          className="btn"
+                          className={`listButton ${
+                            activeSheetName === sheet.name ? "listButtonActive" : ""
+                          }`}
                           type="button"
-                          style={{
-                            width: "100%",
-                            marginBottom: 6,
-                            textAlign: "left",
-                          }}
                           onClick={() => void onOpenSheet(sheet.name)}
                         >
-                          {sheet.name}
-                          {activeSheetName === sheet.name ? " ✓" : ""}
+                          <strong>
+                            {sheet.name}
+                            {activeSheetName === sheet.name ? " ✓" : ""}
+                          </strong>
+                          <span className="listButtonMeta">Spreadsheet</span>
                         </button>
                       ))
                     )}
@@ -5659,7 +5657,7 @@ function handleFrameSelectedModelObject() {
 
                   <div className="sheetToolbar">
                     <button
-                      className="btn"
+                      className="btn btn-subtle"
                       type="button"
                       onClick={() => onAddSheetRow()}
                     >
@@ -5667,7 +5665,7 @@ function handleFrameSelectedModelObject() {
                     </button>
 
                     <button
-                      className="btn"
+                      className="btn btn-subtle"
                       type="button"
                       onClick={() => onAddSheetColumn()}
                     >
@@ -5675,7 +5673,7 @@ function handleFrameSelectedModelObject() {
                     </button>
 
                     <button
-                      className="btn"
+                      className="btn btn-danger"
                       type="button"
                       onClick={() => onDeleteLastSheetRow()}
                     >
@@ -5683,7 +5681,7 @@ function handleFrameSelectedModelObject() {
                     </button>
 
                     <button
-                      className="btn"
+                      className="btn btn-danger"
                       type="button"
                       onClick={() => onDeleteLastSheetColumn()}
                     >
@@ -5732,7 +5730,7 @@ function handleFrameSelectedModelObject() {
 
                   <div className="docsEditorActions">
                     <button
-                      className="btn"
+                      className="btn btn-primary"
                       type="button"
                       onClick={() => onCloseSheet()}
                     >
@@ -5749,7 +5747,9 @@ function handleFrameSelectedModelObject() {
                   </div>
                 </>
               ) : (
-                <div className="emptyState">Create or open a sheet.</div>
+                <div className="emptyState">
+                  No sheet open. Create a new sheet from the sidebar or open an existing spreadsheet to start editing cells.
+                </div>
               )}
             </Panel>
           </section>
@@ -6297,6 +6297,12 @@ function handleFrameSelectedModelObject() {
 
                   <label className="modelNotes">
                     Notes
+                    <div className="docsMeta">
+                      <span>Text / Markdown document</span>
+                      <span className={docDirty ? "docsDirty" : "docsSaved"}>
+                        {docDirty ? "Unsaved changes" : "Saved"}
+                      </span>
+                    </div>
                     <textarea
                       className="docsEditor"
                       value={modelData.notes}
