@@ -22,6 +22,7 @@ const sheets = require("./services/sheets");
 const movies = require("./services/movies");
 const models = require("./services/models");
 const games = require("./services/games");
+const workflows = require("./services/workflows");
 
 
 async function readRecents() {
@@ -527,6 +528,24 @@ const METHODS = {
   },
   "games.save": async (params) => {
     return games.saveGame(params);
+  },
+  "workflows.ensure": async (params) => {
+    return workflows.ensureWorkflowsStorage(params?.projectRoot);
+  },
+  "workflows.list": async (params) => {
+    return workflows.listWorkflows(params);
+  },
+  "workflows.create": async (params) => {
+    return workflows.createWorkflow(params);
+  },
+  "workflows.read": async (params) => {
+    return workflows.readWorkflow(params);
+  },
+  "workflows.save": async (params) => {
+    return workflows.saveWorkflow(params);
+  },
+  "workflows.delete": async (params) => {
+    return workflows.deleteWorkflow(params);
   },
 };
 
