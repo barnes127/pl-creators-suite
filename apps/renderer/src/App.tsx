@@ -2361,9 +2361,31 @@ useEffect(() => {
   <div className="shell">
     <aside className="sidebar">
       <div className="brand">
-        <div className="brandTitle">PL Creators Suite</div>
-        <div className="brandSub">v0.0.1 • offline-first</div>
+        <div className="brandMarkRow">
+          <div className="brandLogoFrame">
+            <img
+              className="brandLogo"
+              src="/brand/praecursor-logo.png"
+              alt="Praecursor Labs"
+            />
+          </div>
+
+          <div className="brandText">
+            <div className="brandEyebrow">Praecursor Labs</div>
+            <div className="brandTitle">PL Creators Suite</div>
+            <div className="brandSub">v1 Beta · Offline-first</div>
+          </div>
+        </div>
+
+        <div className="brandTagline">Create locally. Build freely.</div>
+
+        <div className="brandBadges">
+          <span>Local-first</span>
+          <span>Creator platform</span>
+        </div>
       </div>
+
+      <div className="sidebarSectionLabel">Studios</div>
 
       <nav className="nav">
         {navItems.map((item) => {
@@ -2383,8 +2405,16 @@ useEffect(() => {
       </nav>
 
       <div className="sidebarFooter">
-        <div className="tiny">Project: {projectRoot ? projectRoot : "(none)"}</div>
-        <div className="tiny">Recent:</div>
+        <div className="sidebarSectionLabel">Project</div>
+
+        <div className="projectSummaryCard">
+          <div className="projectSummaryLabel">Current Project</div>
+          <div className="projectSummaryValue">
+            {projectRoot ? projectRoot : "No project open"}
+          </div>
+        </div>
+
+        <div className="projectSummaryLabel">Recent Projects</div>
 
         {recents.length === 0 ? (
           <div className="tiny">(none)</div>
@@ -2416,6 +2446,8 @@ useEffect(() => {
           </div>
         )}
       </div>
+
+      <div className="sidebarSectionLabel sidebarToolsLabel">Tools</div>
 
       <CollapsiblePanel 
         title="Local AI"
@@ -2770,7 +2802,7 @@ useEffect(() => {
       </CollapsiblePanel>
 
       <CollapsiblePanel 
-        title="PLugins" 
+        title="Plugins" 
         defaultOpen={false}
         storageKey="pl.layout.plugins"
       >
@@ -3033,11 +3065,11 @@ useEffect(() => {
             type="button"
             onClick={() => setPhysicsDrawerOpen((value) => !value)}
           >
-            {physicsDrawerOpen ? "▼" : "▲"} Physics Engine
+            {physicsDrawerOpen ? "▼" : "▲"} Simulation Tools
           </button>
 
           <div className="physicsDrawerMeta">
-            Simulation / math engine tools
+            Physics, math and simulation diagnostics
           </div>
         </div>
 
