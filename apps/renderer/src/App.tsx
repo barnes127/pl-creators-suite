@@ -2450,15 +2450,16 @@ useEffect(() => {
       <div className="sidebarSectionLabel sidebarToolsLabel">Tools</div>
 
       <CollapsiblePanel 
-        title="Local AI"
+        title="Local AI Copilot"
         defaultOpen={true}
         storageKey="pl.layout.panel.localAi"
       >
 
         {localAiStatus ? (
-          <div className="recentList">
-            <div className="recentItem">
-              Status: {localAiStatus.available ? "Available" : "Not configured"}
+          <div className="recentList utilityPanel">
+            <div className="recentItem utilityStatusCard">
+              <strong>Copilot Status</strong>
+              <span>{localAiStatus.available ? "Available" : "Not configured"}</span>
             </div>
             <div className="recentItem">Provider: {localAiStatus.provider}</div>
             {localAiStatus.host && (
@@ -2475,18 +2476,20 @@ useEffect(() => {
             )}
           </div>
         ) : (
-          <div className="emptyState">Checking AI status...</div>
+          <div className="emptyState">
+            Checking local AI status. The suite can run without AI configured.
+          </div>
         )}
       </CollapsiblePanel>
 
       <CollapsiblePanel 
-        title="System Status" 
+        title="Suite Status" 
         defaultOpen={false}
         storageKey="pl.layout.panel.systemStatus"
       >
 
         {featureFlags ? (
-          <div className="recentList">
+          <div className="recentList utilityPanel">
             <div className="recentItem">
               Plugin System: {featureFlags.plugins ? "Enabled" : "Disabled"}
             </div>
@@ -2501,20 +2504,26 @@ useEffect(() => {
             </div>
           </div>
         ) : (
-          <div className="emptyState">Loading system status...</div>
+          <div className="emptyState">Loading suite capability status...</div>
         )}
       </CollapsiblePanel>
 
       <CollapsiblePanel
-        title="Assets"
+        title="Assets Registry"
         defaultOpen={false}
         storageKey="pl.layout.panel.assets"
       >
         {projectRoot ? (
-          <div className="recentList">
-            <div className="recentItem">Asset Registry: Ready</div>
-            <div className="recentItem">Assets: {assets.length}</div>
-            <div className="recentList">
+          <div className="recentList utilityPanel">
+            <div className="recentItem utilityStatusCard">
+              <strong>Registry</strong>
+              <span>Ready</span>
+            </div>
+            <div className="recentItem utilityStatus Card">
+              <strong>Assets</strong>
+              <span>{assets.length}</span>
+            </div>
+            <div className="recentList utilityForm">
               <input
                 className="input"
                 value={assetName}
@@ -2549,7 +2558,7 @@ useEffect(() => {
                 placeholder="/absolute/path/to/file.ext"
               />
               <button
-                className="btn"
+                className="btn btn-subtle"
                 type="button"
                 onClick={() => void handleChooseAssetFile()}
               >
@@ -2557,7 +2566,7 @@ useEffect(() => {
               </button>
 
               <button
-                className="btn"
+                className="btn btn-primary"
                 type="button"
                 onClick={() => void handleImportAsset()}
               >
@@ -2565,7 +2574,7 @@ useEffect(() => {
               </button>
 
               <button
-                className="btn"
+                className="btn btn-subtle"
                 type="button"
                 onClick={() => void handleRegisterAsset()}
               >
@@ -2574,7 +2583,9 @@ useEffect(() => {
             </div>
 
             {assets.length === 0 ? (
-              <div className="emptyState">No assets registered</div>
+              <div className="emptyState">
+                No assets registered yet. Import or register local files for this project.
+              </div>
             ) : (
               assets.map((asset) => (
                 <div className="recentItem" key={asset.id}>
@@ -2587,7 +2598,7 @@ useEffect(() => {
             )}
           </div>
         ) : (
-          <div className="emptyState">Open a project to view assets</div>
+          <div className="emptyState">Open a project to use a the asset registry.</div>
         )}
       </CollapsiblePanel>
 
@@ -2597,9 +2608,15 @@ useEffect(() => {
         storageKey="pl.layout.panel.workflows"
       >
         {projectRoot ? (
-          <div className="recentList workflowPanel">
-            <div className="recentItem">Workflow Registry: Ready</div>
-            <div className="recentItem">Workflows: {workflowsList.length}</div>
+          <div className="recentList workflowPanel utilityPanel">
+            <div className="recentItem utilityStatusCard">
+              <strong>Registry</strong>
+              <span>Ready</span>
+            </div>
+            <div className="recentItem utilityStatusCard">
+              <strong>Workflows</strong>
+              <span>{workflowsList.length}</span>
+            </div>
 
             <div className="recentItem">
               <strong>Template Packs</strong>
@@ -2641,7 +2658,7 @@ useEffect(() => {
                     <span>Tags: {template.tags.join(", ")}</span>
 
                     <button
-                      className="btn"
+                      className="btn btn-primary"
                       type="button"
                       onClick={() =>
                         void handleCreateWorkflowFromTemplate(template)
@@ -2662,7 +2679,7 @@ useEffect(() => {
             />
 
             <button
-              className="btn"
+              className="btn btn-primary"
               type="button"
               onClick={() => void handleCreateWorkflow()}
             >
@@ -2670,7 +2687,7 @@ useEffect(() => {
             </button>
 
             <button
-              className="btn"
+              className="btn btn-subtle"
               type="button"
               onClick={() => void refreshWorkflows(projectRoot)}
             >
@@ -2678,23 +2695,24 @@ useEffect(() => {
             </button>
 
             {workflowsList.length === 0 ? (
-              <div className="emptyState">No workflows yet</div>
+              <div className="emptyState">
+                No workflows yet. Create one manually or start from a template.</div>
             ) : (
               workflowsList.map((workflow) => (
                 <button
-                  className="btn"
+                  className={`listButton ${
+                    activeWorkflowName === workflow.name ? "listButtonActive" : ""
+                  }`}
                   key={workflow.name}
                   type="button"
-                  style={{
-                    width: "100%",
-                    marginBottom: 6,
-                    textAlign: "left",
-                  }}
                   onClick={() => void handleOpenWorkflow(workflow.name)}
                   title={workflow.path}
                 >
-                  {workflow.name}
-                  {activeWorkflowName === workflow.name ? " ✓" : ""}
+                  <strong>
+                    {workflow.name}
+                    {activeWorkflowName === workflow.name ? " ✓" : ""}
+                  </strong>
+                  <span className="listButtonMeta">Project workflow</span>
                 </button>
               ))
             )}
@@ -2723,43 +2741,43 @@ useEffect(() => {
 
                 <div className="docsEditorActions">
                   <button
-                    className="btn"
+                    className="btn btn-primary"
                     type="button"
                     onClick={() => void handleRunWorkflowManual()}
                     disabled={workflowBusy}
                   >
-                    {workflowBusy ? "Running..." : "Run Manual"}
+                    {workflowBusy ? "Running..." : "Run Workflow"}
                   </button>
 
                   <button
-                    className="btn"
+                    className="btn btn-subtle"
                     type="button"
                     onClick={() => void handleSimulateWorkflowTrigger("manual")}
                     disabled={workflowBusy}
                   >
-                    Sim Manual
+                    Test Manual
                   </button>
 
                   <button
-                    className="btn"
+                    className="btn btn-subtle"
                     type="button"
                     onClick={() => void handleSimulateWorkflowTrigger("onSave")}
                     disabled={workflowBusy}
                   >
-                    Sim onSave
+                    Test Save Trigger
                   </button>
 
                   <button
-                    className="btn"
+                    className="btn btn-subtle"
                     type="button"
                     onClick={() => void handleSimulateWorkflowTrigger("onExport")}
                     disabled={workflowBusy}
                   >
-                    Sim onExport
+                    Test Export Trigger
                   </button>
 
                   <button
-                    className="btn"
+                    className="btn btn-primary"
                     type="button"
                     onClick={() => void handleSaveWorkflow()}
                     disabled={workflowBusy}
@@ -2768,7 +2786,7 @@ useEffect(() => {
                   </button>
 
                   <button
-                    className="btn dangerBtn"
+                    className="btn btn-danger"
                     type="button"
                     onClick={() => void handleDeleteWorkflow()}
                     disabled={workflowBusy}
@@ -2778,7 +2796,7 @@ useEffect(() => {
                 </div>
               </div>
             ) : (
-              <div className="emptyState">Open a workflow to run it.</div>
+              <div className="emptyState">Open a workflow to inspect triggers and actions.</div>
             )}
 
             {workflowRunResult && (
@@ -2802,15 +2820,17 @@ useEffect(() => {
       </CollapsiblePanel>
 
       <CollapsiblePanel 
-        title="Plugins" 
+        title="Extensions & Plugins" 
         defaultOpen={false}
         storageKey="pl.layout.plugins"
       >
 
         {plugins.length === 0 ? (
-          <div className="emptyState">No plugins installed</div>
+          <div className="emptyState">
+            No plugins installed. Extension support is available for local-first tools.
+          </div>
         ) : (
-          <div className="recentList">
+          <div className="recentList utilityPanel">
             {plugins.map((plugin) => (
               <div className="recentItem" key={plugin.id}>
                 <strong>{plugin.name}</strong>
@@ -2818,10 +2838,10 @@ useEffect(() => {
                   {plugin.version} · {plugin.enabled ? "Enabled" : "Disabled"}
                 </span>
                 <button
-                  className="btn"
+                  className={plugin.enabled ? "btn btn-subtle" : "btn btn-primary"}
                   type="button"
                   onClick={() => void handleSetPluginEnabled(plugin.id, !plugin.enabled)}
->
+                >
                   {plugin.enabled ? "Disable" : "Enable"}
                 </button>
               </div>
@@ -2834,16 +2854,16 @@ useEffect(() => {
     <main className="main">
       <header className="topbar">
         <div className="topbarRight">
-          <button className="btn" type="button" onClick={handleNewProject}>
+          <button className="btn btn-primary" type="button" onClick={handleNewProject}>
             New Project
           </button>
 
-          <button className="btn" type="button" onClick={handleOpenProject}>
+          <button className="btn btn-subtle" type="button" onClick={handleOpenProject}>
             Open Project
           </button>
 
           <button
-            className="btn"
+            className="btn btn-subtle"
             type="button"
             onClick={async () => {
               try {
@@ -2860,11 +2880,11 @@ useEffect(() => {
             Export Logs
           </button>
 
-          <button className="btn" type="button" onClick={handleExportProject}>
+          <button className="btn btn-subtle" type="button" onClick={handleExportProject}>
             Export Project
           </button>
 
-          <button className="btn" type="button" onClick={handleImportProject}>
+          <button className="btn btn-subtle" type="button" onClick={handleImportProject}>
             Import Project
           </button>
 
@@ -3005,7 +3025,7 @@ useEffect(() => {
             type="button"
             onClick={() => setCopilotDrawerOpen((value) => !value)}
           >
-            {copilotDrawerOpen ? "▼" : "▲"} Copilot
+            {copilotDrawerOpen ? "▼" : "▲"} Local Copilot
           </button>
 
           <div className="copilotDrawerMeta">
@@ -3021,7 +3041,7 @@ useEffect(() => {
               className="input copilotInput"
               value={aiPrompt}
               onChange={(e) => setAiPrompt(e.target.value)}
-              placeholder="Ask the local copilot..."
+              placeholder="Ask the copilot for help with the current project..."
               rows={3}
             />
 
@@ -3037,7 +3057,7 @@ useEffect(() => {
               </label>
 
               <button
-                className="btn"
+                className="btn btn-primary"
                 type="button"
                 onClick={() => void handleSendAiPrompt()}
                 disabled={aiBusy}
@@ -3052,7 +3072,9 @@ useEffect(() => {
                 <div>{aiResponse}</div>
               </div>
             ) : (
-              <div className="emptyState">No response yet</div>
+              <div className="emptyState">
+                No response yet. Ask a question or request help with the active workspace.
+              </div>
             )}
           </div>
         )}
@@ -3069,7 +3091,7 @@ useEffect(() => {
           </button>
 
           <div className="physicsDrawerMeta">
-            Physics, math and simulation diagnostics
+            Physics, motion and simulation tools
           </div>
         </div>
 
