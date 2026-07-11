@@ -14,6 +14,7 @@ async function createWindow() {
  const state = await loadWindowState();
 
 const win = new BrowserWindow({
+  title: "PL Creators Suite Beta"
   width: state.width,
   height: state.height,
   x: state.x,

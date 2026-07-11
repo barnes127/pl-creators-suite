@@ -4,7 +4,7 @@ import "./app.css";
 import { Modal } from "./components/Modal";
 import { ThreeModelViewport } from "./components/modeling";
 import { CollapsiblePanel } from "./components/CollapsiblePanel";
-import { Button, Panel, Toolbar, WorkspaceHeader } from "./components/pl-ui";
+import { Panel, WorkspaceHeader } from "./components/pl-ui";
 import {
   applyGravity2D,
   convertDistance,
@@ -301,12 +301,12 @@ function readStoredBoolean(key: string, fallback: boolean) {
 export default function App() {
   const navItems: NavItem[] = useMemo(
     () => [
-      { id: "code", label: "Code IDE", hint: "Edit + run scripts later" },
-      { id: "game", label: "Game Studio", hint: "Scenes + assets later" },
-      { id: "movie", label: "Movie Studio", hint: "Timeline + export later" },
-      { id: "docs", label: "Docs", hint: "Notes + docs later" },
-      { id: "sheets", label: "Sheets", hint: "Grid + formulas later" },
-      { id: "modeler", label: "Modeling", hint: "3D + physics later" },
+      { id: "code", label: "Code IDE", hint: "Scripts and local files" },
+      { id: "game", label: "Game Studio", hint: "Scenes and gameplay data" },
+      { id: "movie", label: "Movie Studio", hint: "Timeline and animation" },
+      { id: "docs", label: "Docs", hint: "Markdown notes and writing" },
+      { id: "sheets", label: "Sheets", hint: "Local grids and tables" },
+      { id: "modeler", label: "Modeling", hint: "3D scenes and objects" },
     ],
     []
   );
@@ -2895,19 +2895,6 @@ useEffect(() => {
         <WorkspaceHeader
           title={active}
           subtitle={projectRoot ? `Project: ${projectRoot}` : "No project open"}
-          actions={
-            <Toolbar>
-              <Button type="button" variant="ghost" onClick={handleNewProject}>
-                New
-              </Button>
-              <Button type="button" variant="ghost" onClick={handleOpenProject}>
-                Open
-              </Button>
-              <Button type="button" variant="ghost" onClick={handleExportProject}>
-                Export
-              </Button>
-            </Toolbar>
-          }
         />
 
         <Workspace 
@@ -4081,7 +4068,7 @@ function Workspace({
     null
   );
 
-  const [modelEngineDrawerOpen, setModelEngineDrawerOpen] = useState(true);
+  const [modelEngineDrawerOpen, setModelEngineDrawerOpen] = useState(false);
 
   const [modelViewportCamera, setModelViewportCamera] =
     useState<ModelingCamera>(() => createModelingCamera());
@@ -4281,7 +4268,7 @@ function handleFrameSelectedModelObject() {
   const [gameRuntimeState, setGameRuntimeState] =
     useState<GameRuntimeState | null>(null);
 
-  const [gameEngineDrawerOpen, setGameEngineDrawerOpen] = useState(true);
+  const [gameEngineDrawerOpen, setGameEngineDrawerOpen] = useState(false);
 
   useEffect(() => {
     setGameRuntimeState(gameRuntimeEngine?.getState() ?? null);
