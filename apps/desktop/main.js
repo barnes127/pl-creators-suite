@@ -58,7 +58,7 @@ win.on("close", async () => {
       query: { rpcPort: String(rpcPort) },
     });
   } else {
-    win.loadURL("http://localhost:5173?rpcPort=${rpcPort}");
+    win.loadURL(`http://localhost:5173?rpcPort=${rpcPort}`);
   }
   }
 
