@@ -25,3 +25,16 @@ linux:
   executableName: pl-creators-suite
   syncDesktopName: true
   icon: build/icons/icon.png
+
+win:
+  target:
+    - nsis
+  executableName: pl-creators-suite
+
+nsis:
+  oneClick: false
+  allowToChangeInstallationDirectory: true
+  createDesktopShortcut: true
+  createStartMenuShortcut: true
+  shortcutName: PL Creators Suite
+  artifactName: PL-Creators-Suite-${version}-Setup.${ext}

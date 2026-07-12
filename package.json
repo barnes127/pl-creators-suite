@@ -9,8 +9,10 @@
     "dev": "pnpm -r dev",
     "build:renderer": "pnpm --filter renderer build",
     "package:linux": "pnpm build:renderer && electron-builder --linux AppImage --config electron-builder.yml",
-    "clean:release": "rm -rf release",
+    "package:win": "pnpm build:renderer && electron-builder --win nsis --config electron-builder.yml",
+    "clean:release": "node -e \"require('fs').rmSync('release',{recursive:true,force:true})\"",
     "release:linux": "pnpm clean:release && pnpm package:linux",
+    "release:win": "pnpm clean:release && pnpm package:win",
     "release:check": "ls -lah release && ls -lah release/linux-unpacked | head"
   },
   "devDependencies": {
