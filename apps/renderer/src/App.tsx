@@ -2365,7 +2365,7 @@ useEffect(() => {
           <div className="brandLogoFrame">
             <img
               className="brandLogo"
-              src="/brand/praecursor-logo.png"
+              src="./brand/praecursor-logo.png"
               alt="Praecursor Labs"
             />
           </div>
