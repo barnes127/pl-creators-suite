@@ -5,6 +5,11 @@
   "description": "Offline-first creator-focused software suite.",
   "author": "Praecursor Labs",
   "desktopName": "pl-creators-suite",
+  "packageManager": "pnpm@10.31.0",
+  "engines": {
+    "node": "20.20.2",
+    "pnpm": "10.31.0"
+  },
   "scripts": {
     "dev": "pnpm -r dev",
     "build:renderer": "pnpm --filter renderer build",
@@ -16,8 +21,7 @@
     "release:check": "ls -lah release && ls -lah release/linux-unpacked | head"
   },
   "devDependencies": {
-    "asar": "^3.2.0",
-    "electron": "^40.0.0",
-    "electron-builder": "^26.15.3"
+    "electron": "40.0.0",
+    "electron-builder": "26.15.3"
   }
 }
