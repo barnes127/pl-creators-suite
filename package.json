@@ -10,6 +10,12 @@
     "node": "22.12.0",
     "pnpm": "10.31.0"
   },
+  "pnpm": {
+    "overrides": {
+      "postcss": "8.5.23",
+      "rollup": "4.59.0"
+    }
+  },
   "scripts": {
     "env:report": "node scripts/environment-report.js",
     "clean:build": "node scripts/clean-build.js",

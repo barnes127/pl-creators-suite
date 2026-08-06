@@ -127,8 +127,8 @@ if (rendererPackage) {
   );
 
   check(
-    rendererPackage.devDependencies?.vite === "7.3.1",
-    "renderer Vite version is 7.3.1",
+    rendererPackage.devDependencies?.vite === "7.3.2",
+    "renderer Vite version is 7.3.2",
   );
 }
 
