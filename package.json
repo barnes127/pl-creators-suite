@@ -7,10 +7,13 @@
   "desktopName": "pl-creators-suite",
   "packageManager": "pnpm@10.31.0",
   "engines": {
-    "node": "20.20.2",
+    "node": "22.12.0",
     "pnpm": "10.31.0"
   },
   "scripts": {
+    "env:report": "node scripts/environment-report.js",
+    "clean:build": "node scripts/clean-build.js",
+    "test:smoke": "node scripts/smoke-test.js",
     "dev": "pnpm -r dev",
     "build:renderer": "pnpm --filter renderer build",
     "package:linux": "pnpm build:renderer && electron-builder --linux AppImage --config electron-builder.yml",
@@ -21,7 +24,7 @@
     "release:check": "ls -lah release && ls -lah release/linux-unpacked | head"
   },
   "devDependencies": {
-    "electron": "40.0.0",
+    "electron": "41.10.3",
     "electron-builder": "26.15.3"
   }
 }
