@@ -1,6 +1,7 @@
 const fs = require("fs/promises");
 const path = require("path");
 const { USER_DATA_DIR } = require("../../storage/paths");
+const { randomUUID } = require("crypto");
 
 const PLUGINS_DIR = path.join(USER_DATA_DIR, "plugins");
 const PLUGIN_REGISTRY_PATH = path.join(PLUGINS_DIR, "registry.json");
@@ -39,8 +40,14 @@ async function writePluginRegistry(registry) {
       : [],
   };
 
-  const tmpPath = `${PLUGIN_REGISTRY_PATH}.tmp`;
-  await fs.writeFile(tmpPath, JSON.stringify(safeRegistry, null, 2), "utf8");
+  const tmpPath = `${PLUGIN_REGISTRY_PATH}.${randomUUID()}.tmp`;
+
+  await fs.writeFile(
+    tmpPath,
+    JSON.stringify(safeRegistry, null, 2),
+    "utf8",
+  );
+
   await fs.rename(tmpPath, PLUGIN_REGISTRY_PATH);
 
   return safeRegistry;

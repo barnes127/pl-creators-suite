@@ -595,7 +595,14 @@ function startRpcServer({ port }) {
         res.writeHead(200, { "Content-Type": "application/json" });
         res.end(JSON.stringify(payload));
       } catch (err) {
-        const payload = makeJsonRpcResponse(null, null, err);
+        console.error("RPC request failed:", err);
+
+        const payload = makeJsonRpcResponse(
+          null,
+          null,
+          new Error("Internal RPC error"),
+        );
+
         res.writeHead(200, { "Content-Type": "application/json" });
         res.end(JSON.stringify(payload));
       }
