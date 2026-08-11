@@ -1,0 +1,155 @@
+{
+  "registryVersion": 1,
+  "slice": "PL Workflow Hardware and Research Platform",
+  "sliceCode": "LAB",
+  "capabilities": [
+    {
+      "id": "PL-LAB-WORKFLOW-001",
+      "name": "Advanced Workflow Execution",
+      "description": "Support branching, chaining, conditions, parallel steps, joins, retries, timeouts, compensation, cancellation, resource locks, variables, typed data, and subworkflows.",
+      "slice": "LAB",
+      "area": "workflow",
+      "status": "missing",
+      "targetMilestone": "v1.18",
+      "source": "v1.18 — Wave 1.18.1 Advanced visual workflow editor and execution model",
+      "implementation": [],
+      "validation": [],
+      "notes": "Execution remains local by default.",
+      "blockedBy": [
+        "PL-ENG-WORKFLOW-001",
+        "PL-CORE-TASK-001"
+      ],
+      "deferralReason": null
+    },
+    {
+      "id": "PL-LAB-TRIGGER-001",
+      "name": "Workflow Triggers Scheduling and Packs",
+      "description": "Provide project, file, cell, task, build, test, commit, export, device, threshold, timer, and manual triggers plus reusable workflow packs.",
+      "slice": "LAB",
+      "area": "orchestration",
+      "status": "missing",
+      "targetMilestone": "v1.18",
+      "source": "v1.18 — Wave 1.18.2 Triggers schedules templates packs and orchestration",
+      "implementation": [],
+      "validation": [],
+      "notes": "Runaway loops, duplicate runs, and hidden external actions must be prevented.",
+      "blockedBy": [
+        "PL-LAB-WORKFLOW-001"
+      ],
+      "deferralReason": null
+    },
+    {
+      "id": "PL-LAB-TRACE-001",
+      "name": "Workflow Tracing and Analytics",
+      "description": "Record workflow inputs, outputs, duration, retries, resource use, logs, providers, provenance, failures, run history, and bottlenecks.",
+      "slice": "LAB",
+      "area": "diagnostics",
+      "status": "missing",
+      "targetMilestone": "v1.18",
+      "source": "v1.18 — Wave 1.18.3 Workflow diagnostics analytics execution tracing and command center",
+      "implementation": [],
+      "validation": [],
+      "notes": null,
+      "blockedBy": [
+        "PL-LAB-WORKFLOW-001",
+        "PL-CENTER-JOB-001",
+        "PL-CORE-DIAG-001"
+      ],
+      "deferralReason": null
+    },
+    {
+      "id": "PL-LAB-DEVICE-001",
+      "name": "Device Discovery and Plugin Foundation",
+      "description": "Provide USB, serial, scanner, sensor, and device discovery, identity, connection profiles, permissions, reconnect, health, capabilities, and safe removal.",
+      "slice": "LAB",
+      "area": "devices",
+      "status": "missing",
+      "targetMilestone": "v1.18",
+      "source": "v1.18 — Wave 1.18.4 USB serial scanners sensors and device plugin foundation",
+      "implementation": [],
+      "validation": [],
+      "notes": "Device access must be explicit and sandboxed where practical.",
+      "blockedBy": [
+        "PL-EXT-SDK-001",
+        "PL-EXT-PERM-001"
+      ],
+      "deferralReason": null
+    },
+    {
+      "id": "PL-LAB-FIRMWARE-001",
+      "name": "Firmware and Embedded Workflow Integration",
+      "description": "Support source, toolchain detection, build, flash, monitor, logging, device selection, test, artifacts, diagnostics, and recovery workflows.",
+      "slice": "LAB",
+      "area": "firmware",
+      "status": "missing",
+      "targetMilestone": "v1.18",
+      "source": "v1.18 — Wave 1.18.5 Firmware and embedded workflows",
+      "implementation": [],
+      "validation": [],
+      "notes": "Automatic flashing and privileged device operations require explicit confirmation.",
+      "blockedBy": [
+        "PL-LAB-DEVICE-001",
+        "PL-BRIDGE-CLI-001",
+        "PL-TERM-TRUST-001",
+        "PL-ENG-CODE-001"
+      ],
+      "deferralReason": null
+    },
+    {
+      "id": "PL-LAB-DATA-001",
+      "name": "Live Data Pipeline Recording and Replay",
+      "description": "Provide typed timestamped data streams with units, schemas, transforms, filters, buffering, storage, checkpoints, backpressure, monitoring, recording, replay, calibration, and export.",
+      "slice": "LAB",
+      "area": "data",
+      "status": "missing",
+      "targetMilestone": "v1.18",
+      "source": "v1.18 — Wave 1.18.6 Data pipelines live monitoring recording replay and calibration",
+      "implementation": [],
+      "validation": [],
+      "notes": "Data can feed Sheets, simulation, Docs, models, games, animation, and workflows.",
+      "blockedBy": [
+        "PL-LAB-DEVICE-001",
+        "PL-PHYS-UNITS-001",
+        "PL-CORE-TASK-001"
+      ],
+      "deferralReason": null
+    },
+    {
+      "id": "PL-LAB-RESEARCH-001",
+      "name": "Integrated Research Project Workflow",
+      "description": "Track experiments, methods, assumptions, devices, datasets, simulations, plots, citations, versions, notes, measured results, and reproducibility metadata.",
+      "slice": "LAB",
+      "area": "research",
+      "status": "missing",
+      "targetMilestone": "v1.18",
+      "source": "v1.18 — Wave 1.18.7 Research projects experiment tracking visualization and reproducibility",
+      "implementation": [],
+      "validation": [],
+      "notes": "Measured hardware data should be comparable against simulation results.",
+      "blockedBy": [
+        "PL-LAB-DATA-001",
+        "PL-PHYS-EXPERIMENT-001",
+        "PL-PHYS-VIS-001"
+      ],
+      "deferralReason": null
+    },
+    {
+      "id": "PL-LAB-REPORT-001",
+      "name": "Research Reporting and Reproducibility",
+      "description": "Generate linked Docs reports, Sheets analysis, visualizations, complete result packages, provenance records, and recoverable scientific workflows.",
+      "slice": "LAB",
+      "area": "reporting",
+      "status": "missing",
+      "targetMilestone": "v1.18",
+      "source": "v1.18 — Validation and public-beta release gate",
+      "implementation": [],
+      "validation": [],
+      "notes": null,
+      "blockedBy": [
+        "PL-LAB-RESEARCH-001",
+        "PL-PHYS-NOTEBOOK-001"
+      ],
+      "deferralReason": null
+    }
+  ]
+}

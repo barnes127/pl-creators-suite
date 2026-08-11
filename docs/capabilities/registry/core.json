@@ -1,0 +1,532 @@
+{
+  "registryVersion": 1,
+  "slice": "PL Creators Suite Core",
+  "sliceCode": "CORE",
+  "capabilities": [
+    {
+      "id": "PL-CORE-PROJECT-001",
+      "name": "Versioned project contract",
+      "description": "Define and enforce the versioned .plproj project manifest and shared project data contract.",
+      "slice": "CORE",
+      "area": "project",
+      "status": "partial",
+      "targetMilestone": "v1.1.3",
+      "source": "Wave 1.1.3 — Project Format Contract",
+      "implementation": [
+        "docs/PROJECT_FORMAT.md"
+      ],
+      "validation": [],
+      "notes": "Project infrastructure exists, but formal versioning and migration behavior are completed in Wave 1.1.3.",
+      "blockedBy": [],
+      "deferralReason": null
+    },
+    {
+      "id": "PL-CORE-MIGRATION-001",
+      "name": "Project schema migration",
+      "description": "Safely migrate older supported project and slice schemas with backup and atomic replacement.",
+      "slice": "CORE",
+      "area": "project",
+      "status": "missing",
+      "targetMilestone": "v1.1.3",
+      "source": "Wave 1.1.3 — Project Format Contract",
+      "implementation": [],
+      "validation": [],
+      "notes": null,
+      "blockedBy": [
+        "PL-CORE-PROJECT-001"
+      ],
+      "deferralReason": null
+    },
+    {
+      "id": "PL-CORE-RPC-001",
+      "name": "Shared RPC contract",
+      "description": "Provide a stable renderer-to-main RPC contract with structured responses and typed failure behavior.",
+      "slice": "CORE",
+      "area": "rpc",
+      "status": "partial",
+      "targetMilestone": "v1.1.4",
+      "source": "Wave 1.1.4 — RPC and Error Boundaries",
+      "implementation": [
+        "apps/desktop/backend.js"
+      ],
+      "validation": [],
+      "notes": "JSON-RPC behavior exists and raw internal stack exposure has been hardened, but the complete contract remains unfinished.",
+      "blockedBy": [],
+      "deferralReason": null
+    },
+    {
+      "id": "PL-CORE-SHELL-001",
+      "name": "Unified application shell",
+      "description": "Provide shared navigation, workspace layout, slice switching, project context, status, commands, and application-level UI infrastructure.",
+      "slice": "CORE",
+      "area": "shell",
+      "status": "partial",
+      "targetMilestone": "v1.2",
+      "source": "Shared Creator Platform Foundations",
+      "implementation": [
+        "apps/renderer/src/App.tsx"
+      ],
+      "validation": [],
+      "notes": "The current shell works but remains heavily concentrated in App.tsx and requires decomposition and shared-component cleanup.",
+      "blockedBy": [],
+      "deferralReason": null
+    },
+    {
+      "id": "PL-CORE-ASSET-001",
+      "name": "Shared asset system",
+      "description": "Track project assets, metadata, dependencies, linked and embedded states, missing assets, and reusable asset references.",
+      "slice": "CORE",
+      "area": "assets",
+      "status": "partial",
+      "targetMilestone": "v1.2",
+      "source": "Shared Creator Platform Foundations / Assets",
+      "implementation": [
+        "apps/desktop/services/assets/index.js"
+      ],
+      "validation": [],
+      "notes": "A shared asset service exists, but the complete cross-slice asset contract is not finished.",
+      "blockedBy": [
+        "PL-CORE-PROJECT-001"
+      ],
+      "deferralReason": null
+    },
+    {
+      "id": "PL-CORE-LINK-001",
+      "name": "Cross-slice project links",
+      "description": "Provide durable references between documents, sheets, source files, models, animation assets, game assets, and shared project data.",
+      "slice": "CORE",
+      "area": "links",
+      "status": "missing",
+      "targetMilestone": "v1.9",
+      "source": "Cross-Slice Integration and Workflow Convergence",
+      "implementation": [],
+      "validation": [],
+      "notes": "Links must survive save, reopen, rename, migration, and missing-asset states.",
+      "blockedBy": [
+        "PL-CORE-ASSET-001",
+        "PL-CORE-PROJECT-001"
+      ],
+      "deferralReason": null
+    },
+    {
+      "id": "PL-CORE-HISTORY-001",
+      "name": "Shared history autosave and recovery",
+      "description": "Provide reusable undo history, snapshots, autosave, crash recovery, and restore behavior.",
+      "slice": "CORE",
+      "area": "history",
+      "status": "missing",
+      "targetMilestone": "v1.2",
+      "source": "Shared Creator Platform Foundations / History and Recovery",
+      "implementation": [],
+      "validation": [],
+      "notes": "Individual slices should consume this shared infrastructure rather than invent unrelated recovery systems.",
+      "blockedBy": [
+        "PL-CORE-PROJECT-001"
+      ],
+      "deferralReason": null
+    },
+    {
+      "id": "PL-CORE-IO-001",
+      "name": "Shared import and export framework",
+      "description": "Provide reusable importer, exporter, conversion, validation, progress, error, and format-registration infrastructure.",
+      "slice": "CORE",
+      "area": "interchange",
+      "status": "missing",
+      "targetMilestone": "v1.2",
+      "source": "Shared Creator Platform Foundations / Import Export",
+      "implementation": [],
+      "validation": [],
+      "notes": null,
+      "blockedBy": [
+        "PL-CORE-TASK-001"
+      ],
+      "deferralReason": null
+    },
+    {
+      "id": "PL-CORE-TASK-001",
+      "name": "Background task and worker system",
+      "description": "Execute long-running work with progress, cancellation, diagnostics, lifecycle state, and failure isolation.",
+      "slice": "CORE",
+      "area": "tasks",
+      "status": "partial",
+      "targetMilestone": "v1.2",
+      "source": "Shared Creator Platform Foundations / Tasks Workers Diagnostics",
+      "implementation": [],
+      "validation": [],
+      "notes": "Some engine operations exist, but the standard suite-wide job contract remains incomplete.",
+      "blockedBy": [
+        "PL-CORE-RPC-001"
+      ],
+      "deferralReason": null
+    },
+    {
+      "id": "PL-CORE-COMMAND-001",
+      "name": "Shared command system",
+      "description": "Register application and slice commands for menus, shortcuts, command palette, automation, and future extensions.",
+      "slice": "CORE",
+      "area": "commands",
+      "status": "missing",
+      "targetMilestone": "v1.2",
+      "source": "Shared Creator Platform Foundations / Reusable UI Infrastructure",
+      "implementation": [],
+      "validation": [],
+      "notes": null,
+      "blockedBy": [
+        "PL-CORE-SHELL-001"
+      ],
+      "deferralReason": null
+    },
+    {
+      "id": "PL-CORE-PERMISSION-001",
+      "name": "Permissions and trust framework",
+      "description": "Gate sensitive filesystem, process, network, AI, extension, and workspace operations through explicit permissions and trust.",
+      "slice": "CORE",
+      "area": "security",
+      "status": "partial",
+      "targetMilestone": "v1.10",
+      "source": "Extension System and Security Model",
+      "implementation": [],
+      "validation": [],
+      "notes": "Security boundaries exist in parts of the application but are not yet represented by one complete permission framework.",
+      "blockedBy": [],
+      "deferralReason": null
+    },
+    {
+      "id": "PL-CORE-EXT-001",
+      "name": "Extension platform",
+      "description": "Provide extension discovery, lifecycle, APIs, permissions, compatibility, installation, and isolation.",
+      "slice": "CORE",
+      "area": "extensions",
+      "status": "partial",
+      "targetMilestone": "v1.10",
+      "source": "Extension Platform",
+      "implementation": [
+        "apps/desktop/services/plugins/registry.js"
+      ],
+      "validation": [],
+      "notes": "Plugin registry infrastructure exists; the complete public extension contract and marketplace-facing platform do not.",
+      "blockedBy": [
+        "PL-CORE-PERMISSION-001"
+      ],
+      "deferralReason": null
+    },
+    {
+      "id": "PL-CORE-AI-001",
+      "name": "Project-aware Copilot framework",
+      "description": "Provide permissioned project context, tool invocation, proposal review, patch review, and user-controlled AI actions.",
+      "slice": "CORE",
+      "area": "ai",
+      "status": "partial",
+      "targetMilestone": "v1.11",
+      "source": "Project-Aware Copilot",
+      "implementation": [],
+      "validation": [],
+      "notes": "AI infrastructure exists experimentally, but official-v1 project-aware action contracts remain incomplete.",
+      "blockedBy": [
+        "PL-CORE-PERMISSION-001",
+        "PL-CORE-RPC-001"
+      ],
+      "deferralReason": null
+    },
+    {
+      "id": "PL-CORE-RENDER-001",
+      "name": "Shared rendering infrastructure",
+      "description": "Provide common render jobs, preview state, output configuration, progress, cancellation, and diagnostics where practical.",
+      "slice": "CORE",
+      "area": "rendering",
+      "status": "partial",
+      "targetMilestone": "v1.7",
+      "source": "Shared Engine Infrastructure",
+      "implementation": [],
+      "validation": [],
+      "notes": "Modeling and Movie engine foundations exist, but a stable suite-level render contract is not yet complete.",
+      "blockedBy": [
+        "PL-CORE-TASK-001"
+      ],
+      "deferralReason": null
+    },
+    {
+      "id": "PL-CORE-MEDIA-001",
+      "name": "Shared media infrastructure",
+      "description": "Provide reusable audio, video, media metadata, timing, decoding, preview, and asset-handling contracts.",
+      "slice": "CORE",
+      "area": "media",
+      "status": "partial",
+      "targetMilestone": "v1.7",
+      "source": "Movie Animation and Game Shared Media Requirements",
+      "implementation": [],
+      "validation": [],
+      "notes": "Movie and Game foundations already model media-related state, but shared production-grade media infrastructure remains incomplete.",
+      "blockedBy": [
+        "PL-CORE-ASSET-001"
+      ],
+      "deferralReason": null
+    },
+    {
+      "id": "PL-CORE-GEOMETRY-001",
+      "name": "Shared geometry foundation",
+      "description": "Provide reusable geometry representations and operations needed by modeling, rendering, physics, and game asset workflows.",
+      "slice": "CORE",
+      "area": "geometry",
+      "status": "partial",
+      "targetMilestone": "v1.6",
+      "source": "Modeling and Shared Engine Foundations",
+      "implementation": [
+        "apps/renderer/src/engines/modeling"
+      ],
+      "validation": [
+        "docs/releases/stage-4-modeling-engine-validation.md"
+      ],
+      "notes": "Scene/object geometry foundations exist, but production mesh operation contracts remain incomplete.",
+      "blockedBy": [],
+      "deferralReason": null
+    },
+    {
+      "id": "PL-CORE-PHYSICS-001",
+      "name": "Shared physics and simulation infrastructure",
+      "description": "Provide reusable simulation state, bodies, colliders, stepping, diagnostics, and physics integration contracts.",
+      "slice": "CORE",
+      "area": "physics",
+      "status": "partial",
+      "targetMilestone": "v1.8",
+      "source": "Physics Simulation Engine Foundations",
+      "implementation": [],
+      "validation": [
+        "docs/releases/stage-4-physics-simulation-engine-validation.md"
+      ],
+      "notes": "Physics foundations exist, but full Modeler and Game integration remains incomplete.",
+      "blockedBy": [],
+      "deferralReason": null
+    },
+    {
+      "id": "PL-CORE-TIMELINE-001",
+      "name": "Shared timeline and keyframe primitives",
+      "description": "Provide reusable timing, playback, track, keyframe, range, marker, and interpolation concepts.",
+      "slice": "CORE",
+      "area": "timeline",
+      "status": "partial",
+      "targetMilestone": "v1.7",
+      "source": "Movie Animation Engine Foundations",
+      "implementation": [
+        "apps/renderer/src/engines/movie/timelineEngine.ts",
+        "apps/renderer/src/engines/movie/keyframes.ts",
+        "apps/renderer/src/engines/movie/playback.ts"
+      ],
+      "validation": [
+        "docs/releases/stage-4-movie-animation-engine-validation.md"
+      ],
+      "notes": "Animation engine primitives exist; reusable cross-slice timeline contracts remain incomplete.",
+      "blockedBy": [],
+      "deferralReason": null
+    },
+    {
+      "id": "PL-CORE-CALC-001",
+      "name": "Calculation and dependency graph foundation",
+      "description": "Provide deterministic dependency tracking and recalculation infrastructure for formula-driven data.",
+      "slice": "CORE",
+      "area": "calculation",
+      "status": "missing",
+      "targetMilestone": "v1.4",
+      "source": "Spreadsheet Formula Engine Requirements",
+      "implementation": [],
+      "validation": [],
+      "notes": "Initially consumed by Spreadsheets but defined separately so later project data systems can reuse the dependency model.",
+      "blockedBy": [],
+      "deferralReason": null
+    },
+    {
+      "id": "PL-CORE-DIAG-001",
+      "name": "Shared diagnostics infrastructure",
+      "description": "Provide structured diagnostic events, logging, warnings, errors, task state, and engine health visibility.",
+      "slice": "CORE",
+      "area": "diagnostics",
+      "status": "partial",
+      "targetMilestone": "v1.2",
+      "source": "Shared Creator Platform Foundations / Tasks Workers Diagnostics",
+      "implementation": [],
+      "validation": [],
+      "notes": "Multiple engines already expose diagnostic information, but one stable shared contract is still needed.",
+      "blockedBy": [
+        "PL-CORE-RPC-001"
+      ],
+      "deferralReason": null
+    },
+    {
+      "id": "PL-CORE-ACCESS-001",
+      "name": "Shared accessibility infrastructure",
+      "description": "Provide reusable keyboard navigation, focus behavior, semantic controls, scaling, and accessibility patterns.",
+      "slice": "CORE",
+      "area": "accessibility",
+      "status": "partial",
+      "targetMilestone": "v1.2",
+      "source": "Shared Creator Platform Foundations / Accessibility and UI Infrastructure",
+      "implementation": [],
+      "validation": [],
+      "notes": "Existing UI provides portions of standard desktop behavior but has not completed the formal accessibility pass.",
+      "blockedBy": [
+        "PL-CORE-SHELL-001"
+      ],
+      "deferralReason": null
+    },
+    {
+      "id": "PL-CORE-EVENT-001",
+      "name": "Typed event bus",
+      "description": "Provide a versioned typed event bus for project, asset, slice, engine, task, terminal, extension, AI, cloud, collaboration, and platform events.",
+      "slice": "CORE",
+      "area": "events",
+      "status": "missing",
+      "targetMilestone": "v1.2",
+      "source": "v1.2 — Wave 1.2.2 Command registry event bus settings and capability services",
+      "implementation": [],
+      "validation": [],
+      "notes": null,
+      "blockedBy": [
+        "PL-CORE-RPC-001"
+      ],
+      "deferralReason": null
+    },
+    {
+      "id": "PL-CORE-SETTINGS-001",
+      "name": "Scoped settings system",
+      "description": "Provide application, profile, project, slice, language, extension, and provider settings scopes through stable shared contracts.",
+      "slice": "CORE",
+      "area": "settings",
+      "status": "missing",
+      "targetMilestone": "v1.2",
+      "source": "v1.2 — Wave 1.2.2 Command registry event bus settings and capability services",
+      "implementation": [],
+      "validation": [],
+      "notes": null,
+      "blockedBy": [
+        "PL-CORE-PROJECT-001"
+      ],
+      "deferralReason": null
+    },
+    {
+      "id": "PL-CORE-SEARCH-001",
+      "name": "Global project search",
+      "description": "Provide project-wide search across files, documents, cells, symbols, assets, scenes, shots, tasks, workflows, and extension content.",
+      "slice": "CORE",
+      "area": "search",
+      "status": "missing",
+      "targetMilestone": "v1.2",
+      "source": "v1.2 — Wave 1.2.3 Project asset indexing and global search services",
+      "implementation": [],
+      "validation": [],
+      "notes": null,
+      "blockedBy": [
+        "PL-CORE-INDEX-001",
+        "PL-CORE-PROJECT-001"
+      ],
+      "deferralReason": null
+    },
+    {
+      "id": "PL-CORE-INDEX-001",
+      "name": "Background indexing service",
+      "description": "Provide incremental background indexing with content hashing, stale detection, cancellation, status reporting, and update tracking.",
+      "slice": "CORE",
+      "area": "indexing",
+      "status": "missing",
+      "targetMilestone": "v1.2",
+      "source": "v1.2 — Wave 1.2.3 Project asset indexing and global search services",
+      "implementation": [],
+      "validation": [],
+      "notes": null,
+      "blockedBy": [
+        "PL-CORE-ASSET-001",
+        "PL-CORE-TASK-001"
+      ],
+      "deferralReason": null
+    },
+    {
+      "id": "PL-CORE-NOTIFY-001",
+      "name": "Shared notification service",
+      "description": "Provide consistent application and project notifications through a stable internal Notification API.",
+      "slice": "CORE",
+      "area": "notifications",
+      "status": "missing",
+      "targetMilestone": "v1.2",
+      "source": "v1.2 — Required outcomes and Wave 1.2.6 Initial platform SDK contracts",
+      "implementation": [],
+      "validation": [],
+      "notes": null,
+      "blockedBy": [
+        "PL-CORE-SHELL-001",
+        "PL-CORE-EVENT-001"
+      ],
+      "deferralReason": null
+    },
+    {
+      "id": "PL-CORE-SERVICE-001",
+      "name": "Permission-aware service registry",
+      "description": "Provide versioned service registration and permission-aware service discovery instead of direct cross-module imports.",
+      "slice": "CORE",
+      "area": "services",
+      "status": "missing",
+      "targetMilestone": "v1.2",
+      "source": "v1.2 — Wave 1.2.2 Command registry event bus settings and capability services",
+      "implementation": [],
+      "validation": [],
+      "notes": null,
+      "blockedBy": [
+        "PL-CORE-PERMISSION-001",
+        "PL-CORE-RPC-001"
+      ],
+      "deferralReason": null
+    },
+    {
+      "id": "PL-CORE-TELEMETRY-001",
+      "name": "Local operational telemetry",
+      "description": "Provide locally stored operational telemetry and diagnostics with explicit opt-in boundaries for any future cloud diagnostic transmission.",
+      "slice": "CORE",
+      "area": "telemetry",
+      "status": "missing",
+      "targetMilestone": "v1.2",
+      "source": "v1.2 — Shared Creator Platform required outcomes",
+      "implementation": [],
+      "validation": [],
+      "notes": "Operational telemetry remains local unless the user explicitly opts into a future external diagnostic flow.",
+      "blockedBy": [
+        "PL-CORE-DIAG-001",
+        "PL-CORE-PERMISSION-001"
+      ],
+      "deferralReason": null
+    },
+    {
+      "id": "PL-CORE-THEME-001",
+      "name": "Shared theme API",
+      "description": "Provide a stable internal Theme API for shared UI styling, extension integration, workspace behavior, accessibility, and future SDK consumers.",
+      "slice": "CORE",
+      "area": "ui-platform",
+      "status": "missing",
+      "targetMilestone": "v1.2",
+      "source": "v1.2 — Wave 1.2.6 Initial platform SDK contracts",
+      "implementation": [],
+      "validation": [],
+      "notes": null,
+      "blockedBy": [
+        "PL-CORE-SHELL-001",
+        "PL-CORE-ACCESS-001"
+      ],
+      "deferralReason": null
+    },
+    {
+      "id": "PL-CORE-TEMPLATE-001",
+      "name": "Shared template API",
+      "description": "Provide stable project, slice, workflow, and extension-facing template contracts for reusable creator content and workflows.",
+      "slice": "CORE",
+      "area": "templates",
+      "status": "missing",
+      "targetMilestone": "v1.2",
+      "source": "v1.2 — Wave 1.2.6 Initial platform SDK contracts",
+      "implementation": [],
+      "validation": [],
+      "notes": null,
+      "blockedBy": [
+        "PL-CORE-PROJECT-001",
+        "PL-CORE-IO-001"
+      ],
+      "deferralReason": null
+    }
+  ]
+}

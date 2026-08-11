@@ -1,0 +1,218 @@
+{
+  "registryVersion": 1,
+  "slice": "PL Unified Cross-Slice Creator Platform",
+  "sliceCode": "XSLICE",
+  "capabilities": [
+    {
+      "id": "PL-XSLICE-GRAPH-001",
+      "name": "Project relationship and provenance graph",
+      "description": "Represent documents, sections, ranges, cells, charts, symbols, files, models, materials, scenes, shots, clips, game entities, simulations, workflows, extensions, and outputs as linkable project resources.",
+      "slice": "XSLICE",
+      "area": "relationship-graph",
+      "status": "missing",
+      "targetMilestone": "v1.15",
+      "source": "v1.15 — Wave 1.15.1 Project relationship and provenance graph",
+      "implementation": [],
+      "validation": [],
+      "notes": "Tracks stable IDs, versions, ownership, dependencies, provenance, permissions, stale links, missing references, and source or derived state.",
+      "blockedBy": [
+        "PL-CORE-LINK-001",
+        "PL-CORE-ASSET-001",
+        "PL-CORE-PROJECT-001"
+      ],
+      "deferralReason": null
+    },
+    {
+      "id": "PL-XSLICE-NAV-001",
+      "name": "Cross-platform relationship queries and navigation",
+      "description": "Provide relationship graph queries and bidirectional navigation through slice UI, Command Center, CLI, workflows, extensions, AI, and collaboration surfaces.",
+      "slice": "XSLICE",
+      "area": "navigation",
+      "status": "missing",
+      "targetMilestone": "v1.15",
+      "source": "v1.15 — Wave 1.15.1 Project relationship and provenance graph",
+      "implementation": [],
+      "validation": [],
+      "notes": "Cycle and destructive-update detection is part of graph navigation and analysis.",
+      "blockedBy": [
+        "PL-XSLICE-GRAPH-001",
+        "PL-CENTER-SEARCH-001",
+        "PL-BRIDGE-PROJECT-001"
+      ],
+      "deferralReason": null
+    },
+    {
+      "id": "PL-XSLICE-LINK-001",
+      "name": "Link embed snapshot and representation framework",
+      "description": "Support linked, embedded, snapshot, generated, cached, and fallback representations of project resources.",
+      "slice": "XSLICE",
+      "area": "resource-links",
+      "status": "missing",
+      "targetMilestone": "v1.15",
+      "source": "v1.15 — Wave 1.15.2 Link embed snapshot refresh and conflict framework",
+      "implementation": [],
+      "validation": [],
+      "notes": null,
+      "blockedBy": [
+        "PL-XSLICE-GRAPH-001",
+        "PL-CORE-LINK-001",
+        "PL-CORE-HISTORY-001"
+      ],
+      "deferralReason": null
+    },
+    {
+      "id": "PL-XSLICE-REFRESH-001",
+      "name": "Controlled refresh and update policies",
+      "description": "Provide refresh previews, affected-resource lists, update policies, approved auto-refresh boundaries, source navigation, and downstream-edit preservation warnings.",
+      "slice": "XSLICE",
+      "area": "updates",
+      "status": "missing",
+      "targetMilestone": "v1.15",
+      "source": "v1.15 — Wave 1.15.2 Link embed snapshot refresh and conflict framework",
+      "implementation": [],
+      "validation": [],
+      "notes": "Cross-slice changes must never silently destroy source data or downstream edits.",
+      "blockedBy": [
+        "PL-XSLICE-LINK-001",
+        "PL-CORE-HISTORY-001"
+      ],
+      "deferralReason": null
+    },
+    {
+      "id": "PL-XSLICE-REPAIR-001",
+      "name": "Cross-slice link repair and conflict handling",
+      "description": "Detect and repair moved, renamed, missing, stale, conflicting, or incompatible relationship sources.",
+      "slice": "XSLICE",
+      "area": "recovery",
+      "status": "missing",
+      "targetMilestone": "v1.15",
+      "source": "v1.15 — Wave 1.15.2 Link embed snapshot refresh and conflict framework",
+      "implementation": [],
+      "validation": [],
+      "notes": null,
+      "blockedBy": [
+        "PL-XSLICE-REFRESH-001",
+        "PL-CORE-DIAG-001"
+      ],
+      "deferralReason": null
+    },
+    {
+      "id": "PL-XSLICE-REPORT-001",
+      "name": "Cross-slice reporting and research workflows",
+      "description": "Provide live tables, charts, ranges, API documentation, design reports, BOMs, shot lists, schedules, build reports, experiment reports, dashboards, and scientific result links.",
+      "slice": "XSLICE",
+      "area": "reporting",
+      "status": "missing",
+      "targetMilestone": "v1.15",
+      "source": "v1.15 — Wave 1.15.3 Docs Sheets reporting and research workflows",
+      "implementation": [],
+      "validation": [],
+      "notes": "Scientific plots, units, parameters, provenance, and validation metadata must survive linking and export.",
+      "blockedBy": [
+        "PL-XSLICE-REFRESH-001",
+        "PL-PHYS-NOTEBOOK-001"
+      ],
+      "deferralReason": null
+    },
+    {
+      "id": "PL-XSLICE-CREATIVE-001",
+      "name": "Creative slice handoff framework",
+      "description": "Provide controlled code-symbol, shader, model-to-animation, model-to-game, animation-to-game, cinematic, data-table, diagnostic, and asset-update handoffs.",
+      "slice": "XSLICE",
+      "area": "creative-handoffs",
+      "status": "missing",
+      "targetMilestone": "v1.15",
+      "source": "v1.15 — Wave 1.15.4 Code Modeling Animation and Game handoffs",
+      "implementation": [],
+      "validation": [],
+      "notes": "Update policies include hierarchy, transform, materials, rigs, animation, colliders, units, naming, and prefabs.",
+      "blockedBy": [
+        "PL-XSLICE-REFRESH-001",
+        "PL-ENG-GEOMETRY-001",
+        "PL-ENG-TIMELINE-001",
+        "PL-ENG-GAME-001",
+        "PL-ENG-CODE-001"
+      ],
+      "deferralReason": null
+    },
+    {
+      "id": "PL-XSLICE-WORKFLOW-001",
+      "name": "Unified project and creator workflow templates",
+      "description": "Provide reusable all-slice project templates and creator workflow templates with status, logs, dry runs, cancellation, validation, and recovery.",
+      "slice": "XSLICE",
+      "area": "workflows",
+      "status": "missing",
+      "targetMilestone": "v1.15",
+      "source": "v1.15 — Wave 1.15.5 Unified workflows templates tasks and command-center integration",
+      "implementation": [],
+      "validation": [],
+      "notes": "Relationships are prepared for later AI, marketplace packs, cloud synchronization, and collaboration.",
+      "blockedBy": [
+        "PL-XSLICE-GRAPH-001",
+        "PL-ENG-WORKFLOW-001",
+        "PL-CENTER-WORKFLOW-001",
+        "PL-CORE-TEMPLATE-001"
+      ],
+      "deferralReason": null
+    },
+    {
+      "id": "PL-XSLICE-HEALTH-001",
+      "name": "Unified project relationship health",
+      "description": "Surface stale dependencies, blocked tasks, jobs, builds, renders, simulations, extension conflicts, queues, and relationship health through Command Center.",
+      "slice": "XSLICE",
+      "area": "project-health",
+      "status": "missing",
+      "targetMilestone": "v1.15",
+      "source": "v1.15 — Wave 1.15.5 Unified workflows templates tasks and command-center integration",
+      "implementation": [],
+      "validation": [],
+      "notes": null,
+      "blockedBy": [
+        "PL-XSLICE-GRAPH-001",
+        "PL-CENTER-HEALTH-001",
+        "PL-CORE-DIAG-001"
+      ],
+      "deferralReason": null
+    },
+    {
+      "id": "PL-XSLICE-RECOVERY-001",
+      "name": "Multi-resource transaction recovery",
+      "description": "Snapshot related resources before batch updates and restore a consistent project state after partial cross-slice failures.",
+      "slice": "XSLICE",
+      "area": "recovery",
+      "status": "missing",
+      "targetMilestone": "v1.15",
+      "source": "v1.15 — Wave 1.15.6 Cross-slice recovery and all-suite reference project",
+      "implementation": [],
+      "validation": [],
+      "notes": "Project migration and rollback must operate across the complete relationship graph.",
+      "blockedBy": [
+        "PL-XSLICE-GRAPH-001",
+        "PL-CORE-HISTORY-001",
+        "PL-XSLICE-REPAIR-001"
+      ],
+      "deferralReason": null
+    },
+    {
+      "id": "PL-XSLICE-REFERENCE-001",
+      "name": "All-suite reference project",
+      "description": "Maintain a reference project that exercises Docs, Sheets, Code, Modeling, Animation, Game, simulations, workflows, extensions, CLI, Command Center, and shared engines together.",
+      "slice": "XSLICE",
+      "area": "validation",
+      "status": "missing",
+      "targetMilestone": "v1.15",
+      "source": "v1.15 — Wave 1.15.6 Cross-slice recovery and all-suite reference project",
+      "implementation": [],
+      "validation": [],
+      "notes": "The reference project validates end-to-end links, migration, rollback, compatibility, and update policies.",
+      "blockedBy": [
+        "PL-XSLICE-RECOVERY-001",
+        "PL-XSLICE-WORKFLOW-001",
+        "PL-XSLICE-CREATIVE-001",
+        "PL-XSLICE-REPORT-001",
+        "PL-ENG-FREEZE-001"
+      ],
+      "deferralReason": null
+    }
+  ]
+}

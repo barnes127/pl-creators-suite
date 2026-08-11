@@ -1,0 +1,174 @@
+{
+  "registryVersion": 1,
+  "slice": "PL Local-First Copilot",
+  "sliceCode": "AI",
+  "capabilities": [
+    {
+      "id": "PL-AI-PROVIDER-001",
+      "name": "AI Provider Abstraction",
+      "description": "Provide one provider interface for local runtimes, user-provided APIs, and later PL-managed hosted AI.",
+      "slice": "AI",
+      "area": "providers",
+      "status": "partial",
+      "targetMilestone": "v1.16",
+      "source": "v1.16 — Wave 1.16.1 Provider model capability and routing abstraction",
+      "implementation": [],
+      "validation": [],
+      "notes": "Provider identity, availability, streaming, cancellation, capability discovery, errors, and offline state must remain transparent.",
+      "blockedBy": [
+        "PL-CORE-AI-001",
+        "PL-CORE-RPC-001"
+      ],
+      "deferralReason": null
+    },
+    {
+      "id": "PL-AI-ROUTE-001",
+      "name": "Model Capability Discovery and Routing",
+      "description": "Detect provider and model capabilities, context limits, supported actions, profiles, fallback paths, quotas, and per-task routing.",
+      "slice": "AI",
+      "area": "routing",
+      "status": "missing",
+      "targetMilestone": "v1.16",
+      "source": "v1.16 — Wave 1.16.1 Provider model capability and routing abstraction",
+      "implementation": [],
+      "validation": [],
+      "notes": null,
+      "blockedBy": [
+        "PL-AI-PROVIDER-001"
+      ],
+      "deferralReason": null
+    },
+    {
+      "id": "PL-AI-CONTEXT-001",
+      "name": "Explicit AI Context Selection",
+      "description": "Allow explicit selection of files, ranges, objects, scenes, workflows, projects, and other approved resources used as AI context.",
+      "slice": "AI",
+      "area": "context",
+      "status": "missing",
+      "targetMilestone": "v1.16",
+      "source": "v1.16 — Wave 1.16.2 Context privacy secrets indexing and project memory boundaries",
+      "implementation": [],
+      "validation": [],
+      "notes": "Unapproved resources must not be silently included.",
+      "blockedBy": [
+        "PL-CORE-PROJECT-001",
+        "PL-CORE-PERMISSION-001",
+        "PL-ENG-INDEX-001"
+      ],
+      "deferralReason": null
+    },
+    {
+      "id": "PL-AI-PRIVACY-001",
+      "name": "AI Privacy and Secret Boundaries",
+      "description": "Exclude secrets, credentials, ignored files, private paths, and unapproved resources and show what data leaves the device.",
+      "slice": "AI",
+      "area": "privacy",
+      "status": "missing",
+      "targetMilestone": "v1.16",
+      "source": "v1.16 — Wave 1.16.2 Context privacy secrets indexing and project memory boundaries",
+      "implementation": [],
+      "validation": [],
+      "notes": "Local-only operation and no automatic cloud upload are permanent product requirements.",
+      "blockedBy": [
+        "PL-AI-CONTEXT-001",
+        "PL-CORE-PERMISSION-001"
+      ],
+      "deferralReason": null
+    },
+    {
+      "id": "PL-AI-MEMORY-001",
+      "name": "Local Project AI Memory",
+      "description": "Provide local project indexing and memory with explicit storage, deletion, rebuild, scope, and provider boundaries.",
+      "slice": "AI",
+      "area": "memory",
+      "status": "missing",
+      "targetMilestone": "v1.16",
+      "source": "v1.16 — Wave 1.16.2 Context privacy secrets indexing and project memory boundaries",
+      "implementation": [],
+      "validation": [],
+      "notes": null,
+      "blockedBy": [
+        "PL-AI-CONTEXT-001",
+        "PL-ENG-INDEX-001"
+      ],
+      "deferralReason": null
+    },
+    {
+      "id": "PL-AI-ACTION-001",
+      "name": "Structured AI Action Proposals",
+      "description": "Represent AI mutations as reviewed structured actions with affected resources, diffs, previews, validation, risk, and explicit approval.",
+      "slice": "AI",
+      "area": "actions",
+      "status": "missing",
+      "targetMilestone": "v1.16",
+      "source": "v1.16 — Structured action proposal requirements",
+      "implementation": [],
+      "validation": [],
+      "notes": "AI mutations may not bypass the normal command and permission systems.",
+      "blockedBy": [
+        "PL-CORE-COMMAND-001",
+        "PL-CORE-PERMISSION-001",
+        "PL-CORE-HISTORY-001"
+      ],
+      "deferralReason": null
+    },
+    {
+      "id": "PL-AI-AUDIT-001",
+      "name": "AI Audit Undo and Recovery",
+      "description": "Record AI requests and actions with provider, context, approvals, affected resources, results, and recovery or undo paths.",
+      "slice": "AI",
+      "area": "safety",
+      "status": "missing",
+      "targetMilestone": "v1.16",
+      "source": "v1.16 — Validation and public-beta release gate",
+      "implementation": [],
+      "validation": [],
+      "notes": null,
+      "blockedBy": [
+        "PL-AI-ACTION-001",
+        "PL-CORE-HISTORY-001",
+        "PL-CORE-DIAG-001"
+      ],
+      "deferralReason": null
+    },
+    {
+      "id": "PL-AI-SLICE-001",
+      "name": "Slice and Workflow AI Assistance",
+      "description": "Provide permissioned assistants for all six slices, Command Center, workflows, terminal, diagnostics, and project-aware operations.",
+      "slice": "AI",
+      "area": "integration",
+      "status": "missing",
+      "targetMilestone": "v1.16",
+      "source": "v1.16 — Required outcomes",
+      "implementation": [],
+      "validation": [],
+      "notes": "AI is optional and must not become a dependency of normal creator workflows.",
+      "blockedBy": [
+        "PL-AI-ACTION-001",
+        "PL-CENTER-CMD-001",
+        "PL-TERM-AI-001",
+        "PL-ENG-WORKFLOW-001"
+      ],
+      "deferralReason": null
+    },
+    {
+      "id": "PL-AI-EVAL-001",
+      "name": "AI Evaluation and Disabled-Mode Validation",
+      "description": "Validate privacy, provider routing, action safety, terminal safeguards, quality, failures, and complete operation with AI disabled.",
+      "slice": "AI",
+      "area": "validation",
+      "status": "missing",
+      "targetMilestone": "v1.16",
+      "source": "v1.16 — Validation and public-beta release gate",
+      "implementation": [],
+      "validation": [],
+      "notes": null,
+      "blockedBy": [
+        "PL-AI-PROVIDER-001",
+        "PL-AI-PRIVACY-001",
+        "PL-AI-ACTION-001"
+      ],
+      "deferralReason": null
+    }
+  ]
+}

@@ -1,0 +1,464 @@
+{
+  "registryVersion": 1,
+  "slice": "PL Code IDE",
+  "sliceCode": "CODE",
+  "capabilities": [
+    {
+      "id": "PL-CODE-FILE-001",
+      "name": "Create source file",
+      "description": "Create a source-code file inside project code storage.",
+      "slice": "CODE",
+      "area": "file-management",
+      "status": "complete",
+      "targetMilestone": "v1.5.1",
+      "source": "PL Code IDE / File Management",
+      "implementation": [
+        "apps/desktop/services/code/index.js",
+        "apps/renderer/src/App.tsx"
+      ],
+      "validation": [
+        "docs/releases/stage-3-code-ide-v0-validation.md"
+      ],
+      "notes": null,
+      "blockedBy": [],
+      "deferralReason": null
+    },
+    {
+      "id": "PL-CODE-FILE-002",
+      "name": "Open source file",
+      "description": "Open an existing code file for editing.",
+      "slice": "CODE",
+      "area": "file-management",
+      "status": "complete",
+      "targetMilestone": "v1.5.1",
+      "source": "PL Code IDE / File Management",
+      "implementation": [
+        "apps/desktop/services/code/index.js",
+        "apps/renderer/src/App.tsx"
+      ],
+      "validation": [
+        "docs/releases/stage-3-code-ide-v0-validation.md"
+      ],
+      "notes": null,
+      "blockedBy": [],
+      "deferralReason": null
+    },
+    {
+      "id": "PL-CODE-FILE-003",
+      "name": "Edit and save source file",
+      "description": "Edit code text and persist changes to disk.",
+      "slice": "CODE",
+      "area": "file-management",
+      "status": "complete",
+      "targetMilestone": "v1.5.1",
+      "source": "PL Code IDE / File Management",
+      "implementation": [
+        "apps/desktop/services/code/index.js",
+        "apps/renderer/src/App.tsx"
+      ],
+      "validation": [
+        "docs/releases/stage-3-code-ide-v0-validation.md"
+      ],
+      "notes": "Saved content persists across close and reopen.",
+      "blockedBy": [],
+      "deferralReason": null
+    },
+    {
+      "id": "PL-CODE-FILE-004",
+      "name": "Nested folder workspace",
+      "description": "Browse, create, rename, move, and delete files and nested directories.",
+      "slice": "CODE",
+      "area": "workspace",
+      "status": "missing",
+      "targetMilestone": "v1.5.1",
+      "source": "PL Code IDE / Workspace and File Explorer",
+      "implementation": [],
+      "validation": [],
+      "notes": "Nested folders and rename/delete are explicitly missing from Code IDE v0.",
+      "blockedBy": [],
+      "deferralReason": null
+    },
+    {
+      "id": "PL-CODE-EDITOR-001",
+      "name": "Multi-file tabbed editor",
+      "description": "Edit multiple project files using a polished tabbed editor.",
+      "slice": "CODE",
+      "area": "editor",
+      "status": "partial",
+      "targetMilestone": "v1.5.1",
+      "source": "PL Code IDE / Dev v2 Official v1 Target",
+      "implementation": [
+        "apps/renderer/src/App.tsx"
+      ],
+      "validation": [],
+      "notes": "Basic editor exists; official-v1 multi-file workflow still needs build-out and validation.",
+      "blockedBy": [],
+      "deferralReason": null
+    },
+    {
+      "id": "PL-CODE-EDITOR-002",
+      "name": "Syntax highlighting",
+      "description": "Provide strong language-aware syntax highlighting.",
+      "slice": "CODE",
+      "area": "editor",
+      "status": "missing",
+      "targetMilestone": "v1.5.1",
+      "source": "PL Code IDE / Dev v2 Official v1 Target",
+      "implementation": [],
+      "validation": [],
+      "notes": "Code IDE v0 only detects a basic language label from extension.",
+      "blockedBy": [],
+      "deferralReason": null
+    },
+    {
+      "id": "PL-CODE-EDITOR-003",
+      "name": "Line numbers and editor navigation",
+      "description": "Provide line numbering, scrolling, cursor navigation, and standard editor navigation behavior.",
+      "slice": "CODE",
+      "area": "editor",
+      "status": "partial",
+      "targetMilestone": "v1.5.1",
+      "source": "PL Code IDE / Beta and Official v1 Editor",
+      "implementation": [
+        "apps/renderer/src/App.tsx"
+      ],
+      "validation": [],
+      "notes": "Requires current implementation audit before complete status.",
+      "blockedBy": [],
+      "deferralReason": null
+    },
+    {
+      "id": "PL-CODE-EDITOR-004",
+      "name": "Find and replace",
+      "description": "Search and replace content within files and across the workspace.",
+      "slice": "CODE",
+      "area": "editor",
+      "status": "missing",
+      "targetMilestone": "v1.5.1",
+      "source": "PL Code IDE / Search and Replace",
+      "implementation": [],
+      "validation": [],
+      "notes": null,
+      "blockedBy": [],
+      "deferralReason": null
+    },
+    {
+      "id": "PL-CODE-EDITOR-005",
+      "name": "Split editors and customizable layout",
+      "description": "Support split editor groups and user-customizable IDE layout.",
+      "slice": "CODE",
+      "area": "editor",
+      "status": "missing",
+      "targetMilestone": "v1.5.1",
+      "source": "PL Code IDE / v1.x and Official v1 Targets",
+      "implementation": [],
+      "validation": [],
+      "notes": null,
+      "blockedBy": [],
+      "deferralReason": null
+    },
+    {
+      "id": "PL-CODE-EDITOR-006",
+      "name": "Command palette and shortcuts",
+      "description": "Expose IDE commands through a searchable palette and customizable shortcuts.",
+      "slice": "CODE",
+      "area": "editor",
+      "status": "missing",
+      "targetMilestone": "v1.5.1",
+      "source": "PL Code IDE / v1.x Development",
+      "implementation": [],
+      "validation": [],
+      "notes": null,
+      "blockedBy": [
+        "PL-CORE-COMMAND-001"
+      ],
+      "deferralReason": null
+    },
+    {
+      "id": "PL-CODE-LANG-001",
+      "name": "Language detection",
+      "description": "Identify file language from project and file metadata.",
+      "slice": "CODE",
+      "area": "language-services",
+      "status": "complete",
+      "targetMilestone": "v1.5.1",
+      "source": "PL Code IDE / Basic Language Modes",
+      "implementation": [
+        "apps/renderer/src/App.tsx"
+      ],
+      "validation": [
+        "docs/releases/stage-3-code-ide-v0-validation.md"
+      ],
+      "notes": "Current implementation performs basic extension-based language detection.",
+      "blockedBy": [],
+      "deferralReason": null
+    },
+    {
+      "id": "PL-CODE-LANG-002",
+      "name": "Language server support",
+      "description": "Provide Language Server Protocol integration for supported languages.",
+      "slice": "CODE",
+      "area": "language-services",
+      "status": "missing",
+      "targetMilestone": "v1.5.2",
+      "source": "PL Code IDE / Completion and Language-Server Support",
+      "implementation": [],
+      "validation": [],
+      "notes": null,
+      "blockedBy": [],
+      "deferralReason": null
+    },
+    {
+      "id": "PL-CODE-LANG-003",
+      "name": "Code completion",
+      "description": "Provide language-aware code completion and suggestions.",
+      "slice": "CODE",
+      "area": "language-services",
+      "status": "missing",
+      "targetMilestone": "v1.5.2",
+      "source": "PL Code IDE / Completion and Language-Server Support",
+      "implementation": [],
+      "validation": [],
+      "notes": null,
+      "blockedBy": [
+        "PL-CODE-LANG-002"
+      ],
+      "deferralReason": null
+    },
+    {
+      "id": "PL-CODE-LANG-004",
+      "name": "Symbol navigation",
+      "description": "Navigate to definitions, references, symbols, and related code locations.",
+      "slice": "CODE",
+      "area": "language-services",
+      "status": "missing",
+      "targetMilestone": "v1.5.2",
+      "source": "PL Code IDE / Symbol Navigation",
+      "implementation": [],
+      "validation": [],
+      "notes": null,
+      "blockedBy": [
+        "PL-CODE-LANG-002"
+      ],
+      "deferralReason": null
+    },
+    {
+      "id": "PL-CODE-LANG-005",
+      "name": "Formatting and lint integration",
+      "description": "Run language-aware formatting and linting tools and display diagnostics.",
+      "slice": "CODE",
+      "area": "language-services",
+      "status": "missing",
+      "targetMilestone": "v1.5.2",
+      "source": "PL Code IDE / v1.x Development",
+      "implementation": [],
+      "validation": [],
+      "notes": null,
+      "blockedBy": [],
+      "deferralReason": null
+    },
+    {
+      "id": "PL-CODE-TERM-001",
+      "name": "Integrated terminal",
+      "description": "Provide an interactive terminal inside the Code IDE.",
+      "slice": "CODE",
+      "area": "terminal",
+      "status": "missing",
+      "targetMilestone": "v1.5.3",
+      "source": "PL Code IDE / Integrated Terminal",
+      "implementation": [],
+      "validation": [],
+      "notes": "Terminal integration is explicitly absent from Code IDE v0.",
+      "blockedBy": [
+        "PL-CORE-TASK-001"
+      ],
+      "deferralReason": null
+    },
+    {
+      "id": "PL-CODE-TASK-001",
+      "name": "Build and project tasks",
+      "description": "Define, execute, monitor, cancel, and reuse project build and automation tasks.",
+      "slice": "CODE",
+      "area": "tasks",
+      "status": "missing",
+      "targetMilestone": "v1.5.3",
+      "source": "PL Code IDE / Build Tasks",
+      "implementation": [],
+      "validation": [],
+      "notes": null,
+      "blockedBy": [
+        "PL-CORE-TASK-001"
+      ],
+      "deferralReason": null
+    },
+    {
+      "id": "PL-CODE-RUN-001",
+      "name": "Run workflow",
+      "description": "Launch and monitor project programs and commands from the IDE.",
+      "slice": "CODE",
+      "area": "run-debug",
+      "status": "missing",
+      "targetMilestone": "v1.5.3",
+      "source": "PL Code IDE / Run Debug Workflows",
+      "implementation": [],
+      "validation": [],
+      "notes": "Run flow is explicitly absent from Code IDE v0.",
+      "blockedBy": [
+        "PL-CODE-TASK-001"
+      ],
+      "deferralReason": null
+    },
+    {
+      "id": "PL-CODE-DEBUG-001",
+      "name": "Basic debugging",
+      "description": "Provide basic launch, breakpoint, stepping, and runtime inspection workflows for supported runtimes.",
+      "slice": "CODE",
+      "area": "run-debug",
+      "status": "missing",
+      "targetMilestone": "v1.5.3",
+      "source": "PL Code IDE / Run Debug Workflows",
+      "implementation": [],
+      "validation": [],
+      "notes": "Debugging is explicitly absent from Code IDE v0.",
+      "blockedBy": [
+        "PL-CODE-RUN-001"
+      ],
+      "deferralReason": null
+    },
+    {
+      "id": "PL-CODE-GIT-001",
+      "name": "Git integration",
+      "description": "Provide common source-control status, staging, commit, branch, and diff workflows.",
+      "slice": "CODE",
+      "area": "source-control",
+      "status": "missing",
+      "targetMilestone": "v1.5.4",
+      "source": "PL Code IDE / Git Integration",
+      "implementation": [],
+      "validation": [],
+      "notes": null,
+      "blockedBy": [],
+      "deferralReason": null
+    },
+    {
+      "id": "PL-CODE-TEST-001",
+      "name": "Testing support",
+      "description": "Discover, execute, and report supported project tests.",
+      "slice": "CODE",
+      "area": "testing",
+      "status": "missing",
+      "targetMilestone": "v1.5.4",
+      "source": "PL Code IDE / Testing Support",
+      "implementation": [],
+      "validation": [],
+      "notes": null,
+      "blockedBy": [
+        "PL-CORE-TASK-001"
+      ],
+      "deferralReason": null
+    },
+    {
+      "id": "PL-CODE-EXT-001",
+      "name": "IDE extension support",
+      "description": "Extend Code IDE functionality through the PL extension system.",
+      "slice": "CODE",
+      "area": "extensions",
+      "status": "partial",
+      "targetMilestone": "v1.10",
+      "source": "PL Code IDE / Extension System",
+      "implementation": [],
+      "validation": [],
+      "notes": "Suite-level plugin infrastructure exists, but the official-v1 Code IDE extension API is not complete.",
+      "blockedBy": [
+        "PL-CORE-EXT-001"
+      ],
+      "deferralReason": null
+    },
+    {
+      "id": "PL-CODE-TRUST-001",
+      "name": "Workspace trust",
+      "description": "Restrict potentially dangerous project, extension, terminal, and task behavior until the user trusts a workspace.",
+      "slice": "CODE",
+      "area": "security",
+      "status": "missing",
+      "targetMilestone": "v1.5.5",
+      "source": "PL Code IDE / Workspace Trust",
+      "implementation": [],
+      "validation": [],
+      "notes": null,
+      "blockedBy": [
+        "PL-CORE-PERMISSION-001"
+      ],
+      "deferralReason": null
+    },
+    {
+      "id": "PL-CODE-DOC-001",
+      "name": "Integrated code documentation",
+      "description": "Provide inline documentation, Markdown preview, linked docs, and code-to-Docs workflows.",
+      "slice": "CODE",
+      "area": "documentation",
+      "status": "missing",
+      "targetMilestone": "v1.9",
+      "source": "PL Code IDE / Documentation Integration",
+      "implementation": [],
+      "validation": [],
+      "notes": null,
+      "blockedBy": [
+        "PL-CORE-LINK-001"
+      ],
+      "deferralReason": null
+    },
+    {
+      "id": "PL-CODE-XSLICE-001",
+      "name": "Cross-slice development workflows",
+      "description": "Connect source code to Docs, Spreadsheets, Modeling, Animation, and Game Studio workflows.",
+      "slice": "CODE",
+      "area": "cross-slice",
+      "status": "missing",
+      "targetMilestone": "v1.9",
+      "source": "PL Code IDE / Cross-Slice Workflows",
+      "implementation": [],
+      "validation": [],
+      "notes": "Includes shaders, scripts, data files, generated docs, project metrics, game scripts, and asset tooling.",
+      "blockedBy": [
+        "PL-CORE-LINK-001"
+      ],
+      "deferralReason": null
+    },
+    {
+      "id": "PL-CODE-AI-001",
+      "name": "Project-aware AI coding assistance",
+      "description": "Provide permissioned code explanation, generation, refactoring, diagnostics, and proposed patch workflows.",
+      "slice": "CODE",
+      "area": "ai",
+      "status": "missing",
+      "targetMilestone": "v1.11",
+      "source": "PL Code IDE / AI Copilot Capabilities",
+      "implementation": [],
+      "validation": [],
+      "notes": "AI file edits should use reviewable patches and must not silently rewrite user files.",
+      "blockedBy": [
+        "PL-CORE-AI-001",
+        "PL-CORE-PERMISSION-001"
+      ],
+      "deferralReason": null
+    },
+    {
+      "id": "PL-CODE-RECOVERY-001",
+      "name": "Autosave and recovery",
+      "description": "Recover unsaved source changes and editor state after interruption.",
+      "slice": "CODE",
+      "area": "recovery",
+      "status": "missing",
+      "targetMilestone": "v1.12",
+      "source": "PL Code IDE / Autosave and Recovery",
+      "implementation": [],
+      "validation": [],
+      "notes": null,
+      "blockedBy": [
+        "PL-CORE-HISTORY-001"
+      ],
+      "deferralReason": null
+    }
+  ]
+}

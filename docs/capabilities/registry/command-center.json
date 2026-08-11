@@ -1,0 +1,205 @@
+{
+  "registryVersion": 1,
+  "slice": "PL Creators Suite Command Center",
+  "sliceCode": "CENTER",
+  "capabilities": [
+    {
+      "id": "PL-CENTER-DASH-001",
+      "name": "Command Center Dashboard",
+      "description": "Provide a customizable suite homepage that surfaces creator operations, project state, and quick access to major workflows",
+      "slice": "CENTER",
+      "area": "dashboard",
+      "status": "missing",
+      "targetMilestone": "v1.3",
+      "source": "v1.3 Creator Command Center - Dashboard shell and widget framework",
+      "implementation": [],
+      "validation": [],
+      "notes": "The dashboard must reflect real service state and cannot be only decorative UI.",
+      "blockedBy": [
+        "PL-CORE-SHELL-001",
+        "PL-CORE-PROJECT-001"
+      ],
+      "deferralReason": null
+    },
+    {
+      "id": "PL-CENTER-WIDGET-001",
+      "name": "Widget Framework",
+      "description": "Provide versioned customizable Command Center widgets with layout, resizing, pinning, hiding, grouping, and persistence.",
+      "slice": "CENTER",
+      "area": "widgets",
+      "status": "missing",
+      "targetMilestone": "v1.3",
+      "source": "v1.3 Creator Command Center - Wave 1.3.1 Dashboard shell and widget framework",
+      "implementation": [],
+      "validation": [],
+      "notes": "The framework must support first-party widgets and later permissioned extension-provided widgets.",
+      "blockedBy": [
+        "PL-CORE-SHELL-001"
+      ],
+      "deferralReason": null
+    },
+    {
+      "id": "PL-CENTER-PROFILE-001",
+      "name": "Workspace Profiles",
+      "description": "Provide creator-oriented workspace profiles with persistent layout, themes, shortcuts, tool visibility, and extension-stack performances.",
+      "slice": "CENTER",
+      "area": "workspaces",
+      "status": "missing",
+      "targetMilestone": "v1.3",
+      "source": "v1.3 Creator Command Center - Wave 1.3.2 Workspace profiles and session recovery",
+      "implementation": [],
+      "validation": [],
+      "notes": "Planned profiles include Writing, Data, Development, Modeling, Animation, Game, Research, and Custom.",
+      "blockedBy": [
+        "PL-CORE-SHELL-001"
+      ],
+      "deferralReason": null
+    },
+    {
+      "id": "PL-CENTER-SESSION-001",
+      "name": "Session Recovery",
+      "description": "Restore open projects, active slices, panel layouts, selected resources, unsaved state, terminals, and task context after restart.",
+      "slice": "CENTER",
+      "area": "session",
+      "status": "missing",
+      "targetMilestone": "v1.3",
+      "source": "v1.3 Creator Command Center — Wave 1.3.2 Workspace profiles and session recovery",
+      "implementation": [],
+      "validation": [],
+      "notes": "Session metadata must be recoverable without silently replaying unsafe operations.",
+      "blockedBy": [
+        "PL-CORE-SHELL-001",
+        "PL-CORE-HISTORY-001",
+        "PL-CORE-PROJECT-001"
+      ],
+      "deferralReason": null
+    },
+    {
+      "id": "PL-CENTER-HEALTH-001",
+      "name": "Operational Health Center",
+      "description": "Display project, engine, extension, backup, AI, indexing, synchronization, worker, and system-health state with actionable diagnostics.",
+      "slice": "CENTER",
+      "area": "diagnostics",
+      "status": "missing",
+      "targetMilestone": "v1.3",
+      "source": "v1.3 Creator Command Center — Wave 1.3.3 Operational visibility and health center",
+      "implementation": [],
+      "validation": [],
+      "notes": "Health statuses must represent actual services and expose ownership, severity, logs, and suggested actions.",
+      "blockedBy": [
+        "PL-CORE-DIAG-001"
+      ],
+      "deferralReason": null
+    },
+    {
+      "id": "PL-CENTER-JOB-001",
+      "name": "Unified Job and Queue Management",
+      "description": "Present build, render, simulation, conversion, import, export, indexing, update, workflow, and cloud jobs through one queue model.",
+      "slice": "CENTER",
+      "area": "jobs",
+      "status": "missing",
+      "targetMilestone": "v1.3",
+      "source": "v1.3 Creator Command Center — Wave 1.3.4 Jobs queues tasks and notifications",
+      "implementation": [],
+      "validation": [],
+      "notes": "Supported jobs should expose state, progress, priority, logs, outputs, pause or cancellation, retry, and recovery.",
+      "blockedBy": [
+        "PL-CORE-TASK-001",
+        "PL-CORE-DIAG-001"
+      ],
+      "deferralReason": null
+    },
+    {
+      "id": "PL-CENTER-NOTIFY-001",
+      "name": "Notification Center",
+      "description": "Provide actionable, dismissible, grouped, searchable notifications tied to suite operations and affected resources.",
+      "slice": "CENTER",
+      "area": "notifications",
+      "status": "missing",
+      "targetMilestone": "v1.3",
+      "source": "v1.3 Creator Command Center — Wave 1.3.4 Jobs queues tasks and notifications",
+      "implementation": [],
+      "validation": [],
+      "notes": "A later CORE pass may promote shared notification infrastructure into its own dedicated capability.",
+      "blockedBy": [
+        "PL-CORE-SHELL-001",
+        "PL-CORE-DIAG-001"
+      ],
+      "deferralReason": null
+    },
+    {
+      "id": "PL-CENTER-SEARCH-001",
+      "name": "Global Resource Search",
+      "description": "Search major project and suite resources including files, symbols, documents, cells, assets, scenes, shots, workflows, settings, extensions, and help.",
+      "slice": "CENTER",
+      "area": "search",
+      "status": "missing",
+      "targetMilestone": "v1.3",
+      "source": "v1.3 Creator Command Center — Wave 1.3.5 Global search command palette and operational shortcuts",
+      "implementation": [],
+      "validation": [],
+      "notes": "Search depends on project and asset metadata and will later consume the shared indexing system.",
+      "blockedBy": [
+        "PL-CORE-PROJECT-001",
+        "PL-CORE-ASSET-001"
+      ],
+      "deferralReason": null
+    },
+    {
+      "id": "PL-CENTER-CMD-001",
+      "name": "Global Command Palette",
+      "description": "Provide searchable commands with aliases, favorites, recent and frequent commands, categories, permissions, context, and operational shortcuts.",
+      "slice": "CENTER",
+      "area": "commands",
+      "status": "missing",
+      "targetMilestone": "v1.3",
+      "source": "v1.3 Creator Command Center — Wave 1.3.5 Global search command palette and operational shortcuts",
+      "implementation": [],
+      "validation": [],
+      "notes": "Major actions should report status and support cancellation where the underlying command supports it.",
+      "blockedBy": [
+        "PL-CORE-COMMAND-001",
+        "PL-CORE-TASK-001"
+      ],
+      "deferralReason": null
+    },
+    {
+      "id": "PL-CENTER-WORKFLOW-001",
+      "name": "Workflow Overview and Editor",
+      "description": "Provide workflow creation, library access, validation, dry-run preview, run monitoring, logs, inputs, outputs, and failure visibility.",
+      "slice": "CENTER",
+      "area": "workflows",
+      "status": "missing",
+      "targetMilestone": "v1.3",
+      "source": "v1.3 Creator Command Center — Wave 1.3.6 Workflow overview editor diagnostics and monitoring",
+      "implementation": [],
+      "validation": [],
+      "notes": "This is the initial operational workflow surface that later terminal, CLI, extension, AI, and cloud systems build upon.",
+      "blockedBy": [
+        "PL-CORE-COMMAND-001",
+        "PL-CORE-TASK-001",
+        "PL-CORE-DIAG-001"
+      ],
+      "deferralReason": null
+    },
+    {
+      "id": "PL-CENTER-SAFE-001",
+      "name": "Command Center Safe Recovery",
+      "description": "Allow the Command Center to open in a recoverable safe state when widgets, extensions, services, or previous session state fail.",
+      "slice": "CENTER",
+      "area": "recovery",
+      "status": "missing",
+      "targetMilestone": "v1.3",
+      "source": "v1.3 Creator Command Center — Validation and public-beta release gate",
+      "implementation": [],
+      "validation": [],
+      "notes": "A failing widget or extension must not prevent access to recovery controls.",
+      "blockedBy": [
+        "PL-CORE-DIAG-001",
+        "PL-CORE-HISTORY-001",
+        "PL-CORE-EXT-001"
+      ],
+      "deferralReason": null
+    }
+  ]
+}

@@ -1,0 +1,356 @@
+{
+  "registryVersion": 1,
+  "slice": "PL Movie/Animation Studio",
+  "sliceCode": "ANIM",
+  "capabilities": [
+    {
+      "id": "PL-ANIM-FILE-001",
+      "name": "Create open save and close production",
+      "description": "Create and persist native Movie/Animation projects.",
+      "slice": "ANIM",
+      "area": "file-management",
+      "status": "complete",
+      "targetMilestone": "v1.7.1",
+      "source": "Movie/Animation Studio / Project Management",
+      "implementation": [
+        "apps/renderer/src/App.tsx"
+      ],
+      "validation": [
+        "docs/releases/stage-3-movie-studio-v0-validation.md"
+      ],
+      "notes": "Native .plmovie.json project creation and persistence are validated.",
+      "blockedBy": [],
+      "deferralReason": null
+    },
+    {
+      "id": "PL-ANIM-PROD-001",
+      "name": "Production sequence shot hierarchy",
+      "description": "Organize productions into sequences, scenes, shots, takes, and assets with metadata and statuses.",
+      "slice": "ANIM",
+      "area": "production",
+      "status": "partial",
+      "targetMilestone": "v1.7.1",
+      "source": "Wave 1.7.1 — Production model workspaces shots timeline tracks and layers",
+      "implementation": [],
+      "validation": [],
+      "notes": "Basic project metadata exists but the full production hierarchy does not.",
+      "blockedBy": [],
+      "deferralReason": null
+    },
+    {
+      "id": "PL-ANIM-TIMELINE-001",
+      "name": "Timeline engine",
+      "description": "Provide engine-backed timeline state, ranges, tracks, clips, activity, layout, and navigation.",
+      "slice": "ANIM",
+      "area": "timeline",
+      "status": "partial",
+      "targetMilestone": "v1.7.1",
+      "source": "Wave 1.7.1",
+      "implementation": [
+        "apps/renderer/src/engines/movie/timelineEngine.ts",
+        "apps/renderer/src/engines/movie/timelineLayout.ts",
+        "apps/renderer/src/engines/movie/timelineActivity.ts"
+      ],
+      "validation": [
+        "docs/releases/stage-4-movie-animation-engine-validation.md"
+      ],
+      "notes": "Engine foundation exists; full editing operations, track hierarchy, snapping, markers, and shot operations remain incomplete.",
+      "blockedBy": [],
+      "deferralReason": null
+    },
+    {
+      "id": "PL-ANIM-PLAY-001",
+      "name": "Timeline playback and preview",
+      "description": "Preview timeline state with playback controls and frame-aware timing.",
+      "slice": "ANIM",
+      "area": "playback",
+      "status": "partial",
+      "targetMilestone": "v1.7.1",
+      "source": "Wave 1.7.1",
+      "implementation": [
+        "apps/renderer/src/engines/movie/playback.ts",
+        "apps/renderer/src/engines/movie/previewEngine.ts"
+      ],
+      "validation": [
+        "docs/releases/stage-4-movie-animation-engine-validation.md"
+      ],
+      "notes": "Playback engine foundation is validated but not yet a finished media-preview system.",
+      "blockedBy": [],
+      "deferralReason": null
+    },
+    {
+      "id": "PL-ANIM-KEY-001",
+      "name": "Keyframe animation",
+      "description": "Create and manipulate property keyframes with interpolation and timing controls.",
+      "slice": "ANIM",
+      "area": "animation",
+      "status": "partial",
+      "targetMilestone": "v1.7.2",
+      "source": "Wave 1.7.2 — Keyframes curves dope sheet and 3D animation",
+      "implementation": [
+        "apps/renderer/src/engines/movie/keyframes.ts"
+      ],
+      "validation": [
+        "docs/releases/stage-4-movie-animation-engine-validation.md"
+      ],
+      "notes": "Keyframe engine exists; complete editing and interpolation UI remains unfinished.",
+      "blockedBy": [],
+      "deferralReason": null
+    },
+    {
+      "id": "PL-ANIM-CURVE-001",
+      "name": "Graph editor and dope sheet",
+      "description": "Edit animation curves, timing, interpolation handles, key categories, and retiming.",
+      "slice": "ANIM",
+      "area": "animation",
+      "status": "missing",
+      "targetMilestone": "v1.7.2",
+      "source": "Wave 1.7.2",
+      "implementation": [],
+      "validation": [],
+      "notes": null,
+      "blockedBy": [
+        "PL-ANIM-KEY-001"
+      ],
+      "deferralReason": null
+    },
+    {
+      "id": "PL-ANIM-3D-001",
+      "name": "3D property animation",
+      "description": "Animate object hierarchy, transforms, cameras, lights, materials, and properties.",
+      "slice": "ANIM",
+      "area": "3d-animation",
+      "status": "missing",
+      "targetMilestone": "v1.7.2",
+      "source": "Wave 1.7.2",
+      "implementation": [],
+      "validation": [],
+      "notes": null,
+      "blockedBy": [
+        "PL-MODEL-XFORM-001",
+        "PL-ANIM-KEY-001"
+      ],
+      "deferralReason": null
+    },
+    {
+      "id": "PL-ANIM-2D-001",
+      "name": "2D frame and vector animation",
+      "description": "Support drawing, brushes, frame exposure, onion skin, vector shapes, paths, and reusable symbols.",
+      "slice": "ANIM",
+      "area": "2d-animation",
+      "status": "missing",
+      "targetMilestone": "v1.7.3",
+      "source": "Wave 1.7.3 — 2D vector cutout rigging skinning and character tools",
+      "implementation": [],
+      "validation": [],
+      "notes": null,
+      "blockedBy": [],
+      "deferralReason": null
+    },
+    {
+      "id": "PL-ANIM-RIG-001",
+      "name": "Rigging and character animation basics",
+      "description": "Provide rigs, constraints, controllers, weights, morph targets, poses, clips, and animation layers.",
+      "slice": "ANIM",
+      "area": "rigging",
+      "status": "missing",
+      "targetMilestone": "v1.7.3",
+      "source": "Wave 1.7.3",
+      "implementation": [],
+      "validation": [],
+      "notes": null,
+      "blockedBy": [
+        "PL-MODEL-SCENE-001"
+      ],
+      "deferralReason": null
+    },
+    {
+      "id": "PL-ANIM-STORY-001",
+      "name": "Storyboard and animatic workflow",
+      "description": "Create storyboard panels, views, exports, animatics, and reviewable shot sequences.",
+      "slice": "ANIM",
+      "area": "storyboard",
+      "status": "missing",
+      "targetMilestone": "v1.7.4",
+      "source": "Wave 1.7.4 — Storyboards animatics camera motion graphics and cinematics",
+      "implementation": [],
+      "validation": [],
+      "notes": null,
+      "blockedBy": [],
+      "deferralReason": null
+    },
+    {
+      "id": "PL-ANIM-CAMERA-001",
+      "name": "Cinematic camera tools",
+      "description": "Support camera rigs, cuts, composition, shot preview, and camera animation.",
+      "slice": "ANIM",
+      "area": "cinematics",
+      "status": "missing",
+      "targetMilestone": "v1.7.4",
+      "source": "Wave 1.7.4",
+      "implementation": [],
+      "validation": [],
+      "notes": null,
+      "blockedBy": [
+        "PL-MODEL-VIEW-002"
+      ],
+      "deferralReason": null
+    },
+    {
+      "id": "PL-ANIM-MOTION-001",
+      "name": "Motion graphics",
+      "description": "Create animated shapes, text, presets, reusable symbols, and timeline-driven motion graphics.",
+      "slice": "ANIM",
+      "area": "motion-graphics",
+      "status": "missing",
+      "targetMilestone": "v1.7.4",
+      "source": "Wave 1.7.4",
+      "implementation": [],
+      "validation": [],
+      "notes": null,
+      "blockedBy": [],
+      "deferralReason": null
+    },
+    {
+      "id": "PL-ANIM-VIDEO-001",
+      "name": "Video editing",
+      "description": "Support multi-track video editing, clip arrangement, trimming, transitions, and timing operations.",
+      "slice": "ANIM",
+      "area": "video",
+      "status": "partial",
+      "targetMilestone": "v1.7.5",
+      "source": "Wave 1.7.5 — Video audio effects compositing and color",
+      "implementation": [
+        "apps/renderer/src/engines/movie/timelineEngine.ts"
+      ],
+      "validation": [],
+      "notes": "Video track/clip foundations exist, but real editing functionality remains incomplete.",
+      "blockedBy": [
+        "PL-CORE-MEDIA-001"
+      ],
+      "deferralReason": null
+    },
+    {
+      "id": "PL-ANIM-AUDIO-001",
+      "name": "Audio editing and synchronization",
+      "description": "Provide waveforms, trimming, fades, levels, synchronization, and multi-track audio.",
+      "slice": "ANIM",
+      "area": "audio",
+      "status": "partial",
+      "targetMilestone": "v1.7.5",
+      "source": "Wave 1.7.5",
+      "implementation": [],
+      "validation": [
+        "docs/releases/stage-3-movie-studio-v0-validation.md"
+      ],
+      "notes": "Default audio tracks exist, but real audio editing does not.",
+      "blockedBy": [
+        "PL-CORE-MEDIA-001"
+      ],
+      "deferralReason": null
+    },
+    {
+      "id": "PL-ANIM-FX-001",
+      "name": "Effects and compositing",
+      "description": "Provide effect stacks, masks, adjustment layers, blending, basic node compositing, and color correction.",
+      "slice": "ANIM",
+      "area": "effects",
+      "status": "missing",
+      "targetMilestone": "v1.7.5",
+      "source": "Wave 1.7.5",
+      "implementation": [],
+      "validation": [],
+      "notes": null,
+      "blockedBy": [
+        "PL-CORE-RENDER-001"
+      ],
+      "deferralReason": null
+    },
+    {
+      "id": "PL-ANIM-RENDER-001",
+      "name": "Animation render and export",
+      "description": "Queue and produce stills, image sequences, video, audio, review exports, and game-animation outputs.",
+      "slice": "ANIM",
+      "area": "rendering",
+      "status": "missing",
+      "targetMilestone": "v1.7.6",
+      "source": "Wave 1.7.6 — Render export assets AI and cross-slice",
+      "implementation": [],
+      "validation": [],
+      "notes": "Rendering and export are explicitly absent from the Stage 3 Movie Studio.",
+      "blockedBy": [
+        "PL-CORE-RENDER-001",
+        "PL-CORE-TASK-001"
+      ],
+      "deferralReason": null
+    },
+    {
+      "id": "PL-ANIM-ASSET-001",
+      "name": "Production asset linking",
+      "description": "Manage linked production assets, versions, dependencies, relinking, updates, and packaging.",
+      "slice": "ANIM",
+      "area": "assets",
+      "status": "missing",
+      "targetMilestone": "v1.7.6",
+      "source": "Wave 1.7.6",
+      "implementation": [],
+      "validation": [],
+      "notes": null,
+      "blockedBy": [
+        "PL-CORE-ASSET-001"
+      ],
+      "deferralReason": null
+    },
+    {
+      "id": "PL-ANIM-XSLICE-001",
+      "name": "Cross-slice animation workflows",
+      "description": "Use Docs scripts, Sheets production data, Code scripts and shaders, Modeler assets, and Game cinematics and clips.",
+      "slice": "ANIM",
+      "area": "cross-slice",
+      "status": "missing",
+      "targetMilestone": "v1.9",
+      "source": "Wave 1.7.6",
+      "implementation": [],
+      "validation": [],
+      "notes": null,
+      "blockedBy": [
+        "PL-CORE-LINK-001"
+      ],
+      "deferralReason": null
+    },
+    {
+      "id": "PL-ANIM-AI-001",
+      "name": "AI production proposals",
+      "description": "Provide reviewable AI timing, production, shot, marker, animation, and render proposals.",
+      "slice": "ANIM",
+      "area": "ai",
+      "status": "missing",
+      "targetMilestone": "v1.11",
+      "source": "Wave 1.7.6",
+      "implementation": [],
+      "validation": [],
+      "notes": null,
+      "blockedBy": [
+        "PL-CORE-AI-001"
+      ],
+      "deferralReason": null
+    },
+    {
+      "id": "PL-ANIM-RECOVERY-001",
+      "name": "Production history and recovery",
+      "description": "Provide snapshots, autosave, crash recovery, and durable production history.",
+      "slice": "ANIM",
+      "area": "recovery",
+      "status": "missing",
+      "targetMilestone": "v1.12",
+      "source": "Movie/Animation Studio Completion Gate",
+      "implementation": [],
+      "validation": [],
+      "notes": null,
+      "blockedBy": [
+        "PL-CORE-HISTORY-001"
+      ],
+      "deferralReason": null
+    }
+  ]
+}

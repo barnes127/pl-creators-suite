@@ -1,0 +1,173 @@
+{
+  "registryVersion": 1,
+  "slice": "PL Cloud and Hosted Services Platform",
+  "sliceCode": "CLOUD",
+  "capabilities": [
+    {
+      "id": "PL-CLOUD-PROVIDER-001",
+      "name": "Cloud Provider Abstraction",
+      "description": "Route identity, database, storage, sync, backup, compute, AI, rendering, builds, collaboration, marketplace, and notifications through capability-based providers.",
+      "slice": "CLOUD",
+      "area": "providers",
+      "status": "missing",
+      "targetMilestone": "v1.19",
+      "source": "v1.19 — Wave 1.19.1 Cloud provider abstraction and service routing",
+      "implementation": [],
+      "validation": [],
+      "notes": "Cloud-disabled, local, self-hosted, PL Cloud, and approved third-party modes remain first-class.",
+      "blockedBy": [
+        "PL-CORE-PERMISSION-001",
+        "PL-CORE-RPC-001"
+      ],
+      "deferralReason": null
+    },
+    {
+      "id": "PL-CLOUD-IDENTITY-001",
+      "name": "Identity Accounts and Device Linking",
+      "description": "Provide optional accounts, profiles, sessions, secure tokens, recovery, deletion, privacy controls, trusted devices, and account synchronization.",
+      "slice": "CLOUD",
+      "area": "identity",
+      "status": "missing",
+      "targetMilestone": "v1.19",
+      "source": "v1.19 — Wave 1.19.2 Identity accounts local-only mode and device linking",
+      "implementation": [],
+      "validation": [],
+      "notes": "Supabase is the approved initial account/auth foundation; accounts remain optional for local use.",
+      "blockedBy": [
+        "PL-CLOUD-PROVIDER-001"
+      ],
+      "deferralReason": null
+    },
+    {
+      "id": "PL-CLOUD-SYNC-001",
+      "name": "Project Sync Backup and Object Storage",
+      "description": "Provide project sync, backup sets, snapshots, storage, resume, integrity checking, selective sync, restore, transfer accounting, and conflict entry points.",
+      "slice": "CLOUD",
+      "area": "sync",
+      "status": "missing",
+      "targetMilestone": "v1.19",
+      "source": "v1.19 — Wave 1.19.3 Sync backups object storage and conflict-safe transfer",
+      "implementation": [],
+      "validation": [],
+      "notes": "Cloudflare R2 is the approved initial object-storage backend.",
+      "blockedBy": [
+        "PL-CLOUD-PROVIDER-001",
+        "PL-CLOUD-IDENTITY-001",
+        "PL-CORE-HISTORY-001",
+        "PL-CORE-PROJECT-001"
+      ],
+      "deferralReason": null
+    },
+    {
+      "id": "PL-CLOUD-ENTITLE-001",
+      "name": "Owned and Subscription Entitlements",
+      "description": "Synchronize owned extension and pack entitlements while keeping them structurally separate from subscription service entitlements.",
+      "slice": "CLOUD",
+      "area": "entitlements",
+      "status": "missing",
+      "targetMilestone": "v1.19",
+      "source": "v1.19 — Wave 1.19.4 Ownership licensing entitlements and offline cache",
+      "implementation": [],
+      "validation": [],
+      "notes": "Owned local products retain permanent offline use and cannot depend on continuous verification.",
+      "blockedBy": [
+        "PL-CLOUD-IDENTITY-001",
+        "PL-EXT-OWN-001"
+      ],
+      "deferralReason": null
+    },
+    {
+      "id": "PL-CLOUD-BILLING-001",
+      "name": "Subscriptions Billing Credits and Usage",
+      "description": "Provide billing, plans, invoices, cancellation, entitlement updates, usage accounting, limits, credits, warnings, support tools, and cost monitoring.",
+      "slice": "CLOUD",
+      "area": "billing",
+      "status": "missing",
+      "targetMilestone": "v1.19",
+      "source": "v1.19 — Wave 1.19.5 Subscriptions credits billing usage and plan limits",
+      "implementation": [],
+      "validation": [],
+      "notes": "Stripe is the approved billing foundation.",
+      "blockedBy": [
+        "PL-CLOUD-IDENTITY-001",
+        "PL-CLOUD-ENTITLE-001"
+      ],
+      "deferralReason": null
+    },
+    {
+      "id": "PL-CLOUD-SELFHOST-001",
+      "name": "Self-Hosting and Custom Endpoints",
+      "description": "Provide custom endpoints, health checks, credentials, certificates, homelab routing, capability detection, diagnostics, migration, and export.",
+      "slice": "CLOUD",
+      "area": "self-hosting",
+      "status": "missing",
+      "targetMilestone": "v1.19",
+      "source": "v1.19 — Wave 1.19.6 Self-hosting homelab routing and custom endpoints",
+      "implementation": [],
+      "validation": [],
+      "notes": "Provider differences must be exposed rather than falsely presenting every backend as identical.",
+      "blockedBy": [
+        "PL-CLOUD-PROVIDER-001",
+        "PL-CORE-DIAG-001"
+      ],
+      "deferralReason": null
+    },
+    {
+      "id": "PL-CLOUD-COMPUTE-001",
+      "name": "Hosted Compute AI Render and Build Services",
+      "description": "Provide optional hosted AI, remote compute, rendering, conversion, builds, backup, and workflow execution with estimates, limits, queues, costs, logs, cancellation, and local fallback.",
+      "slice": "CLOUD",
+      "area": "compute",
+      "status": "missing",
+      "targetMilestone": "v1.19",
+      "source": "v1.19 — Wave 1.19.7 Hosted AI cloud compute rendering builds and orchestration",
+      "implementation": [],
+      "validation": [],
+      "notes": "Uploads require explicit context and provider consent.",
+      "blockedBy": [
+        "PL-CLOUD-PROVIDER-001",
+        "PL-CLOUD-BILLING-001",
+        "PL-AI-PROVIDER-001",
+        "PL-CORE-TASK-001"
+      ],
+      "deferralReason": null
+    },
+    {
+      "id": "PL-CLOUD-MARKET-001",
+      "name": "Online Marketplace Commercial Backend",
+      "description": "Provide online catalogs, search, listings, checkout, entitlements, signed downloads, updates, ownership recovery, subscription listings, analytics, and commercial first-party products.",
+      "slice": "CLOUD",
+      "area": "marketplace",
+      "status": "missing",
+      "targetMilestone": "v1.19",
+      "source": "v1.19 — Wave 1.19.8 Online marketplace backend and commercial operation",
+      "implementation": [],
+      "validation": [],
+      "notes": "Purchase, restore, refund, offline use, update, rollback, and account deletion scenarios require validation.",
+      "blockedBy": [
+        "PL-CLOUD-ENTITLE-001",
+        "PL-CLOUD-BILLING-001",
+        "PL-EXT-MARKET-001",
+        "PL-EXT-SIGN-001"
+      ],
+      "deferralReason": null
+    },
+    {
+      "id": "PL-CLOUD-OFFLINE-001",
+      "name": "Cloud-Optional Product Boundary",
+      "description": "Guarantee that local projects, local AI, local workflows, local engines, and owned local extensions remain usable when cloud services are disabled or unavailable.",
+      "slice": "CLOUD",
+      "area": "offline",
+      "status": "missing",
+      "targetMilestone": "v1.19",
+      "source": "v1.19 — Validation and public-beta release gate",
+      "implementation": [],
+      "validation": [],
+      "notes": null,
+      "blockedBy": [
+        "PL-CLOUD-PROVIDER-001"
+      ],
+      "deferralReason": null
+    }
+  ]
+}

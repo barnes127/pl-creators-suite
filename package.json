@@ -39,6 +39,8 @@
     "env:report": "node scripts/environment-report.js",
     "clean:build": "node scripts/clean-build.js",
     "test:smoke": "node scripts/smoke-test.js",
+    "capabilities:validate": "node scripts/capabilities/validate-registry.js",
+    "capabilities:report": "node scripts/capabilities/report-registry.js",
     "dev": "pnpm -r dev",
     "build:renderer": "pnpm --filter renderer build",
     "package:linux": "pnpm build:renderer && electron-builder --linux AppImage --config electron-builder.yml",

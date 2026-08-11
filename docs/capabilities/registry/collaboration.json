@@ -1,0 +1,193 @@
+{
+  "registryVersion": 1,
+  "slice": "PL Collaboration and Release Convergence",
+  "sliceCode": "COLLAB",
+  "capabilities": [
+    {
+      "id": "PL-COLLAB-MODEL-001",
+      "name": "Collaboration Data and Sync Model",
+      "description": "Represent shared projects, workspaces, revisions, memberships, roles, permissions, presence, comments, activity, locks, and synchronization records.",
+      "slice": "COLLAB",
+      "area": "data-model",
+      "status": "missing",
+      "targetMilestone": "v1.20",
+      "source": "v1.20 — Wave 1.20.1 Collaboration data model sync architecture GitHub and activity",
+      "implementation": [],
+      "validation": [],
+      "notes": null,
+      "blockedBy": [
+        "PL-CLOUD-SYNC-001",
+        "PL-CORE-PROJECT-001",
+        "PL-CORE-PERMISSION-001"
+      ],
+      "deferralReason": null
+    },
+    {
+      "id": "PL-COLLAB-GIT-001",
+      "name": "GitHub and Project Activity Integration",
+      "description": "Integrate approved repository, branch, commit, issue, link, and project activity workflows without making Git mandatory.",
+      "slice": "COLLAB",
+      "area": "integration",
+      "status": "missing",
+      "targetMilestone": "v1.20",
+      "source": "v1.20 — Wave 1.20.1 Collaboration data model sync architecture GitHub and activity",
+      "implementation": [],
+      "validation": [],
+      "notes": null,
+      "blockedBy": [
+        "PL-COLLAB-MODEL-001"
+      ],
+      "deferralReason": null
+    },
+    {
+      "id": "PL-COLLAB-LAN-001",
+      "name": "Local Network and Cloud Collaboration Routing",
+      "description": "Support local-network discovery and collaboration plus optional cloud routing through provider contracts.",
+      "slice": "COLLAB",
+      "area": "transport",
+      "status": "missing",
+      "targetMilestone": "v1.20",
+      "source": "v1.20 — Wave 1.20.1 Collaboration data model sync architecture GitHub and activity",
+      "implementation": [],
+      "validation": [],
+      "notes": "Offline-first ownership and project exportability remain mandatory.",
+      "blockedBy": [
+        "PL-COLLAB-MODEL-001",
+        "PL-CLOUD-PROVIDER-001"
+      ],
+      "deferralReason": null
+    },
+    {
+      "id": "PL-COLLAB-TEAM-001",
+      "name": "Small Team Shared Workspaces",
+      "description": "Support teams of 2–5 with invitations, roles, permissions, presence, shared recents, activity, comments, review, tasks, status, and notifications.",
+      "slice": "COLLAB",
+      "area": "teams",
+      "status": "missing",
+      "targetMilestone": "v1.20",
+      "source": "v1.20 — Wave 1.20.2 Teams shared projects workspaces roles permissions and invitations",
+      "implementation": [],
+      "validation": [],
+      "notes": "Large-enterprise administration remains outside Official Version 1.",
+      "blockedBy": [
+        "PL-COLLAB-MODEL-001",
+        "PL-CLOUD-IDENTITY-001"
+      ],
+      "deferralReason": null
+    },
+    {
+      "id": "PL-COLLAB-CONFLICT-001",
+      "name": "Collaborative Conflict Resolution",
+      "description": "Provide revision comparison, conflict detection, manual resolution, safe approved auto-merge, locks, stale-copy warnings, and per-resource ownership behavior.",
+      "slice": "COLLAB",
+      "area": "conflicts",
+      "status": "missing",
+      "targetMilestone": "v1.20",
+      "source": "v1.20 — Wave 1.20.3 Conflict resolution offline edits shared assets and recovery",
+      "implementation": [],
+      "validation": [],
+      "notes": null,
+      "blockedBy": [
+        "PL-COLLAB-MODEL-001",
+        "PL-CORE-HISTORY-001"
+      ],
+      "deferralReason": null
+    },
+    {
+      "id": "PL-COLLAB-OFFLINE-001",
+      "name": "Offline Collaboration Recovery",
+      "description": "Recover from offline edits, reconnects, interrupted synchronization, clock differences, missing assets, schema mismatches, and partial uploads.",
+      "slice": "COLLAB",
+      "area": "recovery",
+      "status": "missing",
+      "targetMilestone": "v1.20",
+      "source": "v1.20 — Wave 1.20.3 Conflict resolution offline edits shared assets and recovery",
+      "implementation": [],
+      "validation": [],
+      "notes": "Cross-slice project snapshots must restore consistent state after failed collaborative changes.",
+      "blockedBy": [
+        "PL-COLLAB-CONFLICT-001",
+        "PL-CLOUD-SYNC-001",
+        "PL-CORE-HISTORY-001"
+      ],
+      "deferralReason": null
+    },
+    {
+      "id": "PL-COLLAB-STACK-001",
+      "name": "Extension and Workflow Stacking",
+      "description": "Run multiple extension and workflow packs together with declared dependencies, optional dependencies, versions, capabilities, precedence, and load order.",
+      "slice": "COLLAB",
+      "area": "extension-stacking",
+      "status": "missing",
+      "targetMilestone": "v1.20",
+      "source": "v1.20 — Wave 1.20.4 Extension stacking dependency resolution capability sharing and recovery",
+      "implementation": [],
+      "validation": [],
+      "notes": null,
+      "blockedBy": [
+        "PL-EXT-RUNTIME-001",
+        "PL-EXT-MANIFEST-001",
+        "PL-ENG-WORKFLOW-001"
+      ],
+      "deferralReason": null
+    },
+    {
+      "id": "PL-COLLAB-STACKSAFE-001",
+      "name": "Extension Stack Conflict and Recovery Mode",
+      "description": "Detect dependency, permission, command, UI, API-version, capability, and resource conflicts before activation and provide stack recovery mode.",
+      "slice": "COLLAB",
+      "area": "extension-stacking",
+      "status": "missing",
+      "targetMilestone": "v1.20",
+      "source": "v1.20 — Wave 1.20.4 Extension stacking dependency resolution capability sharing and recovery",
+      "implementation": [],
+      "validation": [],
+      "notes": "An incompatible extension stack may not create permanent startup lockout.",
+      "blockedBy": [
+        "PL-COLLAB-STACK-001",
+        "PL-EXT-SAFE-001"
+      ],
+      "deferralReason": null
+    },
+    {
+      "id": "PL-COLLAB-COMMUNITY-001",
+      "name": "Community Developer Marketplace Beta",
+      "description": "Support community submissions, publishers, package validation, scanning, permission review, verification, staging, moderation, reports, reviews, metrics, and publisher operations.",
+      "slice": "COLLAB",
+      "area": "community",
+      "status": "missing",
+      "targetMilestone": "v1.20",
+      "source": "v1.20 — Wave 1.20.5 Community developer beta verification moderation and publisher operations",
+      "implementation": [],
+      "validation": [],
+      "notes": "Official, verified, community, and experimental status must remain unambiguous.",
+      "blockedBy": [
+        "PL-CLOUD-MARKET-001",
+        "PL-EXT-SIGN-001",
+        "PL-EXT-SDK-001"
+      ],
+      "deferralReason": null
+    },
+    {
+      "id": "PL-COLLAB-RC-001",
+      "name": "Official Version 1 Release Candidate Convergence",
+      "description": "Converge performance, memory, recovery, accessibility, UX, documentation, security, privacy, packaging, updater, rollback, and all-system validation into the Official Version 1 release candidate.",
+      "slice": "COLLAB",
+      "area": "release-candidate",
+      "status": "missing",
+      "targetMilestone": "v1.20",
+      "source": "v1.20 — Waves 1.20.6 through 1.20.8 and final release gate",
+      "implementation": [],
+      "validation": [],
+      "notes": "No release-blocking data-loss, security, installer, accessibility, or core-workflow defect may remain.",
+      "blockedBy": [
+        "PL-COLLAB-TEAM-001",
+        "PL-COLLAB-OFFLINE-001",
+        "PL-COLLAB-STACKSAFE-001",
+        "PL-COLLAB-COMMUNITY-001",
+        "PL-ENG-FREEZE-001"
+      ],
+      "deferralReason": null
+    }
+  ]
+}

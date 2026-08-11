@@ -1,0 +1,336 @@
+{
+  "registryVersion": 1,
+  "slice": "PL Physics Simulation and Computational Research",
+  "sliceCode": "PHYS",
+  "capabilities": [
+    {
+      "id": "PL-PHYS-API-001",
+      "name": "PL Physics API",
+      "description": "Provide a PL-owned physics contract over a proven production backend while preserving backend replacement and multi-backend support.",
+      "slice": "PHYS",
+      "area": "physics-core",
+      "status": "partial",
+      "targetMilestone": "v1.8",
+      "source": "v1.8 — Required outcomes and Wave 1.8.1 Production rigid-body physics core",
+      "implementation": [],
+      "validation": [
+        "docs/releases/stage-4-physics-simulation-engine-validation.md"
+      ],
+      "notes": "Existing physics foundations count as partial; Official-v1 requires a production contract and conformance suite.",
+      "blockedBy": [
+        "PL-ENG-CONTRACT-001",
+        "PL-ENG-SCENE-001",
+        "PL-CORE-PHYSICS-001"
+      ],
+      "deferralReason": null
+    },
+    {
+      "id": "PL-PHYS-RIGID-001",
+      "name": "Production Rigid-Body Core",
+      "description": "Provide worlds, fixed timesteps, body modes, colliders, materials, forces, impulses, gravity, damping, sleeping, triggers, and collision layers.",
+      "slice": "PHYS",
+      "area": "rigid-body",
+      "status": "missing",
+      "targetMilestone": "v1.8",
+      "source": "v1.8 — Wave 1.8.1 Production rigid-body physics core",
+      "implementation": [],
+      "validation": [],
+      "notes": null,
+      "blockedBy": [
+        "PL-PHYS-API-001",
+        "PL-ENG-EXEC-001"
+      ],
+      "deferralReason": null
+    },
+    {
+      "id": "PL-PHYS-QUERY-001",
+      "name": "Physics Queries Constraints and Controllers",
+      "description": "Provide raycasts, sweeps, overlaps, contacts, joints, constraints, character controllers, and collision events.",
+      "slice": "PHYS",
+      "area": "rigid-body",
+      "status": "missing",
+      "targetMilestone": "v1.8",
+      "source": "v1.8 — Wave 1.8.1 Production rigid-body physics core",
+      "implementation": [],
+      "validation": [],
+      "notes": null,
+      "blockedBy": [
+        "PL-PHYS-RIGID-001"
+      ],
+      "deferralReason": null
+    },
+    {
+      "id": "PL-PHYS-DIAG-001",
+      "name": "Physics Diagnostics Replay and Tracing",
+      "description": "Provide broad and narrow phase diagnostics, contact visualization, force and velocity overlays, step controls, snapshots, replay, and event tracing.",
+      "slice": "PHYS",
+      "area": "diagnostics",
+      "status": "missing",
+      "targetMilestone": "v1.8",
+      "source": "v1.8 — Wave 1.8.1 Production rigid-body physics core",
+      "implementation": [],
+      "validation": [],
+      "notes": null,
+      "blockedBy": [
+        "PL-PHYS-RIGID-001",
+        "PL-CORE-DIAG-001"
+      ],
+      "deferralReason": null
+    },
+    {
+      "id": "PL-PHYS-CONFORM-001",
+      "name": "Rigid-Body Conformance Suite",
+      "description": "Validate stacks, ramps, friction, restitution, joints, tunneling, high-speed bodies, scale extremes, determinism limits, and save/reload stability.",
+      "slice": "PHYS",
+      "area": "validation",
+      "status": "missing",
+      "targetMilestone": "v1.8",
+      "source": "v1.8 — Wave 1.8.1 Production rigid-body physics core",
+      "implementation": [],
+      "validation": [],
+      "notes": null,
+      "blockedBy": [
+        "PL-PHYS-RIGID-001",
+        "PL-PHYS-QUERY-001",
+        "PL-ENG-BENCH-001"
+      ],
+      "deferralReason": null
+    },
+    {
+      "id": "PL-PHYS-MODE-001",
+      "name": "Physics Execution and Trust Modes",
+      "description": "Provide explicit real-time, deterministic, engineering-approximation, scientific-experiment, and experimental execution modes.",
+      "slice": "PHYS",
+      "area": "execution-modes",
+      "status": "missing",
+      "targetMilestone": "v1.8",
+      "source": "v1.8 — Wave 1.8.2 Physics modes precision and backend replacement",
+      "implementation": [],
+      "validation": [],
+      "notes": "Each mode must expose its guarantees, limitations, precision, warnings, and validation status.",
+      "blockedBy": [
+        "PL-PHYS-API-001",
+        "PL-ENG-CONTRACT-001"
+      ],
+      "deferralReason": null
+    },
+    {
+      "id": "PL-PHYS-BACKEND-001",
+      "name": "Physics Backend Replacement",
+      "description": "Provide backend adapters and compatibility tests so production third-party and experimental PL-native implementations can coexist behind one API.",
+      "slice": "PHYS",
+      "area": "backends",
+      "status": "missing",
+      "targetMilestone": "v1.8",
+      "source": "v1.8 — Wave 1.8.2 Physics modes precision and backend replacement",
+      "implementation": [],
+      "validation": [],
+      "notes": "Experimental solvers must never silently replace production behavior.",
+      "blockedBy": [
+        "PL-PHYS-API-001",
+        "PL-PHYS-MODE-001"
+      ],
+      "deferralReason": null
+    },
+    {
+      "id": "PL-PHYS-UNITS-001",
+      "name": "Units and Quantities System",
+      "description": "Provide unit and quantity algebra, conversions, dimensional validation, constants, vectors, matrices, parameters, and uncertainty metadata.",
+      "slice": "PHYS",
+      "area": "units",
+      "status": "missing",
+      "targetMilestone": "v1.8",
+      "source": "v1.8 — Wave 1.8.3 Units quantities expressions and equations",
+      "implementation": [],
+      "validation": [],
+      "notes": "Units must integrate with spreadsheets, model dimensions, physics properties, plots, probes, workflows, imports, and exports.",
+      "blockedBy": [
+        "PL-ENG-CALC-001"
+      ],
+      "deferralReason": null
+    },
+    {
+      "id": "PL-PHYS-EQUATION-001",
+      "name": "Expressions Equations and Computational Graphs",
+      "description": "Provide expression parsing, functions, constraints, equation systems, safe computational graphs, and prevention of invalid mathematical operations.",
+      "slice": "PHYS",
+      "area": "computation",
+      "status": "missing",
+      "targetMilestone": "v1.8",
+      "source": "v1.8 — Wave 1.8.3 Units quantities expressions and equations",
+      "implementation": [],
+      "validation": [],
+      "notes": null,
+      "blockedBy": [
+        "PL-PHYS-UNITS-001",
+        "PL-ENG-CALC-001"
+      ],
+      "deferralReason": null
+    },
+    {
+      "id": "PL-PHYS-NUMERIC-001",
+      "name": "Numerical Computation Foundation",
+      "description": "Provide linear algebra, root finding, interpolation, quadrature, numerical differentiation, ODE integration, optimization basics, statistics, distributions, and transforms.",
+      "slice": "PHYS",
+      "area": "numerical-methods",
+      "status": "missing",
+      "targetMilestone": "v1.8",
+      "source": "v1.8 — Wave 1.8.4 Numerical computation foundations",
+      "implementation": [],
+      "validation": [],
+      "notes": "Configurable tolerance and precision should be exposed where practical.",
+      "blockedBy": [
+        "PL-PHYS-EQUATION-001"
+      ],
+      "deferralReason": null
+    },
+    {
+      "id": "PL-PHYS-ERROR-001",
+      "name": "Numerical Error and Convergence Reporting",
+      "description": "Report convergence, stability, conservation, error estimates, iterations, tolerances, and solver failure reasons.",
+      "slice": "PHYS",
+      "area": "numerical-validation",
+      "status": "missing",
+      "targetMilestone": "v1.8",
+      "source": "v1.8 — Wave 1.8.4 Numerical computation foundations",
+      "implementation": [],
+      "validation": [],
+      "notes": "Approved cases should be cross-checked against analytical solutions and trusted implementations.",
+      "blockedBy": [
+        "PL-PHYS-NUMERIC-001",
+        "PL-CORE-DIAG-001"
+      ],
+      "deferralReason": null
+    },
+    {
+      "id": "PL-PHYS-EXPERIMENT-001",
+      "name": "Reproducible Experiment System",
+      "description": "Store assumptions, inputs, units, environment versions, solver settings, outputs, notes, citations, warnings, and validation results for repeatable experiments.",
+      "slice": "PHYS",
+      "area": "experiments",
+      "status": "missing",
+      "targetMilestone": "v1.8",
+      "source": "v1.8 — Wave 1.8.5 Experiments sweeps uncertainty and batch research",
+      "implementation": [],
+      "validation": [],
+      "notes": null,
+      "blockedBy": [
+        "PL-PHYS-EQUATION-001",
+        "PL-PHYS-NUMERIC-001",
+        "PL-CORE-PROJECT-001"
+      ],
+      "deferralReason": null
+    },
+    {
+      "id": "PL-PHYS-SWEEP-001",
+      "name": "Sweeps Batch Research and Uncertainty",
+      "description": "Provide parameter sweeps, batch experiments, Monte Carlo foundations, sensitivity studies, solver comparisons, checkpoints, caching, cancellation, and reproducible random seeds.",
+      "slice": "PHYS",
+      "area": "experiments",
+      "status": "missing",
+      "targetMilestone": "v1.8",
+      "source": "v1.8 — Wave 1.8.5 Experiments sweeps uncertainty and batch research",
+      "implementation": [],
+      "validation": [],
+      "notes": "Experiment execution should integrate with workflows, queues, Command Center, CLI, Docs, and Spreadsheets.",
+      "blockedBy": [
+        "PL-PHYS-EXPERIMENT-001",
+        "PL-ENG-WORKFLOW-001",
+        "PL-CORE-TASK-001"
+      ],
+      "deferralReason": null
+    },
+    {
+      "id": "PL-PHYS-VIS-001",
+      "name": "Scientific Visualization",
+      "description": "Provide scalar, vector, field, geometry, time-series, phase, distribution, heatmap, comparison, playback, probe, and 2D/3D plotting tools.",
+      "slice": "PHYS",
+      "area": "visualization",
+      "status": "missing",
+      "targetMilestone": "v1.8",
+      "source": "v1.8 — Wave 1.8.6 Scientific visualization and computational notebooks",
+      "implementation": [],
+      "validation": [],
+      "notes": "Plots must preserve units, solver metadata, and provenance.",
+      "blockedBy": [
+        "PL-PHYS-EXPERIMENT-001",
+        "PL-ENG-RENDER-001"
+      ],
+      "deferralReason": null
+    },
+    {
+      "id": "PL-PHYS-NOTEBOOK-001",
+      "name": "Computational Notebook and Experiment Workspace",
+      "description": "Provide a workspace combining equations, narrative, plots, tables, simulations, parameters, and results into a reproducible research record.",
+      "slice": "PHYS",
+      "area": "research-workspace",
+      "status": "missing",
+      "targetMilestone": "v1.8",
+      "source": "v1.8 — Wave 1.8.6 Scientific visualization and computational notebooks",
+      "implementation": [],
+      "validation": [],
+      "notes": "Complete result packages must export to Docs, Spreadsheets, images, tables, and project assets.",
+      "blockedBy": [
+        "PL-PHYS-EXPERIMENT-001",
+        "PL-PHYS-VIS-001"
+      ],
+      "deferralReason": null
+    },
+    {
+      "id": "PL-PHYS-MODULE-001",
+      "name": "Scientific Research Module Extension Points",
+      "description": "Provide extension points for orbital mechanics, electromagnetism, particles, structural approximations, thermal systems, fluids, controls, robotics, and hardware data.",
+      "slice": "PHYS",
+      "area": "research-modules",
+      "status": "missing",
+      "targetMilestone": "v1.8",
+      "source": "v1.8 — Wave 1.8.7 Research modules and PL-native solver program",
+      "implementation": [],
+      "validation": [],
+      "notes": "Specialized scientific domains should extend the shared computation model instead of bloating the base runtime.",
+      "blockedBy": [
+        "PL-PHYS-API-001",
+        "PL-PHYS-EXPERIMENT-001",
+        "PL-ENG-PLUGIN-001"
+      ],
+      "deferralReason": null
+    },
+    {
+      "id": "PL-PHYS-NATIVE-001",
+      "name": "Experimental PL-Native Solver Module",
+      "description": "Run at least one experimental PL-native physics or simulation module behind the common physics API without requiring slice-specific changes.",
+      "slice": "PHYS",
+      "area": "research-solvers",
+      "status": "missing",
+      "targetMilestone": "v1.8",
+      "source": "v1.8 — Wave 1.8.7 Research modules and PL-native solver program",
+      "implementation": [],
+      "validation": [],
+      "notes": "The module remains explicitly experimental until evidence supports stronger claims.",
+      "blockedBy": [
+        "PL-PHYS-BACKEND-001",
+        "PL-PHYS-MODULE-001"
+      ],
+      "deferralReason": null
+    },
+    {
+      "id": "PL-PHYS-VALIDATE-001",
+      "name": "Scientific Validation Library",
+      "description": "Maintain analytical solutions, textbook cases, published benchmarks, and trusted cross-tool comparisons for scientific validation.",
+      "slice": "PHYS",
+      "area": "validation",
+      "status": "missing",
+      "targetMilestone": "v1.8",
+      "source": "v1.8 — Wave 1.8.7 Research modules and PL-native solver program",
+      "implementation": [],
+      "validation": [],
+      "notes": "Experimental results may not be labeled scientifically validated without recorded evidence and known limitations.",
+      "blockedBy": [
+        "PL-PHYS-NUMERIC-001",
+        "PL-PHYS-ERROR-001",
+        "PL-ENG-BENCH-001"
+      ],
+      "deferralReason": null
+    }
+  ]
+}

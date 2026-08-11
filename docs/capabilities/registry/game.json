@@ -1,0 +1,487 @@
+{
+  "registryVersion": 1,
+  "slice": "PL Game Dev Studio",
+  "sliceCode": "GAME",
+  "capabilities": [
+    {
+      "id": "PL-GAME-FILE-001",
+      "name": "Create open save and close game project",
+      "description": "Create and persist native Game Studio projects.",
+      "slice": "GAME",
+      "area": "file-management",
+      "status": "complete",
+      "targetMilestone": "v1.8.1",
+      "source": "Game Studio / Project Management",
+      "implementation": [
+        "apps/desktop/services/games/index.js",
+        "apps/renderer/src/App.tsx"
+      ],
+      "validation": [
+        "docs/releases/stage-3-game-studio-v0-validation.md"
+      ],
+      "notes": "Native .plgame.json persistence is validated.",
+      "blockedBy": [],
+      "deferralReason": null
+    },
+    {
+      "id": "PL-GAME-SCENE-001",
+      "name": "Scene creation and scene graph",
+      "description": "Create game scenes and maintain scene/entity hierarchy.",
+      "slice": "GAME",
+      "area": "scenes",
+      "status": "partial",
+      "targetMilestone": "v1.8.1",
+      "source": "Wave 1.8.1 — Project scenes entities components inspectors and assets",
+      "implementation": [
+        "apps/desktop/services/games/index.js",
+        "apps/renderer/src/engines/game/state.ts"
+      ],
+      "validation": [
+        "docs/releases/stage-3-game-studio-v0-validation.md",
+        "docs/releases/stage-4-game-runtime-engine-validation.md"
+      ],
+      "notes": "Scene creation and runtime scene state exist; instancing, inheritance, transitions, and dependencies remain incomplete.",
+      "blockedBy": [],
+      "deferralReason": null
+    },
+    {
+      "id": "PL-GAME-ENTITY-001",
+      "name": "Entity and component architecture",
+      "description": "Create entities and add, update, enable, disable, remove, and inspect reusable components.",
+      "slice": "GAME",
+      "area": "entities",
+      "status": "complete",
+      "targetMilestone": "v1.8.1",
+      "source": "Wave 1.8.1",
+      "implementation": [
+        "apps/renderer/src/engines/game/entities.ts",
+        "apps/renderer/src/engines/game/components.ts"
+      ],
+      "validation": [
+        "docs/releases/stage-4-game-runtime-engine-validation.md"
+      ],
+      "notes": "Runtime component foundations include transform, sprite, collider, rigidbody, script, camera, audio, and custom components.",
+      "blockedBy": [],
+      "deferralReason": null
+    },
+    {
+      "id": "PL-GAME-RUNTIME-001",
+      "name": "Game runtime engine",
+      "description": "Initialize runtime state, load scenes, select entities, update runtime status, and advance runtime time.",
+      "slice": "GAME",
+      "area": "runtime",
+      "status": "complete",
+      "targetMilestone": "v1.8.1",
+      "source": "Game Runtime Engine Foundation",
+      "implementation": [
+        "apps/renderer/src/engines/game/runtimeEngine.ts",
+        "apps/renderer/src/engines/game/state.ts"
+      ],
+      "validation": [
+        "docs/releases/stage-4-game-runtime-engine-validation.md"
+      ],
+      "notes": "This marks the runtime foundation complete, not the entire production runtime.",
+      "blockedBy": [],
+      "deferralReason": null
+    },
+    {
+      "id": "PL-GAME-PLAY-001",
+      "name": "Preview and play controls",
+      "description": "Start preview/play mode and pause, resume, step, stop, and reset runtime execution.",
+      "slice": "GAME",
+      "area": "runtime",
+      "status": "complete",
+      "targetMilestone": "v1.8.1",
+      "source": "Game Runtime Engine Foundation",
+      "implementation": [
+        "apps/renderer/src/engines/game/preview.ts"
+      ],
+      "validation": [
+        "docs/releases/stage-4-game-runtime-engine-validation.md"
+      ],
+      "notes": null,
+      "blockedBy": [],
+      "deferralReason": null
+    },
+    {
+      "id": "PL-GAME-ASSET-001",
+      "name": "Game asset browser and import pipeline",
+      "description": "Import, browse, inspect, reimport, track, and link game assets.",
+      "slice": "GAME",
+      "area": "assets",
+      "status": "missing",
+      "targetMilestone": "v1.8.1",
+      "source": "Wave 1.8.1",
+      "implementation": [],
+      "validation": [],
+      "notes": "Asset linking was explicitly absent from Stage 3.",
+      "blockedBy": [
+        "PL-CORE-ASSET-001",
+        "PL-CORE-IO-001"
+      ],
+      "deferralReason": null
+    },
+    {
+      "id": "PL-GAME-EDIT2D-001",
+      "name": "2D scene editor",
+      "description": "Provide interactive 2D scene assembly with transforms, snapping, guides, overlays, colliders, and cameras.",
+      "slice": "GAME",
+      "area": "scene-editing",
+      "status": "missing",
+      "targetMilestone": "v1.8.2",
+      "source": "Wave 1.8.2 — 2D/3D editing prefabs tilemaps level design and rendering",
+      "implementation": [],
+      "validation": [],
+      "notes": null,
+      "blockedBy": [],
+      "deferralReason": null
+    },
+    {
+      "id": "PL-GAME-EDIT3D-001",
+      "name": "3D scene editor",
+      "description": "Provide interactive 3D scene assembly with transforms, cameras, lighting, snapping, colliders, and overlays.",
+      "slice": "GAME",
+      "area": "scene-editing",
+      "status": "missing",
+      "targetMilestone": "v1.8.2",
+      "source": "Wave 1.8.2",
+      "implementation": [],
+      "validation": [],
+      "notes": null,
+      "blockedBy": [
+        "PL-MODEL-VIEW-001"
+      ],
+      "deferralReason": null
+    },
+    {
+      "id": "PL-GAME-PREFAB-001",
+      "name": "Prefabs and reusable scenes",
+      "description": "Create reusable scenes and prefabs with variants, inheritance, and overrides.",
+      "slice": "GAME",
+      "area": "prefabs",
+      "status": "missing",
+      "targetMilestone": "v1.8.2",
+      "source": "Wave 1.8.2",
+      "implementation": [],
+      "validation": [],
+      "notes": null,
+      "blockedBy": [],
+      "deferralReason": null
+    },
+    {
+      "id": "PL-GAME-TILE-001",
+      "name": "Tilemap and level-design tools",
+      "description": "Provide tilesets, tilemaps, autotiling, and common 2D level-design workflows.",
+      "slice": "GAME",
+      "area": "level-design",
+      "status": "missing",
+      "targetMilestone": "v1.8.2",
+      "source": "Wave 1.8.2",
+      "implementation": [],
+      "validation": [],
+      "notes": null,
+      "blockedBy": [],
+      "deferralReason": null
+    },
+    {
+      "id": "PL-GAME-RENDER-001",
+      "name": "Game rendering systems",
+      "description": "Support materials, shaders, lighting, post-processing, and particles for game scenes.",
+      "slice": "GAME",
+      "area": "rendering",
+      "status": "missing",
+      "targetMilestone": "v1.8.2",
+      "source": "Wave 1.8.2",
+      "implementation": [],
+      "validation": [],
+      "notes": null,
+      "blockedBy": [
+        "PL-CORE-RENDER-001"
+      ],
+      "deferralReason": null
+    },
+    {
+      "id": "PL-GAME-SCRIPT-001",
+      "name": "Code scripting",
+      "description": "Attach and execute lifecycle-aware game scripts with inspector-exposed properties and debugging.",
+      "slice": "GAME",
+      "area": "scripting",
+      "status": "partial",
+      "targetMilestone": "v1.8.3",
+      "source": "Wave 1.8.3 — Scripting visual scripting events input physics and controllers",
+      "implementation": [
+        "apps/renderer/src/engines/game/components.ts"
+      ],
+      "validation": [
+        "docs/releases/stage-4-game-runtime-engine-validation.md"
+      ],
+      "notes": "Script components exist as a data/runtime foundation, but execution and IDE integration are unfinished.",
+      "blockedBy": [
+        "PL-CODE-RUN-001"
+      ],
+      "deferralReason": null
+    },
+    {
+      "id": "PL-GAME-VSCRIPT-001",
+      "name": "Visual scripting",
+      "description": "Create visual logic graphs with execution flow and runtime tracing.",
+      "slice": "GAME",
+      "area": "scripting",
+      "status": "missing",
+      "targetMilestone": "v1.8.3",
+      "source": "Wave 1.8.3",
+      "implementation": [],
+      "validation": [],
+      "notes": null,
+      "blockedBy": [],
+      "deferralReason": null
+    },
+    {
+      "id": "PL-GAME-EVENT-001",
+      "name": "Events signals and input",
+      "description": "Provide signals/events, input maps, user remapping, and gameplay event routing.",
+      "slice": "GAME",
+      "area": "events",
+      "status": "missing",
+      "targetMilestone": "v1.8.3",
+      "source": "Wave 1.8.3",
+      "implementation": [],
+      "validation": [],
+      "notes": null,
+      "blockedBy": [],
+      "deferralReason": null
+    },
+    {
+      "id": "PL-GAME-PHYS-001",
+      "name": "Game physics",
+      "description": "Support 2D/3D bodies, colliders, joints, physics debugging, and character controllers.",
+      "slice": "GAME",
+      "area": "physics",
+      "status": "partial",
+      "targetMilestone": "v1.8.3",
+      "source": "Wave 1.8.3",
+      "implementation": [
+        "apps/renderer/src/engines/game/components.ts"
+      ],
+      "validation": [
+        "docs/releases/stage-4-game-runtime-engine-validation.md"
+      ],
+      "notes": "Collider and rigidbody component contracts exist, but a complete physics runtime does not.",
+      "blockedBy": [
+        "PL-CORE-PHYSICS-001"
+      ],
+      "deferralReason": null
+    },
+    {
+      "id": "PL-GAME-ANIM-001",
+      "name": "Gameplay animation systems",
+      "description": "Provide animation playback, state machines, blends, animation events, and cross-slice animation clips.",
+      "slice": "GAME",
+      "area": "animation",
+      "status": "missing",
+      "targetMilestone": "v1.8.4",
+      "source": "Wave 1.8.4 — Animation UI audio navigation AI behavior and data-driven systems",
+      "implementation": [],
+      "validation": [],
+      "notes": null,
+      "blockedBy": [
+        "PL-ANIM-KEY-001"
+      ],
+      "deferralReason": null
+    },
+    {
+      "id": "PL-GAME-UI-001",
+      "name": "Game UI system",
+      "description": "Create runtime UI controls, layouts, themes, canvases, and input behavior.",
+      "slice": "GAME",
+      "area": "ui",
+      "status": "missing",
+      "targetMilestone": "v1.8.4",
+      "source": "Wave 1.8.4",
+      "implementation": [],
+      "validation": [],
+      "notes": null,
+      "blockedBy": [],
+      "deferralReason": null
+    },
+    {
+      "id": "PL-GAME-AUDIO-001",
+      "name": "Game audio system",
+      "description": "Provide audio sources, buses, zones, mixing, and runtime audio behavior.",
+      "slice": "GAME",
+      "area": "audio",
+      "status": "partial",
+      "targetMilestone": "v1.8.4",
+      "source": "Wave 1.8.4",
+      "implementation": [
+        "apps/renderer/src/engines/game/components.ts"
+      ],
+      "validation": [
+        "docs/releases/stage-4-game-runtime-engine-validation.md"
+      ],
+      "notes": "Audio component contracts exist; production audio runtime is incomplete.",
+      "blockedBy": [
+        "PL-CORE-MEDIA-001"
+      ],
+      "deferralReason": null
+    },
+    {
+      "id": "PL-GAME-NAV-001",
+      "name": "Navigation and pathfinding",
+      "description": "Provide navigation data, pathfinding, and navigation-aware runtime behavior.",
+      "slice": "GAME",
+      "area": "navigation",
+      "status": "missing",
+      "targetMilestone": "v1.8.4",
+      "source": "Wave 1.8.4",
+      "implementation": [],
+      "validation": [],
+      "notes": null,
+      "blockedBy": [],
+      "deferralReason": null
+    },
+    {
+      "id": "PL-GAME-DATA-001",
+      "name": "Data-driven gameplay systems",
+      "description": "Provide structured editors and validation for items, enemies, quests, dialogue, economy, and other gameplay data.",
+      "slice": "GAME",
+      "area": "data",
+      "status": "missing",
+      "targetMilestone": "v1.8.4",
+      "source": "Wave 1.8.4",
+      "implementation": [],
+      "validation": [],
+      "notes": null,
+      "blockedBy": [],
+      "deferralReason": null
+    },
+    {
+      "id": "PL-GAME-SAVE-001",
+      "name": "Runtime save and load",
+      "description": "Provide versioned and atomic runtime save/load data with migrations.",
+      "slice": "GAME",
+      "area": "persistence",
+      "status": "missing",
+      "targetMilestone": "v1.8.5",
+      "source": "Wave 1.8.5 — Save/load localization testing debugging profiling and optimization",
+      "implementation": [],
+      "validation": [],
+      "notes": null,
+      "blockedBy": [
+        "PL-CORE-PROJECT-001"
+      ],
+      "deferralReason": null
+    },
+    {
+      "id": "PL-GAME-DIAG-001",
+      "name": "Runtime diagnostics",
+      "description": "Expose runtime mode, clock, active scene, selection, components, warnings, and diagnostic state.",
+      "slice": "GAME",
+      "area": "diagnostics",
+      "status": "complete",
+      "targetMilestone": "v1.8.5",
+      "source": "Game Runtime Debug Foundation",
+      "implementation": [
+        "apps/renderer/src/engines/game/state.ts",
+        "apps/renderer/src/App.tsx"
+      ],
+      "validation": [
+        "docs/releases/stage-4-game-runtime-engine-validation.md"
+      ],
+      "notes": "Current debug drawer exposes engine/runtime diagnostics.",
+      "blockedBy": [],
+      "deferralReason": null
+    },
+    {
+      "id": "PL-GAME-TEST-001",
+      "name": "Testing debugging and profiling",
+      "description": "Provide runtime inspection, debugger, console, automated tests, profiler, and performance diagnostics.",
+      "slice": "GAME",
+      "area": "quality",
+      "status": "partial",
+      "targetMilestone": "v1.8.5",
+      "source": "Wave 1.8.5",
+      "implementation": [
+        "apps/renderer/src/App.tsx"
+      ],
+      "validation": [
+        "docs/releases/stage-4-game-runtime-engine-validation.md"
+      ],
+      "notes": "Runtime diagnostics exist, but full debugger/tests/profiler workflows remain incomplete.",
+      "blockedBy": [
+        "PL-CODE-DEBUG-001",
+        "PL-CODE-TEST-001"
+      ],
+      "deferralReason": null
+    },
+    {
+      "id": "PL-GAME-BUILD-001",
+      "name": "Game build and export pipeline",
+      "description": "Build, package, and export playable game projects for supported targets.",
+      "slice": "GAME",
+      "area": "build",
+      "status": "missing",
+      "targetMilestone": "v1.8.6",
+      "source": "PL Game Dev Studio / Build and Export",
+      "implementation": [],
+      "validation": [],
+      "notes": "Stage 3 explicitly lists export/build pipeline as missing.",
+      "blockedBy": [
+        "PL-CORE-TASK-001",
+        "PL-CORE-IO-001"
+      ],
+      "deferralReason": null
+    },
+    {
+      "id": "PL-GAME-XSLICE-001",
+      "name": "Cross-slice game workflows",
+      "description": "Consume Code scripts, Modeler assets, Animation clips, Docs design data, and Sheets game data through project-aware links.",
+      "slice": "GAME",
+      "area": "cross-slice",
+      "status": "missing",
+      "targetMilestone": "v1.9",
+      "source": "PL Game Dev Studio / Cross-Slice Workflows",
+      "implementation": [],
+      "validation": [],
+      "notes": null,
+      "blockedBy": [
+        "PL-CORE-LINK-001"
+      ],
+      "deferralReason": null
+    },
+    {
+      "id": "PL-GAME-AI-001",
+      "name": "Game development AI proposals",
+      "description": "Provide permissioned and reviewable AI assistance for game logic, data, scenes, diagnostics, and development tasks.",
+      "slice": "GAME",
+      "area": "ai",
+      "status": "missing",
+      "targetMilestone": "v1.11",
+      "source": "PL Game Dev Studio / Project-Aware AI Assistance",
+      "implementation": [],
+      "validation": [],
+      "notes": null,
+      "blockedBy": [
+        "PL-CORE-AI-001"
+      ],
+      "deferralReason": null
+    },
+    {
+      "id": "PL-GAME-RECOVERY-001",
+      "name": "Game project autosave and recovery",
+      "description": "Provide project snapshots, autosave, recovery, and safe migration behavior.",
+      "slice": "GAME",
+      "area": "recovery",
+      "status": "missing",
+      "targetMilestone": "v1.12",
+      "source": "PL Game Dev Studio / Recovery",
+      "implementation": [],
+      "validation": [],
+      "notes": null,
+      "blockedBy": [
+        "PL-CORE-HISTORY-001"
+      ],
+      "deferralReason": null
+    }
+  ]
+}

@@ -1,0 +1,463 @@
+{
+  "registryVersion": 1,
+  "slice": "PL Creators Suite Engine Platform",
+  "sliceCode": "ENG",
+  "capabilities": [
+    {
+      "id": "PL-ENG-GOV-001",
+      "name": "Engine Package Map and Governance",
+      "description": "Define named first-class engine boundaries, package ownership, public contracts, private implementations, design records, and lifecycle governance.",
+      "slice": "ENG",
+      "area": "governance",
+      "status": "missing",
+      "targetMilestone": "v1.6",
+      "source": "v1.6 — Wave 1.6.1 Engine package map governance and design records",
+      "implementation": [],
+      "validation": [],
+      "notes": "Named engines include document layout, calculation, code/task, geometry, rendering, physics/simulation, timeline, media, game runtime, workflow, indexing, and assets/dependencies.",
+      "blockedBy": [
+        "PL-CORE-RPC-001"
+      ],
+      "deferralReason": null
+    },
+    {
+      "id": "PL-ENG-CONTRACT-001",
+      "name": "Versioned Engine Contracts",
+      "description": "Define engine versioning, compatibility, deprecation, backend selection, ownership, migration, experimental-status rules, and extension surfaces.",
+      "slice": "ENG",
+      "area": "contracts",
+      "status": "missing",
+      "targetMilestone": "v1.6",
+      "source": "v1.6 — Wave 1.6.1 Engine package map governance and design records",
+      "implementation": [],
+      "validation": [],
+      "notes": "Backends must remain replaceable behind PL-owned contracts.",
+      "blockedBy": [
+        "PL-ENG-GOV-001",
+        "PL-CORE-RPC-001"
+      ],
+      "deferralReason": null
+    },
+    {
+      "id": "PL-ENG-EXEC-001",
+      "name": "Engine Execution Boundaries",
+      "description": "Define CPU, GPU, worker, memory, serialization, cancellation, scheduling, thread-safety, precision, and update-loop boundaries.",
+      "slice": "ENG",
+      "area": "execution",
+      "status": "missing",
+      "targetMilestone": "v1.6",
+      "source": "v1.6 — Wave 1.6.2 CPU GPU worker memory and update-loop contracts",
+      "implementation": [],
+      "validation": [],
+      "notes": "Expensive engine work must not block Electron renderer interaction.",
+      "blockedBy": [
+        "PL-ENG-CONTRACT-001",
+        "PL-CORE-TASK-001"
+      ],
+      "deferralReason": null
+    },
+    {
+      "id": "PL-ENG-RESOURCE-001",
+      "name": "Typed Resource and Dependency Graph",
+      "description": "Represent source, embedded, linked, generated, cached, stale, missing, derived, shared, and external resources with stable dependency tracking.",
+      "slice": "ENG",
+      "area": "resources",
+      "status": "partial",
+      "targetMilestone": "v1.6",
+      "source": "v1.6 — Wave 1.6.3 Typed asset dependency scene and spatial foundation",
+      "implementation": [
+        "apps/desktop/services/assets/index.js"
+      ],
+      "validation": [],
+      "notes": "Existing asset services provide a partial foundation but not the complete typed resource graph.",
+      "blockedBy": [
+        "PL-CORE-ASSET-001",
+        "PL-CORE-PROJECT-001"
+      ],
+      "deferralReason": null
+    },
+    {
+      "id": "PL-ENG-SCENE-001",
+      "name": "Shared Scene and Spatial Foundation",
+      "description": "Provide stable IDs, hierarchy, transforms, layers, visibility, bounds, spatial queries, references, and migration-safe serialization.",
+      "slice": "ENG",
+      "area": "scene",
+      "status": "partial",
+      "targetMilestone": "v1.6",
+      "source": "v1.6 — Wave 1.6.3 Typed asset dependency scene and spatial foundation",
+      "implementation": [
+        "apps/renderer/src/engines/modeling/"
+      ],
+      "validation": [
+        "docs/releases/stage-4-modeling-engine-validation.md"
+      ],
+      "notes": "The Modeling Engine provides a partial scene foundation that must become shared and contract-driven.",
+      "blockedBy": [
+        "PL-ENG-RESOURCE-001",
+        "PL-CORE-PROJECT-001"
+      ],
+      "deferralReason": null
+    },
+    {
+      "id": "PL-ENG-CACHE-001",
+      "name": "Engine Cache and Invalidation",
+      "description": "Provide content hashing, cache invalidation, incremental rebuilds, stale detection, and safe derived-resource cleanup.",
+      "slice": "ENG",
+      "area": "resources",
+      "status": "missing",
+      "targetMilestone": "v1.6",
+      "source": "v1.6 — Wave 1.6.3 Typed asset dependency scene and spatial foundation",
+      "implementation": [],
+      "validation": [],
+      "notes": null,
+      "blockedBy": [
+        "PL-ENG-RESOURCE-001"
+      ],
+      "deferralReason": null
+    },
+    {
+      "id": "PL-ENG-BENCH-001",
+      "name": "Engine Benchmark Laboratory",
+      "description": "Provide fixed benchmark fixtures and repeatable benchmark execution for documents, workbooks, repositories, scenes, timelines, media, games, workflows, and simulations.",
+      "slice": "ENG",
+      "area": "benchmarks",
+      "status": "missing",
+      "targetMilestone": "v1.6",
+      "source": "v1.6 — Wave 1.6.4 Benchmark laboratory and profiling dashboards",
+      "implementation": [],
+      "validation": [],
+      "notes": "Benchmarks must establish workload targets and regression thresholds.",
+      "blockedBy": [
+        "PL-ENG-GOV-001",
+        "PL-CORE-TASK-001",
+        "PL-CORE-DIAG-001"
+      ],
+      "deferralReason": null
+    },
+    {
+      "id": "PL-ENG-PROFILE-001",
+      "name": "Engine Profiling and Trace Capture",
+      "description": "Collect frame, calculation, memory, allocation, worker, GPU, import/export, build, render, simulation, and cache metrics.",
+      "slice": "ENG",
+      "area": "profiling",
+      "status": "missing",
+      "targetMilestone": "v1.6",
+      "source": "v1.6 — Wave 1.6.4 Benchmark laboratory and profiling dashboards",
+      "implementation": [],
+      "validation": [],
+      "notes": null,
+      "blockedBy": [
+        "PL-ENG-BENCH-001",
+        "PL-CORE-DIAG-001"
+      ],
+      "deferralReason": null
+    },
+    {
+      "id": "PL-ENG-FAULT-001",
+      "name": "Engine Fault Injection",
+      "description": "Test worker crashes, device loss, malformed assets, partial writes, invalid schemas, bad extensions, failed imports, and interrupted jobs.",
+      "slice": "ENG",
+      "area": "reliability",
+      "status": "missing",
+      "targetMilestone": "v1.6",
+      "source": "v1.6 — Wave 1.6.5 Failure isolation fault injection and recovery contracts",
+      "implementation": [],
+      "validation": [],
+      "notes": "Faults must produce visible errors and must not silently corrupt projects.",
+      "blockedBy": [
+        "PL-ENG-CONTRACT-001",
+        "PL-CORE-DIAG-001"
+      ],
+      "deferralReason": null
+    },
+    {
+      "id": "PL-ENG-RECOVERY-001",
+      "name": "Engine Recovery and Fallback",
+      "description": "Provide safe cleanup, recovery actions, safe-mode entry points, and fallback backends when supported engine operations fail.",
+      "slice": "ENG",
+      "area": "reliability",
+      "status": "missing",
+      "targetMilestone": "v1.6",
+      "source": "v1.6 — Wave 1.6.5 Failure isolation fault injection and recovery contracts",
+      "implementation": [],
+      "validation": [],
+      "notes": "Engine incidents should integrate with Command Center diagnostics.",
+      "blockedBy": [
+        "PL-ENG-FAULT-001",
+        "PL-CORE-HISTORY-001",
+        "PL-CENTER-HEALTH-001"
+      ],
+      "deferralReason": null
+    },
+    {
+      "id": "PL-ENG-GEOMETRY-001",
+      "name": "Production Geometry and Modeling Engine",
+      "description": "Provide topology representation, robust selection, transforms, snapping, normals, topology editing, modifiers, booleans, validation, undo integration, and cancellable geometry jobs.",
+      "slice": "ENG",
+      "area": "geometry",
+      "status": "partial",
+      "targetMilestone": "v1.7",
+      "source": "v1.7 — Wave 1.7.1 Geometry and modeling engine",
+      "implementation": [
+        "apps/renderer/src/engines/modeling/"
+      ],
+      "validation": [
+        "docs/releases/stage-4-modeling-engine-validation.md"
+      ],
+      "notes": "A real Modeling Engine foundation exists but the Official-v1 geometry engine is substantially broader.",
+      "blockedBy": [
+        "PL-ENG-SCENE-001",
+        "PL-ENG-EXEC-001",
+        "PL-CORE-GEOMETRY-001"
+      ],
+      "deferralReason": null
+    },
+    {
+      "id": "PL-ENG-RENDER-001",
+      "name": "Rendering Material Lighting and GPU Engine",
+      "description": "Provide cameras, materials, textures, lighting, shadows, picking, overlays, gizmos, render targets, capture, post-processing hooks, GPU resource management, culling, batching, and profiling.",
+      "slice": "ENG",
+      "area": "rendering",
+      "status": "partial",
+      "targetMilestone": "v1.7",
+      "source": "v1.7 — Wave 1.7.2 Rendering materials lighting and GPU resources",
+      "implementation": [
+        "apps/renderer/src/engines/modeling/"
+      ],
+      "validation": [
+        "docs/releases/stage-4-modeling-engine-validation.md"
+      ],
+      "notes": "Existing Three.js rendering is a real foundation but not yet the complete production rendering contract.",
+      "blockedBy": [
+        "PL-ENG-SCENE-001",
+        "PL-ENG-EXEC-001",
+        "PL-CORE-RENDER-001"
+      ],
+      "deferralReason": null
+    },
+    {
+      "id": "PL-ENG-TIMELINE-001",
+      "name": "Timeline and Animation Engine",
+      "description": "Provide tracks, clips, layers, keyframes, curves, interpolation, markers, ranges, playback clocks, retiming, blending, and serialization.",
+      "slice": "ENG",
+      "area": "timeline",
+      "status": "partial",
+      "targetMilestone": "v1.7",
+      "source": "v1.7 — Wave 1.7.3 Timeline animation and media computation",
+      "implementation": [
+        "apps/renderer/src/engines/movie/"
+      ],
+      "validation": [
+        "docs/releases/stage-4-movie-animation-engine-validation.md"
+      ],
+      "notes": "The Stage 4 Movie Engine provides an initial timeline/playback/keyframe foundation.",
+      "blockedBy": [
+        "PL-ENG-EXEC-001",
+        "PL-CORE-TIMELINE-001"
+      ],
+      "deferralReason": null
+    },
+    {
+      "id": "PL-ENG-MEDIA-001",
+      "name": "Media and Compositing Engine",
+      "description": "Provide audio/video timing, caches, proxies, waveforms, effects, masks, blend modes, compositing primitives, synchronization, diagnostics, and render jobs.",
+      "slice": "ENG",
+      "area": "media",
+      "status": "partial",
+      "targetMilestone": "v1.7",
+      "source": "v1.7 — Wave 1.7.3 Timeline animation and media computation",
+      "implementation": [
+        "apps/renderer/src/engines/movie/"
+      ],
+      "validation": [
+        "docs/releases/stage-4-movie-animation-engine-validation.md"
+      ],
+      "notes": "Current movie-engine work provides part of the timing/playback foundation; production media computation remains incomplete.",
+      "blockedBy": [
+        "PL-ENG-TIMELINE-001",
+        "PL-CORE-MEDIA-001",
+        "PL-CORE-TASK-001"
+      ],
+      "deferralReason": null
+    },
+    {
+      "id": "PL-ENG-GAME-001",
+      "name": "Game Runtime and Build Engine",
+      "description": "Provide scene lifecycle, entity/component runtime, scripts, events, input, physics binding, animation states, UI, audio, navigation, save/load, testing, profiling, and build contracts.",
+      "slice": "ENG",
+      "area": "game-runtime",
+      "status": "partial",
+      "targetMilestone": "v1.7",
+      "source": "v1.7 — Wave 1.7.4 Game runtime and build engine",
+      "implementation": [
+        "apps/renderer/src/engines/game/"
+      ],
+      "validation": [
+        "docs/releases/stage-4-game-runtime-engine-validation.md"
+      ],
+      "notes": "A real runtime controller and entity/component foundation exists, but the production runtime target is much broader.",
+      "blockedBy": [
+        "PL-ENG-SCENE-001",
+        "PL-ENG-EXEC-001",
+        "PL-ENG-RENDER-001"
+      ],
+      "deferralReason": null
+    },
+    {
+      "id": "PL-ENG-DOC-001",
+      "name": "Document Layout Engine",
+      "description": "Provide structured rich text, pagination, styles, tables, floating objects, references, review state, printing, and PDF layout contracts.",
+      "slice": "ENG",
+      "area": "document-layout",
+      "status": "missing",
+      "targetMilestone": "v1.7",
+      "source": "v1.7 — Wave 1.7.5 Document layout and spreadsheet calculation engines",
+      "implementation": [],
+      "validation": [],
+      "notes": null,
+      "blockedBy": [
+        "PL-ENG-EXEC-001",
+        "PL-CORE-PROJECT-001"
+      ],
+      "deferralReason": null
+    },
+    {
+      "id": "PL-ENG-CALC-001",
+      "name": "Spreadsheet Calculation Engine",
+      "description": "Provide formula parsing, typed values, dependency graphs, incremental and background recalculation, dynamic arrays, errors, auditing, and function conformance.",
+      "slice": "ENG",
+      "area": "calculation",
+      "status": "missing",
+      "targetMilestone": "v1.7",
+      "source": "v1.7 — Wave 1.7.5 Document layout and spreadsheet calculation engines",
+      "implementation": [],
+      "validation": [],
+      "notes": null,
+      "blockedBy": [
+        "PL-ENG-EXEC-001",
+        "PL-CORE-CALC-001"
+      ],
+      "deferralReason": null
+    },
+    {
+      "id": "PL-ENG-CODE-001",
+      "name": "Code Intelligence and Task Runtime",
+      "description": "Provide engine-level integration for language servers, terminals, tasks, builds, diagnostics, tests, Git, and safe process execution.",
+      "slice": "ENG",
+      "area": "code-runtime",
+      "status": "missing",
+      "targetMilestone": "v1.7",
+      "source": "v1.7 — Wave 1.7.6 Code intelligence workflow indexing and plugin runtime",
+      "implementation": [],
+      "validation": [],
+      "notes": null,
+      "blockedBy": [
+        "PL-CORE-TASK-001",
+        "PL-CORE-COMMAND-001",
+        "PL-CORE-DIAG-001"
+      ],
+      "deferralReason": null
+    },
+    {
+      "id": "PL-ENG-WORKFLOW-001",
+      "name": "Workflow Execution Engine",
+      "description": "Provide typed workflow inputs and outputs, cancellation, rollback, dry runs, retries, logs, resource locks, and execution records.",
+      "slice": "ENG",
+      "area": "workflow",
+      "status": "missing",
+      "targetMilestone": "v1.7",
+      "source": "v1.7 — Wave 1.7.6 Code intelligence workflow indexing and plugin runtime",
+      "implementation": [],
+      "validation": [],
+      "notes": null,
+      "blockedBy": [
+        "PL-CORE-COMMAND-001",
+        "PL-CORE-TASK-001"
+      ],
+      "deferralReason": null
+    },
+    {
+      "id": "PL-ENG-INDEX-001",
+      "name": "Indexing and Search Engine",
+      "description": "Provide incremental indexing and search for large projects, extension content, cross-slice references, and changing project resources.",
+      "slice": "ENG",
+      "area": "indexing",
+      "status": "missing",
+      "targetMilestone": "v1.7",
+      "source": "v1.7 — Wave 1.7.6 Code intelligence workflow indexing and plugin runtime",
+      "implementation": [],
+      "validation": [],
+      "notes": null,
+      "blockedBy": [
+        "PL-ENG-RESOURCE-001",
+        "PL-CORE-PROJECT-001"
+      ],
+      "deferralReason": null
+    },
+    {
+      "id": "PL-ENG-PLUGIN-001",
+      "name": "Engine Plugin Runtime Boundaries",
+      "description": "Provide controlled engine and platform runtime boundaries that later extension SDKs and marketplace products can consume safely.",
+      "slice": "ENG",
+      "area": "plugins",
+      "status": "missing",
+      "targetMilestone": "v1.7",
+      "source": "v1.7 — Wave 1.7.6 Code intelligence workflow indexing and plugin runtime",
+      "implementation": [],
+      "validation": [],
+      "notes": null,
+      "blockedBy": [
+        "PL-ENG-CONTRACT-001",
+        "PL-CORE-EXT-001",
+        "PL-CORE-PERMISSION-001"
+      ],
+      "deferralReason": null
+    },
+    {
+      "id": "PL-ENG-INTEGRATION-001",
+      "name": "All-Engine Integration and Contention Testing",
+      "description": "Run all engines inside one reference project and measure contention, memory pressure, worker scheduling, GPU use, cache behavior, and recovery.",
+      "slice": "ENG",
+      "area": "integration",
+      "status": "missing",
+      "targetMilestone": "v1.7",
+      "source": "v1.7 — Wave 1.7.7 All-engine integration and slice-entry freeze",
+      "implementation": [],
+      "validation": [],
+      "notes": "This is the primary proof that separately working engines also coexist as one suite.",
+      "blockedBy": [
+        "PL-ENG-BENCH-001",
+        "PL-ENG-PROFILE-001",
+        "PL-ENG-GEOMETRY-001",
+        "PL-ENG-RENDER-001",
+        "PL-ENG-TIMELINE-001",
+        "PL-ENG-MEDIA-001",
+        "PL-ENG-GAME-001",
+        "PL-ENG-DOC-001",
+        "PL-ENG-CALC-001",
+        "PL-ENG-CODE-001",
+        "PL-ENG-WORKFLOW-001",
+        "PL-ENG-INDEX-001"
+      ],
+      "deferralReason": null
+    },
+    {
+      "id": "PL-ENG-FREEZE-001",
+      "name": "Slice-Entry Engine Contract Freeze",
+      "description": "Freeze the versioned engine contracts required by the six slice build-outs while permitting backward-compatible implementation improvements.",
+      "slice": "ENG",
+      "area": "contracts",
+      "status": "missing",
+      "targetMilestone": "v1.7",
+      "source": "v1.7 — Wave 1.7.7 All-engine integration and slice-entry freeze",
+      "implementation": [],
+      "validation": [],
+      "notes": "Architecture manuals, capability matrices, benchmarks, licenses, fallback paths, and known limitations must be published at this gate.",
+      "blockedBy": [
+        "PL-ENG-INTEGRATION-001",
+        "PL-ENG-CONTRACT-001"
+      ],
+      "deferralReason": null
+    }
+  ]
+}

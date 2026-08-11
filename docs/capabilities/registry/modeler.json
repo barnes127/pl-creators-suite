@@ -1,0 +1,401 @@
+{
+  "registryVersion": 1,
+  "slice": "PL Modeling/Design Studio",
+  "sliceCode": "MODEL",
+  "capabilities": [
+    {
+      "id": "PL-MODEL-FILE-001",
+      "name": "Create model scene",
+      "description": "Create a project-local model scene using the native PL model format.",
+      "slice": "MODEL",
+      "area": "file-management",
+      "status": "complete",
+      "targetMilestone": "v1.6.1",
+      "source": "Modeling Studio / Project and Scene Management",
+      "implementation": [
+        "apps/desktop/services/models/index.js",
+        "apps/renderer/src/App.tsx"
+      ],
+      "validation": [
+        "docs/releases/stage-3-modeling-studio-v0-validation.md"
+      ],
+      "notes": "Native .plmodel.json scene creation and persistence are validated.",
+      "blockedBy": [],
+      "deferralReason": null
+    },
+    {
+      "id": "PL-MODEL-FILE-002",
+      "name": "Open save and close model scene",
+      "description": "Open, persist, close, and reopen model scenes without data loss.",
+      "slice": "MODEL",
+      "area": "file-management",
+      "status": "complete",
+      "targetMilestone": "v1.6.1",
+      "source": "Modeling Studio / Project and Scene Management",
+      "implementation": [
+        "apps/desktop/services/models/index.js",
+        "apps/renderer/src/App.tsx"
+      ],
+      "validation": [
+        "docs/releases/stage-3-modeling-studio-v0-validation.md"
+      ],
+      "notes": null,
+      "blockedBy": [],
+      "deferralReason": null
+    },
+    {
+      "id": "PL-MODEL-VIEW-001",
+      "name": "Interactive 3D viewport",
+      "description": "Render and navigate an interactive Three.js-backed 3D scene.",
+      "slice": "MODEL",
+      "area": "viewport",
+      "status": "complete",
+      "targetMilestone": "v1.6.1",
+      "source": "Wave 1.6.1 — Viewport selection modes transforms and precision",
+      "implementation": [
+        "apps/renderer/src/engines/modeling/viewportEngine.ts",
+        "apps/renderer/src/engines/modeling/sceneEngine.ts"
+      ],
+      "validation": [
+        "docs/releases/stage-4-modeling-engine-validation.md"
+      ],
+      "notes": "Stage 4 replaced the earlier viewport stub with a real engine-backed viewport.",
+      "blockedBy": [],
+      "deferralReason": null
+    },
+    {
+      "id": "PL-MODEL-VIEW-002",
+      "name": "Camera and viewport navigation",
+      "description": "Provide camera orbit, pan, zoom, perspective, orthographic, camera views, overlays, and multi-view layouts.",
+      "slice": "MODEL",
+      "area": "viewport",
+      "status": "partial",
+      "targetMilestone": "v1.6.1",
+      "source": "Wave 1.6.1",
+      "implementation": [
+        "apps/renderer/src/engines/modeling/camera.ts"
+      ],
+      "validation": [
+        "docs/releases/stage-4-modeling-engine-validation.md"
+      ],
+      "notes": "Core camera controls exist; full official-v1 view modes and layout system remain incomplete.",
+      "blockedBy": [],
+      "deferralReason": null
+    },
+    {
+      "id": "PL-MODEL-SELECT-001",
+      "name": "Object and mesh selection modes",
+      "description": "Select objects and support object, edit, vertex, edge, and face selection modes.",
+      "slice": "MODEL",
+      "area": "selection",
+      "status": "partial",
+      "targetMilestone": "v1.6.1",
+      "source": "Wave 1.6.1",
+      "implementation": [
+        "apps/renderer/src/engines/modeling/sceneEngine.ts"
+      ],
+      "validation": [
+        "docs/releases/stage-4-modeling-engine-validation.md"
+      ],
+      "notes": "Object selection exists; full mesh component modes remain missing.",
+      "blockedBy": [],
+      "deferralReason": null
+    },
+    {
+      "id": "PL-MODEL-XFORM-001",
+      "name": "Object transforms",
+      "description": "Translate, rotate, and scale scene objects through engine-backed transform controls.",
+      "slice": "MODEL",
+      "area": "transforms",
+      "status": "complete",
+      "targetMilestone": "v1.6.1",
+      "source": "Wave 1.6.1",
+      "implementation": [
+        "apps/renderer/src/engines/modeling/transforms.ts"
+      ],
+      "validation": [
+        "docs/releases/stage-4-modeling-engine-validation.md"
+      ],
+      "notes": "Basic transform editing foundation is validated.",
+      "blockedBy": [],
+      "deferralReason": null
+    },
+    {
+      "id": "PL-MODEL-XFORM-002",
+      "name": "Precision transforms and snapping",
+      "description": "Support numeric input, pivots, transform orientations, snapping, units, guides, workplanes, rulers, and dimensions.",
+      "slice": "MODEL",
+      "area": "transforms",
+      "status": "partial",
+      "targetMilestone": "v1.6.1",
+      "source": "Wave 1.6.1",
+      "implementation": [
+        "apps/renderer/src/engines/modeling/transforms.ts"
+      ],
+      "validation": [],
+      "notes": "Transforms and units exist, but the complete precision-design workflow does not.",
+      "blockedBy": [],
+      "deferralReason": null
+    },
+    {
+      "id": "PL-MODEL-GEO-001",
+      "name": "Geometry primitives and scene objects",
+      "description": "Create primitives, curves, paths, text, cameras, lights, and references.",
+      "slice": "MODEL",
+      "area": "geometry",
+      "status": "partial",
+      "targetMilestone": "v1.6.2",
+      "source": "Wave 1.6.2 — Geometry creation and mesh editing",
+      "implementation": [
+        "apps/desktop/services/models/index.js",
+        "apps/renderer/src/engines/modeling/sceneEngine.ts"
+      ],
+      "validation": [
+        "docs/releases/stage-3-modeling-studio-v0-validation.md",
+        "docs/releases/stage-4-modeling-engine-validation.md"
+      ],
+      "notes": "Primitive objects exist; the broader object creation set remains incomplete.",
+      "blockedBy": [],
+      "deferralReason": null
+    },
+    {
+      "id": "PL-MODEL-MESH-001",
+      "name": "Core mesh editing",
+      "description": "Provide extrude, inset, bevel, cuts, subdivision, merge, fill, bridge, dissolve, smoothing, normals, and cleanup tools.",
+      "slice": "MODEL",
+      "area": "mesh",
+      "status": "missing",
+      "targetMilestone": "v1.6.2",
+      "source": "Wave 1.6.2",
+      "implementation": [],
+      "validation": [],
+      "notes": "Mesh editing remains outside the current engine foundation.",
+      "blockedBy": [
+        "PL-CORE-GEOMETRY-001"
+      ],
+      "deferralReason": null
+    },
+    {
+      "id": "PL-MODEL-MOD-001",
+      "name": "Modifier and boolean stack",
+      "description": "Provide ordered nondestructive modifiers, booleans, solidify, warnings, application, removal, and copying.",
+      "slice": "MODEL",
+      "area": "modifiers",
+      "status": "missing",
+      "targetMilestone": "v1.6.3",
+      "source": "Wave 1.6.3 — Modifiers booleans hierarchy and assets",
+      "implementation": [],
+      "validation": [],
+      "notes": null,
+      "blockedBy": [
+        "PL-CORE-GEOMETRY-001"
+      ],
+      "deferralReason": null
+    },
+    {
+      "id": "PL-MODEL-SCENE-001",
+      "name": "Scene hierarchy and collections",
+      "description": "Organize objects through collections, parenting, hierarchy, metadata, and reusable scene assets.",
+      "slice": "MODEL",
+      "area": "scene",
+      "status": "partial",
+      "targetMilestone": "v1.6.3",
+      "source": "Wave 1.6.3",
+      "implementation": [
+        "apps/renderer/src/engines/modeling/sceneEngine.ts"
+      ],
+      "validation": [
+        "docs/releases/stage-4-modeling-engine-validation.md"
+      ],
+      "notes": "Scene representation exists; complete collection and asset hierarchy workflows remain incomplete.",
+      "blockedBy": [],
+      "deferralReason": null
+    },
+    {
+      "id": "PL-MODEL-ASSET-001",
+      "name": "Reusable modeling assets",
+      "description": "Support reusable assets, thumbnails, linked and embedded states, dependencies, and repair.",
+      "slice": "MODEL",
+      "area": "assets",
+      "status": "missing",
+      "targetMilestone": "v1.6.3",
+      "source": "Wave 1.6.3",
+      "implementation": [],
+      "validation": [],
+      "notes": null,
+      "blockedBy": [
+        "PL-CORE-ASSET-001"
+      ],
+      "deferralReason": null
+    },
+    {
+      "id": "PL-MODEL-MAT-001",
+      "name": "Materials and textures",
+      "description": "Provide PBR materials, material slots, core node materials, and managed texture channels.",
+      "slice": "MODEL",
+      "area": "materials",
+      "status": "missing",
+      "targetMilestone": "v1.6.4",
+      "source": "Wave 1.6.4 — Materials textures UV lighting cameras and rendering",
+      "implementation": [],
+      "validation": [],
+      "notes": null,
+      "blockedBy": [
+        "PL-CORE-RENDER-001"
+      ],
+      "deferralReason": null
+    },
+    {
+      "id": "PL-MODEL-UV-001",
+      "name": "UV editing",
+      "description": "Generate and edit UVs, seams, packing, inspection, and UV export.",
+      "slice": "MODEL",
+      "area": "uv",
+      "status": "missing",
+      "targetMilestone": "v1.6.4",
+      "source": "Wave 1.6.4",
+      "implementation": [],
+      "validation": [],
+      "notes": null,
+      "blockedBy": [
+        "PL-MODEL-MESH-001"
+      ],
+      "deferralReason": null
+    },
+    {
+      "id": "PL-MODEL-RENDER-001",
+      "name": "Lighting cameras and rendering",
+      "description": "Create lighting environments and cameras and produce still or animated renders through managed render jobs.",
+      "slice": "MODEL",
+      "area": "rendering",
+      "status": "missing",
+      "targetMilestone": "v1.6.4",
+      "source": "Wave 1.6.4",
+      "implementation": [],
+      "validation": [],
+      "notes": null,
+      "blockedBy": [
+        "PL-CORE-RENDER-001",
+        "PL-CORE-TASK-001"
+      ],
+      "deferralReason": null
+    },
+    {
+      "id": "PL-MODEL-ANIM-001",
+      "name": "Asset animation",
+      "description": "Animate model properties through keyframes, timeline, dope sheet, and curve access.",
+      "slice": "MODEL",
+      "area": "animation",
+      "status": "missing",
+      "targetMilestone": "v1.6.5",
+      "source": "Wave 1.6.5 — Animation rig basics physics analysis and print prep",
+      "implementation": [],
+      "validation": [],
+      "notes": null,
+      "blockedBy": [
+        "PL-CORE-TIMELINE-001"
+      ],
+      "deferralReason": null
+    },
+    {
+      "id": "PL-MODEL-PHYS-001",
+      "name": "Model physics setup",
+      "description": "Configure physics bodies, colliders, simulation properties, and basic simulation controls.",
+      "slice": "MODEL",
+      "area": "physics",
+      "status": "partial",
+      "targetMilestone": "v1.6.5",
+      "source": "Wave 1.6.5",
+      "implementation": [],
+      "validation": [],
+      "notes": "Shared physics/simulation foundations exist elsewhere in the suite, but the complete Modeler workflow is not wired.",
+      "blockedBy": [
+        "PL-CORE-PHYSICS-001"
+      ],
+      "deferralReason": null
+    },
+    {
+      "id": "PL-MODEL-VALIDATE-001",
+      "name": "Geometry analysis and print preparation",
+      "description": "Provide measurements, topology checks, game checks, 3D-print validation, and repair.",
+      "slice": "MODEL",
+      "area": "validation",
+      "status": "missing",
+      "targetMilestone": "v1.6.5",
+      "source": "Wave 1.6.5",
+      "implementation": [],
+      "validation": [],
+      "notes": null,
+      "blockedBy": [],
+      "deferralReason": null
+    },
+    {
+      "id": "PL-MODEL-IO-001",
+      "name": "3D interchange",
+      "description": "Import and export OBJ, STL, GLTF, GLB, PLY, practical FBX, images, SVG, and native assets with conversion options.",
+      "slice": "MODEL",
+      "area": "interchange",
+      "status": "missing",
+      "targetMilestone": "v1.6.6",
+      "source": "Wave 1.6.6 — Interchange AI and cross-slice",
+      "implementation": [],
+      "validation": [],
+      "notes": "The original Modeling v0 explicitly had no export pipeline.",
+      "blockedBy": [
+        "PL-CORE-IO-001"
+      ],
+      "deferralReason": null
+    },
+    {
+      "id": "PL-MODEL-XSLICE-001",
+      "name": "Cross-slice modeling workflows",
+      "description": "Exchange models, reports, BOM data, shaders, animation assets, and game-ready assets with other slices.",
+      "slice": "MODEL",
+      "area": "cross-slice",
+      "status": "missing",
+      "targetMilestone": "v1.9",
+      "source": "Wave 1.6.6",
+      "implementation": [],
+      "validation": [],
+      "notes": null,
+      "blockedBy": [
+        "PL-CORE-LINK-001"
+      ],
+      "deferralReason": null
+    },
+    {
+      "id": "PL-MODEL-AI-001",
+      "name": "AI modeling proposals",
+      "description": "Allow project-aware AI to propose reviewable and undoable modeling actions.",
+      "slice": "MODEL",
+      "area": "ai",
+      "status": "missing",
+      "targetMilestone": "v1.11",
+      "source": "Wave 1.6.6",
+      "implementation": [],
+      "validation": [],
+      "notes": null,
+      "blockedBy": [
+        "PL-CORE-AI-001"
+      ],
+      "deferralReason": null
+    },
+    {
+      "id": "PL-MODEL-RECOVERY-001",
+      "name": "Model history autosave and recovery",
+      "description": "Provide undo history, autosave, snapshots, crash recovery, and missing-asset recovery.",
+      "slice": "MODEL",
+      "area": "recovery",
+      "status": "missing",
+      "targetMilestone": "v1.12",
+      "source": "Modeling Studio Completion Gate",
+      "implementation": [],
+      "validation": [],
+      "notes": null,
+      "blockedBy": [
+        "PL-CORE-HISTORY-001"
+      ],
+      "deferralReason": null
+    }
+  ]
+}

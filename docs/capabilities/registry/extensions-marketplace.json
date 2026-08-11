@@ -1,0 +1,187 @@
+{
+  "registryVersion": 1,
+  "slice": "PL Extension and Marketplace Platform",
+  "sliceCode": "EXT",
+  "capabilities": [
+    {
+      "id": "PL-EXT-MANIFEST-001",
+      "name": "Extension Manifest and Package Contracts",
+      "description": "Define versioned extension manifests, package formats, metadata, compatibility rules, categories, migrations, and signatures.",
+      "slice": "EXT",
+      "area": "packages",
+      "status": "partial",
+      "targetMilestone": "v1.17",
+      "source": "v1.17 — Wave 1.17.1 Manifests package formats metadata and compatibility",
+      "implementation": [],
+      "validation": [],
+      "notes": "Package categories include extensions, plugins, themes, templates, asset packs, workflow packs, and cloud-service modules.",
+      "blockedBy": [
+        "PL-CORE-EXT-001"
+      ],
+      "deferralReason": null
+    },
+    {
+      "id": "PL-EXT-RUNTIME-001",
+      "name": "Local Extension Runtime",
+      "description": "Load, enable, disable, reload, update, rollback, and unload local extensions through controlled runtime boundaries.",
+      "slice": "EXT",
+      "area": "runtime",
+      "status": "partial",
+      "targetMilestone": "v1.17",
+      "source": "v1.17 — Wave 1.17.2 Registry loader lifecycle updates compatibility and safe mode",
+      "implementation": [],
+      "validation": [],
+      "notes": null,
+      "blockedBy": [
+        "PL-EXT-MANIFEST-001",
+        "PL-CORE-EXT-001",
+        "PL-ENG-PLUGIN-001"
+      ],
+      "deferralReason": null
+    },
+    {
+      "id": "PL-EXT-REGISTRY-001",
+      "name": "Installed Extension Registry",
+      "description": "Track installed versions, sources, paths, enabled state, ownership type, compatibility, installation dates, updates, and logs.",
+      "slice": "EXT",
+      "area": "registry",
+      "status": "missing",
+      "targetMilestone": "v1.17",
+      "source": "v1.17 — Wave 1.17.2 Registry loader lifecycle updates compatibility and safe mode",
+      "implementation": [],
+      "validation": [],
+      "notes": null,
+      "blockedBy": [
+        "PL-EXT-RUNTIME-001"
+      ],
+      "deferralReason": null
+    },
+    {
+      "id": "PL-EXT-SAFE-001",
+      "name": "Extension Safe Mode and Crash Recovery",
+      "description": "Detect extension crash loops, isolate recent extensions, recover startup, disable faulty products, and permit rollback or removal.",
+      "slice": "EXT",
+      "area": "recovery",
+      "status": "missing",
+      "targetMilestone": "v1.17",
+      "source": "v1.17 — Wave 1.17.2 Registry loader lifecycle updates compatibility and safe mode",
+      "implementation": [],
+      "validation": [],
+      "notes": "A faulty extension must not permanently prevent suite startup.",
+      "blockedBy": [
+        "PL-EXT-RUNTIME-001",
+        "PL-CORE-DIAG-001",
+        "PL-CORE-HISTORY-001"
+      ],
+      "deferralReason": null
+    },
+    {
+      "id": "PL-EXT-PERM-001",
+      "name": "Extension Permission and Trust Model",
+      "description": "Enforce declared project, file, network, cloud, AI, shell, Git, storage, slice, workflow, and device permissions with risk levels and revocation.",
+      "slice": "EXT",
+      "area": "permissions",
+      "status": "partial",
+      "targetMilestone": "v1.17",
+      "source": "v1.17 — Wave 1.17.3 Permissions sandboxing signing trust and risk levels",
+      "implementation": [],
+      "validation": [],
+      "notes": "Shell/system access is critical-risk and is never granted by default.",
+      "blockedBy": [
+        "PL-CORE-PERMISSION-001"
+      ],
+      "deferralReason": null
+    },
+    {
+      "id": "PL-EXT-SIGN-001",
+      "name": "Extension Signing and Verification",
+      "description": "Provide package signatures, publisher identity, verified status, tamper checks, sideload warnings, and trust metadata.",
+      "slice": "EXT",
+      "area": "trust",
+      "status": "missing",
+      "targetMilestone": "v1.17",
+      "source": "v1.17 — Wave 1.17.3 Permissions sandboxing signing trust and risk levels",
+      "implementation": [],
+      "validation": [],
+      "notes": null,
+      "blockedBy": [
+        "PL-EXT-MANIFEST-001",
+        "PL-EXT-PERM-001"
+      ],
+      "deferralReason": null
+    },
+    {
+      "id": "PL-EXT-SDK-001",
+      "name": "Extension Plugin and Workflow SDKs",
+      "description": "Provide stable SDKs, samples, test harnesses, packaging tools, development host, logs, permission simulation, and API documentation.",
+      "slice": "EXT",
+      "area": "sdk",
+      "status": "missing",
+      "targetMilestone": "v1.17",
+      "source": "v1.17 — SDK and developer-mode requirements",
+      "implementation": [],
+      "validation": [],
+      "notes": null,
+      "blockedBy": [
+        "PL-EXT-RUNTIME-001",
+        "PL-EXT-PERM-001",
+        "PL-ENG-PLUGIN-001"
+      ],
+      "deferralReason": null
+    },
+    {
+      "id": "PL-EXT-MARKET-001",
+      "name": "Local Marketplace Interface",
+      "description": "Browse, filter, inspect, install, update, disable, remove, restore, and categorize local first-party marketplace products.",
+      "slice": "EXT",
+      "area": "marketplace",
+      "status": "missing",
+      "targetMilestone": "v1.17",
+      "source": "v1.17 — Marketplace UI and first-party catalog requirements",
+      "implementation": [],
+      "validation": [],
+      "notes": "Listings distinguish free, owned, subscription, local-first, cloud-enhanced, and cloud-required products.",
+      "blockedBy": [
+        "PL-EXT-REGISTRY-001",
+        "PL-EXT-SIGN-001"
+      ],
+      "deferralReason": null
+    },
+    {
+      "id": "PL-EXT-OWN-001",
+      "name": "Local Ownership and Pack Entitlements",
+      "description": "Represent free, buy-once owned, pack, and subscription products separately while preserving permanent offline use for owned local products.",
+      "slice": "EXT",
+      "area": "ownership",
+      "status": "missing",
+      "targetMilestone": "v1.17",
+      "source": "v1.17 — Marketplace ownership and entitlement requirements",
+      "implementation": [],
+      "validation": [],
+      "notes": "Owned local extensions must not require continuous internet verification or an active subscription.",
+      "blockedBy": [
+        "PL-EXT-REGISTRY-001"
+      ],
+      "deferralReason": null
+    },
+    {
+      "id": "PL-EXT-CATALOG-001",
+      "name": "First-Party Extension and Pack Catalog",
+      "description": "Provide free essentials, paid individual extensions, single-slice packs, multi-slice packs, themes, templates, plugins, assets, and workflow packs.",
+      "slice": "EXT",
+      "area": "catalog",
+      "status": "missing",
+      "targetMilestone": "v1.17",
+      "source": "v1.17 — First-party catalog requirements",
+      "implementation": [],
+      "validation": [],
+      "notes": "Initial owned-product pricing and pack structure follow the approved marketplace specification.",
+      "blockedBy": [
+        "PL-EXT-MARKET-001",
+        "PL-EXT-OWN-001",
+        "PL-EXT-SDK-001"
+      ],
+      "deferralReason": null
+    }
+  ]
+}

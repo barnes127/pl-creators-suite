@@ -1,0 +1,491 @@
+{
+  "registryVersion": 1,
+  "slice": "PL Spreadsheets",
+  "sliceCode": "SHEET",
+  "capabilities": [
+    {
+      "id": "PL-SHEET-FILE-001",
+      "name": "Create workbook",
+      "description": "Create a new spreadsheet workbook in project storage.",
+      "slice": "SHEET",
+      "area": "file-management",
+      "status": "complete",
+      "targetMilestone": "v1.4.1",
+      "source": "PL Spreadsheets / Workbook Management",
+      "implementation": [
+        "apps/desktop/services/sheets/index.js",
+        "apps/renderer/src/App.tsx"
+      ],
+      "validation": [
+        "docs/releases/stage-3-sheets-v0-validation.md"
+      ],
+      "notes": "Current implementation uses project-local .plsheet.json storage.",
+      "blockedBy": [],
+      "deferralReason": null
+    },
+    {
+      "id": "PL-SHEET-FILE-002",
+      "name": "Open workbook",
+      "description": "Open an existing spreadsheet workbook from project storage.",
+      "slice": "SHEET",
+      "area": "file-management",
+      "status": "complete",
+      "targetMilestone": "v1.4.1",
+      "source": "PL Spreadsheets / Workbook Management",
+      "implementation": [
+        "apps/desktop/services/sheets/index.js",
+        "apps/renderer/src/App.tsx"
+      ],
+      "validation": [
+        "docs/releases/stage-3-sheets-v0-validation.md"
+      ],
+      "notes": null,
+      "blockedBy": [],
+      "deferralReason": null
+    },
+    {
+      "id": "PL-SHEET-FILE-003",
+      "name": "Save workbook",
+      "description": "Persist spreadsheet values and structure to project storage.",
+      "slice": "SHEET",
+      "area": "file-management",
+      "status": "complete",
+      "targetMilestone": "v1.4.1",
+      "source": "PL Spreadsheets / Workbook Management",
+      "implementation": [
+        "apps/desktop/services/sheets/index.js",
+        "apps/renderer/src/App.tsx"
+      ],
+      "validation": [
+        "docs/releases/stage-3-sheets-v0-validation.md"
+      ],
+      "notes": null,
+      "blockedBy": [],
+      "deferralReason": null
+    },
+    {
+      "id": "PL-SHEET-FILE-004",
+      "name": "Close workbook",
+      "description": "Close the active spreadsheet without closing the project.",
+      "slice": "SHEET",
+      "area": "file-management",
+      "status": "complete",
+      "targetMilestone": "v1.4.1",
+      "source": "PL Spreadsheets / Workbook Management",
+      "implementation": [
+        "apps/renderer/src/App.tsx"
+      ],
+      "validation": [
+        "docs/releases/stage-3-sheets-v0-validation.md"
+      ],
+      "notes": null,
+      "blockedBy": [],
+      "deferralReason": null
+    },
+    {
+      "id": "PL-SHEET-GRID-001",
+      "name": "Editable cell grid",
+      "description": "Display and edit spreadsheet cells containing text or numeric values.",
+      "slice": "SHEET",
+      "area": "grid",
+      "status": "complete",
+      "targetMilestone": "v1.4.1",
+      "source": "PL Spreadsheets / Core Grid",
+      "implementation": [
+        "apps/renderer/src/App.tsx"
+      ],
+      "validation": [
+        "docs/releases/stage-3-sheets-v0-validation.md"
+      ],
+      "notes": "Current grid supports cell editing and persistence.",
+      "blockedBy": [],
+      "deferralReason": null
+    },
+    {
+      "id": "PL-SHEET-GRID-002",
+      "name": "Row and column management",
+      "description": "Add, remove, resize, select, and manage spreadsheet rows and columns.",
+      "slice": "SHEET",
+      "area": "grid",
+      "status": "partial",
+      "targetMilestone": "v1.4.1",
+      "source": "PL Spreadsheets / Core Grid",
+      "implementation": [
+        "apps/renderer/src/App.tsx"
+      ],
+      "validation": [
+        "docs/releases/stage-3-sheets-v0-validation.md"
+      ],
+      "notes": "Adding and deleting the last row or column works; full selected-row/column operations and resizing remain incomplete.",
+      "blockedBy": [],
+      "deferralReason": null
+    },
+    {
+      "id": "PL-SHEET-GRID-003",
+      "name": "Multiple sheets",
+      "description": "Support multiple worksheets inside a workbook.",
+      "slice": "SHEET",
+      "area": "grid",
+      "status": "missing",
+      "targetMilestone": "v1.4.1",
+      "source": "PL Spreadsheets / Dev v2 Official v1 Target",
+      "implementation": [],
+      "validation": [],
+      "notes": "Current .plsheet.json implementation represents individual sheets rather than a complete multi-sheet workbook model.",
+      "blockedBy": [],
+      "deferralReason": null
+    },
+    {
+      "id": "PL-SHEET-GRID-004",
+      "name": "Copy paste and fill operations",
+      "description": "Support cell-range copy, paste, cut, fill, and matrix operations.",
+      "slice": "SHEET",
+      "area": "grid",
+      "status": "missing",
+      "targetMilestone": "v1.4.1",
+      "source": "PL Spreadsheets / Core Grid",
+      "implementation": [],
+      "validation": [],
+      "notes": "Matrix copy/paste is explicitly listed as a Sheets v0 limitation.",
+      "blockedBy": [],
+      "deferralReason": null
+    },
+    {
+      "id": "PL-SHEET-FORMULA-001",
+      "name": "Formula engine",
+      "description": "Evaluate formulas and cell references with dependency-aware recalculation.",
+      "slice": "SHEET",
+      "area": "formulas",
+      "status": "missing",
+      "targetMilestone": "v1.4.2",
+      "source": "PL Spreadsheets / Comprehensive Core Formulas",
+      "implementation": [],
+      "validation": [],
+      "notes": "Formulas are explicitly absent from Sheets v0.",
+      "blockedBy": [
+        "PL-CORE-CALC-001"
+      ],
+      "deferralReason": null
+    },
+    {
+      "id": "PL-SHEET-FORMULA-002",
+      "name": "Core function library",
+      "description": "Provide common arithmetic, logical, text, date, lookup, statistical, and aggregation functions.",
+      "slice": "SHEET",
+      "area": "formulas",
+      "status": "missing",
+      "targetMilestone": "v1.4.2",
+      "source": "PL Spreadsheets / Comprehensive Core Formulas",
+      "implementation": [],
+      "validation": [],
+      "notes": null,
+      "blockedBy": [
+        "PL-SHEET-FORMULA-001"
+      ],
+      "deferralReason": null
+    },
+    {
+      "id": "PL-SHEET-FORMULA-003",
+      "name": "Named ranges",
+      "description": "Create and reference named spreadsheet ranges.",
+      "slice": "SHEET",
+      "area": "formulas",
+      "status": "missing",
+      "targetMilestone": "v1.4.2",
+      "source": "PL Spreadsheets / v1.x Development",
+      "implementation": [],
+      "validation": [],
+      "notes": null,
+      "blockedBy": [
+        "PL-SHEET-FORMULA-001"
+      ],
+      "deferralReason": null
+    },
+    {
+      "id": "PL-SHEET-FORMAT-001",
+      "name": "Cell formatting",
+      "description": "Support fonts, colors, alignment, borders, number formats, and other core cell formatting.",
+      "slice": "SHEET",
+      "area": "formatting",
+      "status": "missing",
+      "targetMilestone": "v1.4.3",
+      "source": "PL Spreadsheets / Formatting",
+      "implementation": [],
+      "validation": [],
+      "notes": "Cell formatting is explicitly absent from Sheets v0.",
+      "blockedBy": [],
+      "deferralReason": null
+    },
+    {
+      "id": "PL-SHEET-FORMAT-002",
+      "name": "Conditional formatting",
+      "description": "Apply visual formatting based on cell values or formulas.",
+      "slice": "SHEET",
+      "area": "formatting",
+      "status": "missing",
+      "targetMilestone": "v1.4.3",
+      "source": "PL Spreadsheets / Dev v2 Official v1 Target",
+      "implementation": [],
+      "validation": [],
+      "notes": null,
+      "blockedBy": [
+        "PL-SHEET-FORMULA-001"
+      ],
+      "deferralReason": null
+    },
+    {
+      "id": "PL-SHEET-DATA-001",
+      "name": "Sorting",
+      "description": "Sort selected spreadsheet data by one or more columns.",
+      "slice": "SHEET",
+      "area": "data",
+      "status": "missing",
+      "targetMilestone": "v1.4.3",
+      "source": "PL Spreadsheets / Sorting and Filtering",
+      "implementation": [],
+      "validation": [],
+      "notes": null,
+      "blockedBy": [],
+      "deferralReason": null
+    },
+    {
+      "id": "PL-SHEET-DATA-002",
+      "name": "Filtering",
+      "description": "Filter table and range data using user-selected conditions.",
+      "slice": "SHEET",
+      "area": "data",
+      "status": "missing",
+      "targetMilestone": "v1.4.3",
+      "source": "PL Spreadsheets / Sorting and Filtering",
+      "implementation": [],
+      "validation": [],
+      "notes": null,
+      "blockedBy": [],
+      "deferralReason": null
+    },
+    {
+      "id": "PL-SHEET-DATA-003",
+      "name": "Data validation",
+      "description": "Restrict and validate cell input using configured rules.",
+      "slice": "SHEET",
+      "area": "data",
+      "status": "missing",
+      "targetMilestone": "v1.4.3",
+      "source": "PL Spreadsheets / Data Validation",
+      "implementation": [],
+      "validation": [],
+      "notes": null,
+      "blockedBy": [],
+      "deferralReason": null
+    },
+    {
+      "id": "PL-SHEET-TABLE-001",
+      "name": "Structured tables",
+      "description": "Convert ranges into structured tables with headers, formatting, sorting, and filtering.",
+      "slice": "SHEET",
+      "area": "tables",
+      "status": "missing",
+      "targetMilestone": "v1.4.3",
+      "source": "PL Spreadsheets / Dev v2 Official v1 Target",
+      "implementation": [],
+      "validation": [],
+      "notes": null,
+      "blockedBy": [],
+      "deferralReason": null
+    },
+    {
+      "id": "PL-SHEET-CHART-001",
+      "name": "Charts",
+      "description": "Create common charts from spreadsheet ranges and tables.",
+      "slice": "SHEET",
+      "area": "charts",
+      "status": "missing",
+      "targetMilestone": "v1.4.4",
+      "source": "PL Spreadsheets / Charts",
+      "implementation": [],
+      "validation": [],
+      "notes": "Charts are explicitly absent from Sheets v0.",
+      "blockedBy": [],
+      "deferralReason": null
+    },
+    {
+      "id": "PL-SHEET-PIVOT-001",
+      "name": "Basic pivot tables",
+      "description": "Summarize and group tabular data using basic pivot-table workflows.",
+      "slice": "SHEET",
+      "area": "analysis",
+      "status": "missing",
+      "targetMilestone": "v1.4.4",
+      "source": "PL Spreadsheets / Dev v2 Official v1 Target",
+      "implementation": [],
+      "validation": [],
+      "notes": null,
+      "blockedBy": [],
+      "deferralReason": null
+    },
+    {
+      "id": "PL-SHEET-IO-001",
+      "name": "CSV import and export",
+      "description": "Import CSV data and export workbook data to CSV.",
+      "slice": "SHEET",
+      "area": "interchange",
+      "status": "missing",
+      "targetMilestone": "v1.4.5",
+      "source": "PL Spreadsheets / Common File Import Export",
+      "implementation": [],
+      "validation": [],
+      "notes": "CSV import/export is explicitly absent from Sheets v0.",
+      "blockedBy": [
+        "PL-CORE-IO-001"
+      ],
+      "deferralReason": null
+    },
+    {
+      "id": "PL-SHEET-IO-002",
+      "name": "Common spreadsheet interchange",
+      "description": "Import and export common spreadsheet file formats.",
+      "slice": "SHEET",
+      "area": "interchange",
+      "status": "missing",
+      "targetMilestone": "v1.4.5",
+      "source": "PL Spreadsheets / Common File Import Export",
+      "implementation": [],
+      "validation": [],
+      "notes": "XLSX support is explicitly absent from Sheets v0.",
+      "blockedBy": [
+        "PL-CORE-IO-001"
+      ],
+      "deferralReason": null
+    },
+    {
+      "id": "PL-SHEET-PRINT-001",
+      "name": "Printing and PDF",
+      "description": "Provide spreadsheet print layout, print settings, and PDF output.",
+      "slice": "SHEET",
+      "area": "printing",
+      "status": "missing",
+      "targetMilestone": "v1.4.5",
+      "source": "PL Spreadsheets / Printing and PDF",
+      "implementation": [],
+      "validation": [],
+      "notes": null,
+      "blockedBy": [],
+      "deferralReason": null
+    },
+    {
+      "id": "PL-SHEET-REVIEW-001",
+      "name": "Comments",
+      "description": "Attach comments and notes to spreadsheet cells and ranges.",
+      "slice": "SHEET",
+      "area": "review",
+      "status": "missing",
+      "targetMilestone": "v1.4.5",
+      "source": "PL Spreadsheets / Comments and Version History",
+      "implementation": [],
+      "validation": [],
+      "notes": null,
+      "blockedBy": [],
+      "deferralReason": null
+    },
+    {
+      "id": "PL-SHEET-HISTORY-001",
+      "name": "Workbook version history",
+      "description": "Maintain recoverable local history for workbook changes.",
+      "slice": "SHEET",
+      "area": "history",
+      "status": "missing",
+      "targetMilestone": "v1.4.5",
+      "source": "PL Spreadsheets / Comments and Version History",
+      "implementation": [],
+      "validation": [],
+      "notes": null,
+      "blockedBy": [
+        "PL-CORE-HISTORY-001"
+      ],
+      "deferralReason": null
+    },
+    {
+      "id": "PL-SHEET-PROJECT-001",
+      "name": "Project-aware data links",
+      "description": "Link spreadsheet cells, ranges, and tables to project assets and shared project data.",
+      "slice": "SHEET",
+      "area": "project-integration",
+      "status": "missing",
+      "targetMilestone": "v1.4.6",
+      "source": "PL Spreadsheets / Project-Aware Links",
+      "implementation": [],
+      "validation": [],
+      "notes": null,
+      "blockedBy": [
+        "PL-CORE-LINK-001"
+      ],
+      "deferralReason": null
+    },
+    {
+      "id": "PL-SHEET-XSLICE-001",
+      "name": "Cross-slice workflows",
+      "description": "Exchange structured data with Docs, Code, Modeling, Animation, and Game Studio.",
+      "slice": "SHEET",
+      "area": "cross-slice",
+      "status": "missing",
+      "targetMilestone": "v1.9",
+      "source": "PL Spreadsheets / Cross-Slice Workflows",
+      "implementation": [],
+      "validation": [],
+      "notes": null,
+      "blockedBy": [
+        "PL-CORE-LINK-001"
+      ],
+      "deferralReason": null
+    },
+    {
+      "id": "PL-SHEET-AI-001",
+      "name": "AI formula and data assistance",
+      "description": "Provide permissioned AI help for formulas, analysis, explanations, and structured spreadsheet actions.",
+      "slice": "SHEET",
+      "area": "ai",
+      "status": "missing",
+      "targetMilestone": "v1.11",
+      "source": "PL Spreadsheets / AI Data and Formula Assistance",
+      "implementation": [],
+      "validation": [],
+      "notes": "AI actions should remain explicit and user-approved.",
+      "blockedBy": [
+        "PL-CORE-AI-001"
+      ],
+      "deferralReason": null
+    },
+    {
+      "id": "PL-SHEET-RECOVERY-001",
+      "name": "Autosave and recovery",
+      "description": "Automatically preserve workbook changes and recover safely after interruption.",
+      "slice": "SHEET",
+      "area": "recovery",
+      "status": "missing",
+      "targetMilestone": "v1.12",
+      "source": "PL Spreadsheets / Autosave and Recovery",
+      "implementation": [],
+      "validation": [],
+      "notes": null,
+      "blockedBy": [
+        "PL-CORE-HISTORY-001"
+      ],
+      "deferralReason": null
+    },
+    {
+      "id": "PL-SHEET-PERF-001",
+      "name": "Medium-to-large workbook performance",
+      "description": "Maintain responsive interaction and calculation performance on normal medium-to-large workbooks.",
+      "slice": "SHEET",
+      "area": "performance",
+      "status": "missing",
+      "targetMilestone": "v1.12",
+      "source": "PL Spreadsheets / Dev v2 Official v1 Target",
+      "implementation": [],
+      "validation": [],
+      "notes": "Requires benchmark fixtures before completion can be claimed.",
+      "blockedBy": [],
+      "deferralReason": null
+    }
+  ]
+}

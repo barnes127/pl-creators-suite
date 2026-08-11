@@ -1,0 +1,221 @@
+{
+  "registryVersion": 1,
+  "slice": "PL Command Bridge",
+  "sliceCode": "BRIDGE",
+  "capabilities": [
+    {
+      "id": "PL-BRIDGE-CLI-001",
+      "name": "Installable PL CLI",
+      "description": "Provide an installable and update-compatible pl command-line interface for supported Windows and Linux environments.",
+      "slice": "BRIDGE",
+      "area": "cli",
+      "status": "missing",
+      "targetMilestone": "v1.4",
+      "source": "v1.4 PL Command Bridge — Wave 1.4.1 CLI packaging discovery and shell integration",
+      "implementation": [],
+      "validation": [],
+      "notes": "The CLI ships with the desktop suite and must cleanly install and uninstall.",
+      "blockedBy": [
+        "PL-CORE-COMMAND-001"
+      ],
+      "deferralReason": null
+    },
+    {
+      "id": "PL-BRIDGE-SHELL-001",
+      "name": "Shell Discovery and Integration",
+      "description": "Support discovery, configuration, completion, help, and environment integration for supported system shells.",
+      "slice": "BRIDGE",
+      "area": "shell",
+      "status": "missing",
+      "targetMilestone": "v1.4",
+      "source": "v1.4 PL Command Bridge — Wave 1.4.1 CLI packaging discovery and shell integration",
+      "implementation": [],
+      "validation": [],
+      "notes": "Target environments include Bash, Zsh, Fish, PowerShell, Command Prompt, and WSL where applicable.",
+      "blockedBy": [
+        "PL-BRIDGE-CLI-001"
+      ],
+      "deferralReason": null
+    },
+    {
+      "id": "PL-BRIDGE-PROJECT-001",
+      "name": "Project-Aware CLI Context",
+      "description": "Detect PL project roots and expose project metadata, slices, assets, tasks, workflows, providers, and build targets safely.",
+      "slice": "BRIDGE",
+      "area": "project",
+      "status": "missing",
+      "targetMilestone": "v1.4",
+      "source": "v1.4 PL Command Bridge — Wave 1.4.2 Project-aware command model",
+      "implementation": [],
+      "validation": [],
+      "notes": "Destructive commands must not guess targets when project context is ambiguous.",
+      "blockedBy": [
+        "PL-BRIDGE-CLI-001",
+        "PL-CORE-PROJECT-001"
+      ],
+      "deferralReason": null
+    },
+    {
+      "id": "PL-BRIDGE-SLICE-001",
+      "name": "Slice Command Groups",
+      "description": "Expose supported headless operations for Docs, Spreadsheets, Code, Modeler, Animation, and Game Studio.",
+      "slice": "BRIDGE",
+      "area": "slice-commands",
+      "status": "missing",
+      "targetMilestone": "v1.4",
+      "source": "v1.4 PL Command Bridge — Wave 1.4.3 Slice engine and job commands",
+      "implementation": [],
+      "validation": [],
+      "notes": "Examples include Docs export, Sheets recalc, Code build or test, Modeler validation, Animation render, and Game run or build.",
+      "blockedBy": [
+        "PL-BRIDGE-PROJECT-001",
+        "PL-CORE-COMMAND-001"
+      ],
+      "deferralReason": null
+    },
+    {
+      "id": "PL-BRIDGE-ENGINE-001",
+      "name": "Engine Command Groups",
+      "description": "Expose safe engine diagnostics, benchmarks, simulation, rendering, cache, validation, and related operations through the CLI.",
+      "slice": "BRIDGE",
+      "area": "engine-commands",
+      "status": "missing",
+      "targetMilestone": "v1.4",
+      "source": "v1.4 PL Command Bridge — Wave 1.4.3 Slice engine and job commands",
+      "implementation": [],
+      "validation": [],
+      "notes": "Final engine command coverage is defined by the v1.6-v1.8 engine capability program.",
+      "blockedBy": [
+        "PL-BRIDGE-PROJECT-001",
+        "PL-CORE-COMMAND-001",
+        "PL-CORE-DIAG-001"
+      ],
+      "deferralReason": null
+    },
+    {
+      "id": "PL-BRIDGE-JOB-001",
+      "name": "CLI Job Control",
+      "description": "List, inspect, monitor, cancel, retry, and navigate outputs for jobs executed through shared suite task infrastructure.",
+      "slice": "BRIDGE",
+      "area": "jobs",
+      "status": "missing",
+      "targetMilestone": "v1.4",
+      "source": "v1.4 PL Command Bridge — Wave 1.4.3 Slice engine and job commands",
+      "implementation": [],
+      "validation": [],
+      "notes": null,
+      "blockedBy": [
+        "PL-CORE-TASK-001",
+        "PL-CORE-DIAG-001"
+      ],
+      "deferralReason": null
+    },
+    {
+      "id": "PL-BRIDGE-WORKFLOW-001",
+      "name": "Workflow CLI",
+      "description": "List, validate, dry-run, execute, monitor, cancel, and inspect workflows from scripts or interactive shell sessions.",
+      "slice": "BRIDGE",
+      "area": "workflows",
+      "status": "missing",
+      "targetMilestone": "v1.4",
+      "source": "v1.4 PL Command Bridge — Wave 1.4.4 Workflow and automation command surface",
+      "implementation": [],
+      "validation": [],
+      "notes": "Local automation must remain useful without requiring cloud infrastructure.",
+      "blockedBy": [
+        "PL-CORE-COMMAND-001",
+        "PL-CORE-TASK-001"
+      ],
+      "deferralReason": null
+    },
+    {
+      "id": "PL-BRIDGE-OUTPUT-001",
+      "name": "Human and Structured Output",
+      "description": "Provide stable human-readable and machine-readable JSON output for supported CLI commands.",
+      "slice": "BRIDGE",
+      "area": "output",
+      "status": "missing",
+      "targetMilestone": "v1.4",
+      "source": "v1.4 PL Command Bridge — Required outcomes and Wave 1.4.5",
+      "implementation": [],
+      "validation": [],
+      "notes": "Structured output enables workflows, scripts, tests, and external tooling to consume results reliably.",
+      "blockedBy": [
+        "PL-BRIDGE-CLI-001"
+      ],
+      "deferralReason": null
+    },
+    {
+      "id": "PL-BRIDGE-EXIT-001",
+      "name": "Stable CLI Exit Codes",
+      "description": "Define stable documented exit codes for success, validation failure, permission denial, unsupported operations, job failures, and other command outcomes.",
+      "slice": "BRIDGE",
+      "area": "contracts",
+      "status": "missing",
+      "targetMilestone": "v1.4",
+      "source": "v1.4 PL Command Bridge — Required outcomes and Wave 1.4.5",
+      "implementation": [],
+      "validation": [],
+      "notes": null,
+      "blockedBy": [
+        "PL-BRIDGE-CLI-001"
+      ],
+      "deferralReason": null
+    },
+    {
+      "id": "PL-BRIDGE-SEC-001",
+      "name": "CLI Trust and Security",
+      "description": "Require explicit trust and confirmation for destructive, shell, network, credential, privilege, and external-file operations.",
+      "slice": "BRIDGE",
+      "area": "security",
+      "status": "missing",
+      "targetMilestone": "v1.4",
+      "source": "v1.4 PL Command Bridge — Wave 1.4.5 Logging security and developer contracts",
+      "implementation": [],
+      "validation": [],
+      "notes": "Logs must redact sensitive data and risky commands may not execute silently.",
+      "blockedBy": [
+        "PL-CORE-PERMISSION-001",
+        "PL-CORE-DIAG-001"
+      ],
+      "deferralReason": null
+    },
+    {
+      "id": "PL-BRIDGE-EXT-001",
+      "name": "Extension CLI Registration",
+      "description": "Provide controlled command-registration contracts for first-party plugins and future extensions.",
+      "slice": "BRIDGE",
+      "area": "extensions",
+      "status": "missing",
+      "targetMilestone": "v1.4",
+      "source": "v1.4 PL Command Bridge — Wave 1.4.5 Logging security and developer contracts",
+      "implementation": [],
+      "validation": [],
+      "notes": "Extension commands must declare arguments, permissions, help, and compatibility through stable contracts.",
+      "blockedBy": [
+        "PL-CORE-EXT-001",
+        "PL-CORE-PERMISSION-001",
+        "PL-CORE-COMMAND-001"
+      ],
+      "deferralReason": null
+    },
+    {
+      "id": "PL-BRIDGE-OFFLINE-001",
+      "name": "Offline CLI Operation",
+      "description": "Keep local project inspection, validation, workflows, slice operations, and supported engine commands usable without an account or subscription.",
+      "slice": "BRIDGE",
+      "area": "offline",
+      "status": "missing",
+      "targetMilestone": "v1.4",
+      "source": "v1.4 PL Command Bridge — Validation and public-beta release gate",
+      "implementation": [],
+      "validation": [],
+      "notes": "Cloud-backed commands may require online services, but the local Command Bridge itself remains offline-first.",
+      "blockedBy": [
+        "PL-BRIDGE-CLI-001",
+        "PL-BRIDGE-PROJECT-001"
+      ],
+      "deferralReason": null
+    }
+  ]
+}

@@ -1,0 +1,281 @@
+{
+  "registryVersion": 1,
+  "slice": "PL Terminal and Workflow Synchronization",
+  "sliceCode": "TERM",
+  "capabilities": [
+    {
+      "id": "PL-TERM-HOST-001",
+      "name": "Integrated Terminal Host",
+      "description": "Provide integrated terminal sessions connected to project context and suite operations.",
+      "slice": "TERM",
+      "area": "terminal",
+      "status": "missing",
+      "targetMilestone": "v1.5",
+      "source": "v1.5 Live Terminal and Workflow Synchronization — Wave 1.5.1 Terminal host profiles tabs and process lifecycle",
+      "implementation": [],
+      "validation": [],
+      "notes": null,
+      "blockedBy": [
+        "PL-CORE-SHELL-001",
+        "PL-CORE-PERMISSION-001"
+      ],
+      "deferralReason": null
+    },
+    {
+      "id": "PL-TERM-PROFILE-001",
+      "name": "Terminal Profiles",
+      "description": "Support shell profiles, environment variables, starting directories, encoding, and restorable terminal configuration.",
+      "slice": "TERM",
+      "area": "terminal",
+      "status": "missing",
+      "targetMilestone": "v1.5",
+      "source": "v1.5 Live Terminal and Workflow Synchronization — Wave 1.5.1 Terminal host profiles tabs and process lifecycle",
+      "implementation": [],
+      "validation": [],
+      "notes": null,
+      "blockedBy": [
+        "PL-TERM-HOST-001"
+      ],
+      "deferralReason": null
+    },
+    {
+      "id": "PL-TERM-TAB-001",
+      "name": "Terminal Tabs and Splits",
+      "description": "Provide multiple terminal tabs and split views with persistent layout metadata.",
+      "slice": "TERM",
+      "area": "terminal",
+      "status": "missing",
+      "targetMilestone": "v1.5",
+      "source": "v1.5 Live Terminal and Workflow Synchronization — Wave 1.5.1 Terminal host profiles tabs and process lifecycle",
+      "implementation": [],
+      "validation": [],
+      "notes": null,
+      "blockedBy": [
+        "PL-TERM-HOST-001",
+        "PL-CORE-SHELL-001"
+      ],
+      "deferralReason": null
+    },
+    {
+      "id": "PL-TERM-PROCESS-001",
+      "name": "Process Lifecycle Tracking",
+      "description": "Track process IDs, working directories, commands, duration, exit codes, output, and termination state for terminal operations.",
+      "slice": "TERM",
+      "area": "processes",
+      "status": "missing",
+      "targetMilestone": "v1.5",
+      "source": "v1.5 Live Terminal and Workflow Synchronization — Wave 1.5.1 Terminal host profiles tabs and process lifecycle",
+      "implementation": [],
+      "validation": [],
+      "notes": "Shell crashes and suite restarts must not corrupt project state.",
+      "blockedBy": [
+        "PL-TERM-HOST-001",
+        "PL-CORE-TASK-001",
+        "PL-CORE-DIAG-001"
+      ],
+      "deferralReason": null
+    },
+    {
+      "id": "PL-TERM-HISTORY-001",
+      "name": "Restorable Terminal Metadata",
+      "description": "Persist terminal layout and history metadata without silently replaying commands after restart.",
+      "slice": "TERM",
+      "area": "recovery",
+      "status": "missing",
+      "targetMilestone": "v1.5",
+      "source": "v1.5 Live Terminal and Workflow Synchronization — Wave 1.5.1 Terminal host profiles tabs and process lifecycle",
+      "implementation": [],
+      "validation": [],
+      "notes": "Persistence records terminal state, not automatic command execution.",
+      "blockedBy": [
+        "PL-TERM-HOST-001",
+        "PL-CORE-HISTORY-001"
+      ],
+      "deferralReason": null
+    },
+    {
+      "id": "PL-TERM-WATCH-001",
+      "name": "Live Project and Filesystem Synchronization",
+      "description": "Detect external file creation, modification, rename, deletion, generated output, and relevant project changes without requiring full reloads.",
+      "slice": "TERM",
+      "area": "synchronization",
+      "status": "missing",
+      "targetMilestone": "v1.5",
+      "source": "v1.5 Live Terminal and Workflow Synchronization — Wave 1.5.2 Live project and filesystem synchronization",
+      "implementation": [],
+      "validation": [],
+      "notes": "Watchers must expose degraded mode and support pause or resume for very large trees.",
+      "blockedBy": [
+        "PL-CORE-PROJECT-001",
+        "PL-CORE-ASSET-001"
+      ],
+      "deferralReason": null
+    },
+    {
+      "id": "PL-TERM-CONFLICT-001",
+      "name": "External Change Conflict Handling",
+      "description": "Detect and resolve conflicts between unsaved in-app edits and files modified by terminal or external processes.",
+      "slice": "TERM",
+      "area": "synchronization",
+      "status": "missing",
+      "targetMilestone": "v1.5",
+      "source": "v1.5 Live Terminal and Workflow Synchronization — Wave 1.5.2 Live project and filesystem synchronization",
+      "implementation": [],
+      "validation": [],
+      "notes": "External changes may not silently overwrite unsaved application state.",
+      "blockedBy": [
+        "PL-TERM-WATCH-001",
+        "PL-CORE-HISTORY-001"
+      ],
+      "deferralReason": null
+    },
+    {
+      "id": "PL-TERM-EVENT-001",
+      "name": "Structured Terminal Events",
+      "description": "Convert recognized terminal and process activity into typed events while preserving original raw output.",
+      "slice": "TERM",
+      "area": "events",
+      "status": "missing",
+      "targetMilestone": "v1.5",
+      "source": "v1.5 Live Terminal and Workflow Synchronization — Wave 1.5.3 Terminal event and problem integration",
+      "implementation": [],
+      "validation": [],
+      "notes": "Events may later feed workflows, Command Center, extensions, and Copilot according to permissions.",
+      "blockedBy": [
+        "PL-TERM-PROCESS-001",
+        "PL-CORE-DIAG-001"
+      ],
+      "deferralReason": null
+    },
+    {
+      "id": "PL-TERM-PROBLEM-001",
+      "name": "Terminal Problem and Artifact Extraction",
+      "description": "Recognize diagnostics, file paths, URLs, test results, build artifacts, and known command outputs and expose navigable results.",
+      "slice": "TERM",
+      "area": "diagnostics",
+      "status": "missing",
+      "targetMilestone": "v1.5",
+      "source": "v1.5 Live Terminal and Workflow Synchronization — Wave 1.5.3 Terminal event and problem integration",
+      "implementation": [],
+      "validation": [],
+      "notes": "Raw terminal output must remain available even when structured interpretations are produced.",
+      "blockedBy": [
+        "PL-TERM-EVENT-001",
+        "PL-CORE-DIAG-001"
+      ],
+      "deferralReason": null
+    },
+    {
+      "id": "PL-TERM-WORKFLOW-001",
+      "name": "Terminal and Workflow Interoperation",
+      "description": "Expose workflow steps as terminal commands and reviewed terminal commands as workflow steps.",
+      "slice": "TERM",
+      "area": "workflows",
+      "status": "missing",
+      "targetMilestone": "v1.5",
+      "source": "v1.5 Live Terminal and Workflow Synchronization — Wave 1.5.4 Workflow plugin and extension CLI synchronization",
+      "implementation": [],
+      "validation": [],
+      "notes": null,
+      "blockedBy": [
+        "PL-TERM-EVENT-001",
+        "PL-CORE-COMMAND-001",
+        "PL-CORE-TASK-001"
+      ],
+      "deferralReason": null
+    },
+    {
+      "id": "PL-TERM-EXT-001",
+      "name": "Extension Terminal Integration",
+      "description": "Allow approved extensions to register terminal and CLI capabilities through declared schemas, help metadata, completion, and permissions.",
+      "slice": "TERM",
+      "area": "extensions",
+      "status": "missing",
+      "targetMilestone": "v1.5",
+      "source": "v1.5 Live Terminal and Workflow Synchronization — Wave 1.5.4 Workflow plugin and extension CLI synchronization",
+      "implementation": [],
+      "validation": [],
+      "notes": "Extensions must not obtain undeclared shell access through command registration.",
+      "blockedBy": [
+        "PL-CORE-EXT-001",
+        "PL-CORE-PERMISSION-001",
+        "PL-BRIDGE-EXT-001"
+      ],
+      "deferralReason": null
+    },
+    {
+      "id": "PL-TERM-TASK-001",
+      "name": "Terminal-Driven Task Creation",
+      "description": "Create and update suite tasks, milestones, builds, exports, and validation jobs from approved terminal activity.",
+      "slice": "TERM",
+      "area": "tasks",
+      "status": "missing",
+      "targetMilestone": "v1.5",
+      "source": "v1.5 Live Terminal and Workflow Synchronization — Wave 1.5.4 Workflow plugin and extension CLI synchronization",
+      "implementation": [],
+      "validation": [],
+      "notes": null,
+      "blockedBy": [
+        "PL-TERM-EVENT-001",
+        "PL-CORE-TASK-001"
+      ],
+      "deferralReason": null
+    },
+    {
+      "id": "PL-TERM-TRUST-001",
+      "name": "Workspace Trust and Restricted Mode",
+      "description": "Restrict unknown or untrusted projects from performing dangerous shell, network, extension, credential, or automated operations.",
+      "slice": "TERM",
+      "area": "security",
+      "status": "missing",
+      "targetMilestone": "v1.5",
+      "source": "v1.5 Live Terminal and Workflow Synchronization — Wave 1.5.5 Safety trust audit and AI command review",
+      "implementation": [],
+      "validation": [],
+      "notes": null,
+      "blockedBy": [
+        "PL-CORE-PERMISSION-001",
+        "PL-BRIDGE-SEC-001"
+      ],
+      "deferralReason": null
+    },
+    {
+      "id": "PL-TERM-AUDIT-001",
+      "name": "Terminal Command Audit Trail",
+      "description": "Record visible local audit metadata for commands, providers, working directories, permissions, results, and affected resources.",
+      "slice": "TERM",
+      "area": "security",
+      "status": "missing",
+      "targetMilestone": "v1.5",
+      "source": "v1.5 Live Terminal and Workflow Synchronization — Wave 1.5.5 Safety trust audit and AI command review",
+      "implementation": [],
+      "validation": [],
+      "notes": "Sensitive values must be redacted from audit and diagnostic output.",
+      "blockedBy": [
+        "PL-TERM-PROCESS-001",
+        "PL-CORE-DIAG-001",
+        "PL-CORE-PERMISSION-001"
+      ],
+      "deferralReason": null
+    },
+    {
+      "id": "PL-TERM-AI-001",
+      "name": "AI Command Proposal and Review",
+      "description": "Allow AI to propose and explain terminal commands while requiring the same trust and approval boundaries as human-triggered risky operations.",
+      "slice": "TERM",
+      "area": "ai",
+      "status": "missing",
+      "targetMilestone": "v1.5",
+      "source": "v1.5 Live Terminal and Workflow Synchronization — Wave 1.5.5 Safety trust audit and AI command review",
+      "implementation": [],
+      "validation": [],
+      "notes": "AI may not silently execute destructive, privileged, remote-download, credential, or hidden-shell commands.",
+      "blockedBy": [
+        "PL-CORE-AI-001",
+        "PL-TERM-TRUST-001",
+        "PL-TERM-AUDIT-001"
+      ],
+      "deferralReason": null
+    }
+  ]
+}
