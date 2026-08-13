@@ -1,5 +1,5 @@
 const path = require("path");
-const { app, BrowserWindow } = require("electron");
+const { app, BrowserWindow, session } = require("electron");
 const { startRpcServer } = require("./backend");
 const { loadWindowState, saveWindowState } = require("./storage/windowState");
 const { createAppMenu } = require("./services/menu");
@@ -63,6 +63,14 @@ win.on("close", async () => {
   }
 
 app.whenReady().then(() => {
+  session.defaultSession.setPermissionRequestHandler(
+    (_webContents, permission, callback) => {
+      const allowedPermissions = new Set([]);
+
+      callback(allowedPermissions.has(permission));
+    },
+  );
+
   createWindow();
 
   app.on("activate", () => {
