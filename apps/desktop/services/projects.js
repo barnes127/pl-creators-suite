@@ -3,7 +3,16 @@ const fs = require("fs/promises");
 const { spawn } = require("child_process");
 const { PROJECTS_DIR } = require("../storage/paths");
 const { addRecent } = require("./recents");
-const { ensureDir, fileExists, nowIso, appendLog } = require("../util/fs");
+const { ensureDir, fileExists, appendLog } = require("../util/fs");
+const {
+  PROJECT_SCHEME_VERSION,
+  PROJECT_MANIFEST_NAME,
+} = require("./project/contract");
+
+const {
+  readProjectManifest,
+  writeProjectManifest,
+} = require("./project/persistence");
 
 
 function runCmd(cmd, args, cwd) {
@@ -18,6 +27,32 @@ function runCmd(cmd, args, cwd) {
       reject(new Error(`${cmd} ${args.join(" ")} failed (${code}): ${err || out}`));
     });
   });
+}
+
+function validateArchiveEntries(entries) {
+  for (const entry of entries) {
+    const normalizedEntry = entry.trim();
+
+    if (!normalizedEntry) continue;
+
+    const segments = normalizedEntry
+      .replace(/\\/g, "/")
+      .split("/")
+      .filter(Boolean);
+
+    const isAbsolute =
+      normalizedEntry.startsWith("/") ||
+      normalizedEntry.startsWith("\\") ||
+      /^[A-Za-z]:/.test(normalizedEntry);
+
+    const escapesRoot = segments.includes("..");
+
+    if (isAbsolute || escapesRoot) {
+      throw new Error(
+        `Unsafe project archive entry: ${normalizedEntry}`,
+      );
+    }
+  }
 }
 
 /**
@@ -41,15 +76,21 @@ async function projectCreate({ name, baseDir }) {
 
   await ensureDir(projectRoot);
 
+  const createdAt = new Date().toISOString();
+
   const manifest = {
-    schemaVersion: 1,
+    schemaVersion: PROJECT_SCHEMA_VERSION,
     name: safeName,
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
+    createdAt,
+    updatedAt: createdAt,
   };
 
-  const manifestPath = path.join(projectRoot, "pl-project.json");
-  await fs.writeFile(manifestPath, JSON.stringify(manifest, null, 2), "utf8");
+  const manifestPath = path.join(
+    projectRoot,
+    PROJECT_MANIFEST_NAME,
+  );
+
+  await writeProjectManifest(manifestPath, manifest);
 
   await addRecent(projectRoot, manifest);
 
@@ -62,13 +103,27 @@ async function projectCreate({ name, baseDir }) {
 async function projectOpen({ projectRoot }) {
   if (!projectRoot) throw new Error("projectRoot required");
 
-  const manifestPath = path.join(projectRoot, "pl-project.json");
+  const manifestPath = path.join(
+    projectRoot,
+    PROJECT_MANIFEST_NAME,
+  );
+
   if (!(await fileExists(manifestPath))) {
     throw new Error("Invalid project (missing manifest)");
   }
 
-  const raw = await fs.readFile(manifestPath, "utf8");
-  const manifest = JSON.parse(raw);
+  const {
+    manifest,
+    migrated,
+  } = await readProjectManifest(manifestPath);
+
+  if (migrated) {
+    await writeProjectManifest(
+      manifestPath,
+      manifest,
+      { backupExisting: true },
+    );
+  }
 
   await addRecent(projectRoot, manifest);
 
@@ -97,34 +152,110 @@ async function projectImport(params = {}) {
   const filePath = (params.filePath || "").toString().trim();
   const baseDir = (params.baseDir || PROJECTS_DIR).toString();
 
-  if (!filePath) throw new Error("filePath is required");
-  if (!filePath.endsWith(".plproj")) throw new Error("Expected a .plproj file");
+  if (!filePath) {
+    throw new Error("filePath is required");
+  }
+
+  if (!filePath.endsWith(".plproj")) {
+    throw new Error("Expected a .plproj file");
+  }
+
+  if (!(await fileExists(filePath))) {
+    throw new Error(`Project archive does not exist: ${filePath}`);
+  }
 
   await ensureDir(baseDir);
 
-  const baseName = path.basename(filePath).replace(/\.plproj$/i, "");
+  const baseName = path
+    .basename(filePath)
+    .replace(/\.plproj$/i, "");
+
   const folderName =
-    baseName.replace(/[<>:"/\\|?*\x00-\x1F]/g, "").slice(0, 64) || "ImportedProject";
+    baseName
+      .replace(/[<>:"/\\|?*\x00-\x1F]/g, "")
+      .slice(0, 64) || "ImportedProject";
 
   const projectRoot = path.join(baseDir, folderName);
 
   if (await fileExists(projectRoot)) {
-    throw new Error(`Project folder already exists: ${projectRoot}`);
+    throw new Error(
+      `Project folder already exists: ${projectRoot}`,
+    );
   }
 
-  await ensureDir(projectRoot);
-  await runCmd("unzip", [filePath, "-d", projectRoot], process.cwd());
+  const listResult = await runCmd(
+    "unzip",
+    ["-Z1", filePath],
+    process.cwd(),
+  );
 
-  const manifestPath = path.join(projectRoot, "pl-project.json");
-  if (!(await fileExists(manifestPath))) {
-    throw new Error(`Imported project missing manifest`);
+  const archiveEntries = listResult.out.split(/\r?\n/);
+
+  validateArchiveEntries(archiveEntries);
+
+  const stagingRoot = await fs.mkdtemp(
+    path.join(baseDir, ".pl-import-"),
+  );
+
+  let installed = false;
+
+  try {
+    await runCmd(
+      "unzip",
+      ["-q", filePath, "-d", stagingRoot],
+      process.cwd(),
+    );
+
+    const manifestPath = path.join(
+      stagingRoot,
+      PROJECT_MANIFEST_NAME,
+    );
+
+    if (!(await fileExists(manifestPath))) {
+      throw new Error(
+        "Imported project missing manifest",
+      );
+    }
+
+    const {
+      manifest,
+      migrated,
+    } = await readProjectManifest(manifestPath);
+
+    if (migrated) {
+      await writeProjectManifest(
+        manifestPath,
+        manifest,
+        { backupExisting: true },
+      );
+    }
+
+    await fs.rename(stagingRoot, projectRoot);
+
+    installed = true;
+
+    await addRecent(projectRoot, manifest);
+
+    await appendLog(
+      projectRoot,
+      `Imported project from "${filePath}"`,
+    );
+
+    return {
+      projectRoot,
+      manifest,
+    };
+  } finally {
+    if (!installed) {
+      await fs.rm(
+        stagingRoot,
+        {
+          recursive: true,
+          force: true,
+        },
+      );
+    }
   }
-
-  const manifest = JSON.parse(await fs.readFile(manifestPath, "utf8"));
-  await addRecent(projectRoot, manifest);
-  await appendLog(projectRoot, `Imported project from "${filePath}"`);
-
-  return { projectRoot, manifest };
 }
 
 module.exports = {

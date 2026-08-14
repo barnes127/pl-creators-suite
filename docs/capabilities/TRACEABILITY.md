@@ -11,9 +11,9 @@ This report is the Wave 1.1.2 no-omission traceability snapshot for the Official
 
 ### Status
 
-- complete: 24
-- missing: 248
-- partial: 57
+- complete: 26
+- missing: 247
+- partial: 56
 
 ### Milestones
 
@@ -210,11 +210,11 @@ This report is the Wave 1.1.2 no-omission traceability snapshot for the Official
 | PL-CORE-IO-001 | CORE | interchange | missing | v1.2 | core.json | — | — | PL-CORE-TASK-001 |
 | PL-CORE-LINK-001 | CORE | links | missing | v1.9 | core.json | — | — | PL-CORE-ASSET-001<br>PL-CORE-PROJECT-001 |
 | PL-CORE-MEDIA-001 | CORE | media | partial | v1.7 | core.json | — | — | PL-CORE-ASSET-001 |
-| PL-CORE-MIGRATION-001 | CORE | project | missing | v1.1.3 | core.json | — | — | PL-CORE-PROJECT-001 |
+| PL-CORE-MIGRATION-001 | CORE | project | complete | v1.1.3 | core.json | apps/desktop/services/project/migrations.js<br>apps/desktop/services/project/persistence.js<br>apps/desktop/services/project/integrity.js | scripts/project-format-test.js<br>docs/releases/wave-1.1.3-project-format-validation.md | — |
 | PL-CORE-NOTIFY-001 | CORE | notifications | missing | v1.2 | core.json | — | — | PL-CORE-SHELL-001<br>PL-CORE-EVENT-001 |
 | PL-CORE-PERMISSION-001 | CORE | security | partial | v1.10 | core.json | — | — | — |
 | PL-CORE-PHYSICS-001 | CORE | physics | partial | v1.8 | core.json | — | docs/releases/stage-4-physics-simulation-engine-validation.md | — |
-| PL-CORE-PROJECT-001 | CORE | project | partial | v1.1.3 | core.json | docs/PROJECT_FORMAT.md | — | — |
+| PL-CORE-PROJECT-001 | CORE | project | complete | v1.1.3 | core.json | apps/desktop/services/project/contract.js<br>apps/desktop/services/project/schemas.js<br>apps/desktop/services/project/persistence.js<br>apps/desktop/services/project/integrity.js<br>apps/desktop/services/projects.js | scripts/project-format-test.js<br>docs/releases/wave-1.1.3-project-format-validation.md | — |
 | PL-CORE-RENDER-001 | CORE | rendering | partial | v1.7 | core.json | — | — | PL-CORE-TASK-001 |
 | PL-CORE-RPC-001 | CORE | rpc | partial | v1.1.4 | core.json | apps/desktop/backend.js | — | — |
 | PL-CORE-SEARCH-001 | CORE | search | missing | v1.2 | core.json | — | — | PL-CORE-INDEX-001<br>PL-CORE-PROJECT-001 |
@@ -429,8 +429,8 @@ This report is the Wave 1.1.2 no-omission traceability snapshot for the Official
 
 ## Traceability Gaps
 
-- Capabilities without implementation links: 274
-- Capabilities without validation links: 282
+- Capabilities without implementation links: 273
+- Capabilities without validation links: 280
 
 Missing implementation or validation links are expected for future milestone capabilities that have not entered active development yet. They must be populated as those capabilities move into implementation.
 

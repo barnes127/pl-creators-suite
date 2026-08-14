@@ -9,14 +9,21 @@
       "description": "Define and enforce the versioned .plproj project manifest and shared project data contract.",
       "slice": "CORE",
       "area": "project",
-      "status": "partial",
+      "status": "complete",
       "targetMilestone": "v1.1.3",
       "source": "Wave 1.1.3 — Project Format Contract",
       "implementation": [
-        "docs/PROJECT_FORMAT.md"
+        "apps/desktop/services/project/contract.js",
+        "apps/desktop/services/project/schemas.js",
+        "apps/desktop/services/project/persistence.js",
+        "apps/desktop/services/project/integrity.js",
+        "apps/desktop/services/projects.js"
       ],
-      "validation": [],
-      "notes": "Project infrastructure exists, but formal versioning and migration behavior are completed in Wave 1.1.3.",
+      "validation": [
+        "scripts/project-format-test.js",
+        "docs/releases/wave-1.1.3-project-format-validation.md"
+      ],
+      "notes": "Versioned project and subsystem persistence contracts, resource states, corruption detection, checksums, journals, repair entry points, and transactional project import are implemented.",
       "blockedBy": [],
       "deferralReason": null
     },
@@ -26,15 +33,20 @@
       "description": "Safely migrate older supported project and slice schemas with backup and atomic replacement.",
       "slice": "CORE",
       "area": "project",
-      "status": "missing",
+      "status": "complete",
       "targetMilestone": "v1.1.3",
       "source": "Wave 1.1.3 — Project Format Contract",
-      "implementation": [],
-      "validation": [],
-      "notes": null,
-      "blockedBy": [
-        "PL-CORE-PROJECT-001"
+      "implementation": [
+        "apps/desktop/services/project/migrations.js",
+        "apps/desktop/services/project/persistence.js",
+        "apps/desktop/services/project/integrity.js"
       ],
+      "validation": [
+      "scripts/project-format-test.js",
+      "docs/releases/wave-1.1.3-project-format-validation.md"
+      ],
+      "notes": "Migration boundary, future-version rejection, pre-migration backups, atomic replacement, and migration-safe project loading are established. Schema v1 is the current baseline, so no historical v0-to-v1 migration exists.",
+      "blockedBy": [],
       "deferralReason": null
     },
     {
