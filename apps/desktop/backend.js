@@ -5,54 +5,23 @@ const fs = require("fs/promises");
 const DEFAULT_PROJECTS_DIR = path.join(os.homedir(), "PLProjects");
 const RECENTS_DIR = path.join(os.homedir(), ".plcs");
 const RECENTS_PATH = path.join(RECENTS_DIR, "recent-projects.json");
-const { spawn } = require("child_process");
-const { app, dialog } = require("electron");
-const projects = require("./services/projects");
-const dialogs = require("./services/dialogs");
-const plugins = require("./services/plugins/registry");
-const pluginManifest = require("./services/plugins/manifest");
-const pluginDiscovery = require("./services/plugins/discovery");
-const entitlements = require("./services/entitlements");
-const localAi = require("./services/ai/local");
-const appMetadata = require("./services/app/metadata");
-const assets = require("./services/assets");
-const docs = require("./services/docs");
-const code = require("./services/code");
-const sheets = require("./services/sheets");
-const movies = require("./services/movies");
-const models = require("./services/models");
-const games = require("./services/games");
-const workflows = require("./services/workflows");
+const {
+  createRpcMethods,
+  METHOD_POLICIES
+} = require("./rpc/registry");
+const {
+  RpcMethodNotFoundError,
+  RpcTimeoutError,
+  normalizeRpcError,
+  serializeRpcError,
+} = require("./rpc/errors");
 
-
-async function readRecents() {
-  try {
-    const txt = await fs.readFile(RECENTS_PATH, "utf8");
-    const data = JSON.parse(txt);
-    return Array.isArray(data) ? data : [];
-  } catch {
-    return [];
-  }
-}
-
-async function writeRecents(list) {
-  await ensureDir(RECENTS_DIR);
-  await fs.writeFile(RECENTS_PATH, JSON.stringify(list, null, 2), "utf8");
-}
-
-async function addRecent(projectRoot, manifest) {
-  const name = manifest?.name || path.basename(projectRoot);
-  const now = nowIso();
-  const list = await readRecents();
-
-  const next = [
-    { projectRoot, name, lastOpenedAt: now },
-    ...list.filter((x) => x?.projectRoot !== projectRoot),
-  ].slice(0, 10);
-
-  await writeRecents(next);
-  return next;
-}
+const {
+  validateRpcRequest,
+  createCorrelationId,
+  makeRpcSuccess,
+  makeRpcFailure,
+} = require("./rpc/protocol");
 
 async function readJsonFileSafe(filePath, fallback) {
   try {
@@ -92,20 +61,6 @@ function nowIso() {
   return new Date().toISOString();
 }
 
-function runCmd(cmd, args, cwd) {
-  return new Promise((resolve, reject) => {
-    const p = spawn(cmd, args, { cwd, stdio: "pipe" });
-    let out = "";
-    let err = "";
-    p.stdout.on("data", (d) => (out += d.toString()));
-    p.stderr.on("data", (d) => (err += d.toString()));
-    p.on("close", (code) => {
-      if (code === 0) return resolve({ out, err });
-      reject(new Error(`${cmd} ${args.join(" ")} failed (${code}): ${err || out}`));
-    });
-  });
-}
-
 async function appendLog(projectRoot, line) {
   // If no project is open yet, just skip logging to disk.
   if (!projectRoot) return;
@@ -116,126 +71,7 @@ async function appendLog(projectRoot, line) {
   await fs.appendFile(logPath, `[${nowIso()}] ${line}\n`, "utf8");
 }
 
-async function writeManifest(projectRoot, manifest) {
-  const manifestPath = path.join(projectRoot, "pl-project.json");
-  await fs.writeFile(manifestPath, JSON.stringify(manifest, null, 2), "utf8");
-  return manifestPath;
-}
-
-async function readManifest(projectRoot) {
-  const manifestPath = path.join(projectRoot, "pl-project.json");
-  const text = await fs.readFile(manifestPath, "utf8");
-  return JSON.parse(text);
-}
-
 // ---- JSON-RPC Methods ----
-
-async function project_create(params) {
-  const name = (params?.name || "Untitled").toString().trim();
-  const baseDir = (params?.baseDir || DEFAULT_PROJECTS_DIR).toString();
-  const folderName = name.replace(/[<>:"/\\|?*\x00-\x1F]/g, "").slice(0, 64) || "Untitled";
-
-  await ensureDir(baseDir);
-
-  const projectRoot = path.join(baseDir, folderName);
-
-  if (await fileExists(projectRoot)) {
-    // avoid clobbering existing folder
-    throw new Error(`Project folder already exists: ${projectRoot}`);
-  }
-
-  await ensureDir(projectRoot);
-
-  const manifest = {
-    schemaVersion: 1,
-    name,
-    createdAt: nowIso(),
-    updatedAt: nowIso(),
-  };
-
-  const manifestPath = await writeManifest(projectRoot, manifest);
-  await addRecent(projectRoot, manifest);
-  await appendLog(projectRoot, `Created project "${name}"`);
-
-  return { projectRoot, manifestPath, manifest };
-}
-
-async function project_open(params) {
-  const projectRoot = (params?.projectRoot || "").toString();
-  if (!projectRoot) throw new Error("projectRoot is required");
-
-  const manifestPath = path.join(projectRoot, "pl-project.json");
-  if (!(await fileExists(manifestPath))) {
-    throw new Error(`Manifest not found: ${manifestPath}`);
-  }
-
-  const manifest = await readManifest(projectRoot);
-  await addRecent(projectRoot, manifest);
-  await appendLog(projectRoot, `Opened project "${manifest?.name || "Unknown"}"`);
-
-  return { projectRoot, manifestPath, manifest };
-}
-async function project_export(params) {
-  const projectRoot = (params?.projectRoot || "").toString();
-  let outPath = (params?.outPath || "").toString();
-
-  if (!projectRoot) throw new Error("projectRoot is required");
-
-  const manifestPath = path.join(projectRoot, "pl-project.json");
-  if (!(await fileExists(manifestPath))) {
-    throw new Error(`Manifest not found: ${manifestPath}`);
-  }
-
-  if (!outPath) {
-    const folderName = path.basename(projectRoot);
-    outPath = path.join(path.dirname(projectRoot), `${folderName}.plproj`);
-  }
-
-  if (!outPath.endsWith(".plproj")) outPath += ".plproj";
-
-  // Zip project root contents so pl-project.json sits at archive root
-  await runCmd("zip", ["-r", outPath, "."], projectRoot);
-
-  await appendLog(projectRoot, `Exported project to "${outPath}"`);
-  return { outPath };
-}
-async function project_import(params) {
-  const filePath = (params?.filePath || "").toString();
-  const baseDir = (params?.baseDir || DEFAULT_PROJECTS_DIR).toString();
-
-  if (!filePath) throw new Error("filePath is required");
-  if (!filePath.endsWith(".plproj")) throw new Error("Expected a .plproj file");
-
-  await ensureDir(baseDir);
-
-  const baseName = path.basename(filePath).replace(/\.plproj$/i, "");
-  const folderName =
-    baseName.replace(/[<>:"/\\|?*\x00-\x1F]/g, "").slice(0, 64) || "ImportedProject";
-
-  const projectRoot = path.join(baseDir, folderName);
-
-  if (await fileExists(projectRoot)) {
-    throw new Error(`Project folder already exists: ${projectRoot}`);
-  }
-
-  await ensureDir(projectRoot);
-
-  // Unzip archive into projectRoot
-  await runCmd("unzip", [filePath, "-d", projectRoot], process.cwd());
-
-  const manifestPath = path.join(projectRoot, "pl-project.json");
-  if (!(await fileExists(manifestPath))) {
-    throw new Error(`Imported project missing manifest: ${manifestPath}`);
-  }
-
-  const manifestRaw = await fs.readFile(manifestPath, "utf-8");
-  const manifest = JSON.parse(manifestRaw);
-
-  await addRecent(projectRoot, manifest);
-  await appendLog(projectRoot, `Imported project from "${filePath}"`);
-
-  return { projectRoot, manifest };
-}
 
 async function logs_export(params) {
   const projectRoot = (params?.projectRoot || "").toString();
@@ -243,7 +79,7 @@ async function logs_export(params) {
 
   const logPath = path.join(projectRoot, "logs", "session.log");
   if (!(await fileExists(logPath))) {
-    // Create an empty log file if missing
+    //Create an empty log file if missing
     await appendLog(projectRoot, "Log initialized");
   }
 
@@ -353,223 +189,114 @@ async function recent_add(params) {
   return { items };
 }
 
-async function dialog_open_plproj() {
-  const result = await dialog.showOpenDialog({
-    title: "Import Project (.plproj)",
-    properties: ["openFile"],
-    filters: [{ name: "PL Project", extensions: ["plproj"] }],
+const METHODS =
+  createRpcMethods({
+    logsExport: logs_export,
+    recentList: recent_list,
+    recentAdd: recent_add,
   });
 
-  if (result.canceled || !result.filePaths?.length) {
-    return { canceled: true };
+async function executeRpcMethod(method, params) {
+  const fn = METHODS[method];
+
+  if (!fn) {
+    throw new RpcMethodNotFoundError(method);
   }
 
-  return { canceled: false, filePath: result.filePaths[0] };
-}
+  const policy = METHOD_POLICIES[method] || null;
 
-const METHODS = {
-  "project.create": projects.projectCreate,
-  "project.open": projects.projectOpen,
-  "logs.export": logs_export,
-  "recent.list": recent_list,
-  "recent.add": recent_add,
-  "project.export": projects.projectExport,
-  "project.import": projects.projectImport,
-  "assets.import": async (params) => {
-    return assets.importAsset(params);
-  },
-  "assets.register": async (params) => {
-    return assets.registerAsset(params);
-  },
-  "assets.ensure": async (params) => {
-    return assets.ensureAssetStorage(params?.projectRoot);
-  },
-  "assets.list": async (params) => {
-    return assets.listAssets(params);
-  },
-  "app.metadata": async () => {
-    return { metadata: await appMetadata.getAppMetadata() };
-  },
-  "ai.local.status": async () => {
-    return { status: await localAi.getLocalAiStatus() };
-  },
-  "ai.local.chat": async (params) => {
-    return localAi.chat(params);
-  },
-  "entitlements.flags": async () => {
-    return { flags: await entitlements.getFeatureFlags() };
-  },
-  "plugins.setEnabled": async (params) => {
-    const plugin = await plugins.setPluginEnabled(params?.pluginId, params?.enabled);
-    return { plugin, plugins: await plugins.listPlugins() };
-  },
-  "plugins.refreshDiscovered": async () => {
-    const repoRoot = path.resolve(__dirname, "../..");
-    return pluginDiscovery.refreshDiscoveredPlugins(repoRoot);
-  },
-  "plugins.validateManifest": async (params) => {
-    return pluginManifest.validateManifest(params?.manifest);
-  },
-  "dialog.openProjectFolder": async () => {
-  const folder = await dialogs.openProjectFolder();
-  if (!folder) return { canceled: true };
-  return { canceled: false, projectRoot: folder };
-  },
-  "dialog.openPlproj": async () => {
-    const file = await dialogs.openPlprojFile();
-    if (!file) return { canceled: true };
-    return { canceled: false, filePath: file };
-  },
-  "dialog.savePlproj": async (params) => {
-    const name = params?.defaultName || "project.plproj";
-    const file = await dialogs.savePlprojFile(name);
-    if (!file) return { canceled: true };
-    return { canceled: false, filePath: file };
-  },
-  "dialog.openAssetFile": async () => {
-    const file = await dialogs.openAssetFile();
-    if (!file) return { canceled: true };
-    return { canceled: false, filePath: file };
-  },
-  "plugins.list": async () => {
-    return { plugins: await plugins.listPlugins() };
-  },
-  "assets.detectType": async (params) => {
-    return {
-      type: assets.detectAssetType(params?.filePath),
-    };
-  },
-  "docs.ensure": async (params) => {
-    return docs.ensureDocsStorage(params?.projectRoot);
-  },
-  "docs.list": async (params) => {
-    return docs.listDocs(params);
-  },
-  "docs.create": async (params) => {
-    return docs.createDoc(params);
-  },
-  "docs.read": async (params) => {
-    return docs.readDoc(params);
-  },
-  "docs.save": async (params) => {
-    return docs.saveDoc(params);
-  },
-  "code.ensure": async (params) => {
-    return code.ensureCodeStorage(params?.projectRoot);
-  },
-  "code.list": async (params) => {
-    return code.listCodeFiles(params);
-  },
-  "code.create": async (params) => {
-    return code.createCodeFile(params);
-  },
-  "code.read": async (params) => {
-    return code.readCodeFile(params);
-  },
-  "code.save": async (params) => {
-    return code.saveCodeFile(params);
-  },
-  "sheets.ensure": async (params) => {
-    return sheets.ensureSheetsStorage(params?.projectRoot);
-  },
-  "sheets.list": async (params) => {
-    return sheets.listSheets(params);
-  },
-  "sheets.create": async (params) => {
-    return sheets.createSheet(params);
-  },
-  "sheets.read": async (params) => {
-    return sheets.readSheet(params);
-  },
-  "sheets.save": async (params) => {
-    return sheets.saveSheet(params);
-  },
-  "movies.ensure": async (params) => {
-    return movies.ensureMoviesStorage(params?.projectRoot);
-  },
-  "movies.list": async (params) => {
-    return movies.listMovies(params);
-  },
-  "movies.create": async (params) => {
-    return movies.createMovie(params);
-  },
-  "movies.read": async (params) => {
-    return movies.readMovie(params);
-  },
-  "movies.save": async (params) => {
-    return movies.saveMovie(params);
-  },
-  "models.ensure": async (params) => {
-    return models.ensureModelsStorage(params?.projectRoot);
-  },
-  "models.list": async (params) => {
-    return models.listModels(params);
-  },
-  "models.create": async (params) => {
-    return models.createModel(params);
-  },
-  "models.read": async (params) => {
-    return models.readModel(params);
-  },
-  "models.save": async (params) => {
-    return models.saveModel(params);
-  },
-  "games.ensure": async (params) => {
-    return games.ensureGamesStorage(params?.projectRoot);
-  },
-  "games.list": async (params) => {
-    return games.listGames(params);
-  },
-  "games.create": async (params) => {
-    return games.createGame(params);
-  },
-  "games.read": async (params) => {
-    return games.readGame(params);
-  },
-  "games.save": async (params) => {
-    return games.saveGame(params);
-  },
-  "workflows.ensure": async (params) => {
-    return workflows.ensureWorkflowsStorage(params?.projectRoot);
-  },
-  "workflows.list": async (params) => {
-    return workflows.listWorkflows(params);
-  },
-  "workflows.create": async (params) => {
-    return workflows.createWorkflow(params);
-  },
-  "workflows.read": async (params) => {
-    return workflows.readWorkflow(params);
-  },
-  "workflows.save": async (params) => {
-    return workflows.saveWorkflow(params);
-  },
-  "workflows.delete": async (params) => {
-    return workflows.deleteWorkflow(params);
-  },
-};
-
-function makeJsonRpcResponse(id, result, error) {
-  if (error) {
-    return {
-      jsonrpc: "2.0",
-      id: id ?? null,
-      error: { code: -32000, message: error.message || String(error) },
-    };
+  if (
+    !policy ||
+    !Number.isInteger(policy.timeoutMs) ||
+    policy.timeoutMs <= 0
+  ) {
+    return fn(params);
   }
-  return { jsonrpc: "2.0", id: id ?? null, result };
+
+  let timeoutId;
+
+  try {
+    return await Promise.race([
+      fn(params),
+
+      new Promise((_, reject) => {
+        timeoutId = setTimeout(() => {
+          reject(
+            new RpcTimeoutError(
+              method,
+              policy.timeoutMs,
+            ),
+          );
+        }, policy.timeoutMs);
+      }),
+    ]);
+  } finally {
+    if (timeoutId) {
+      clearTimeout(timeoutId);
+    }
+  }
 }
 
-function startRpcServer({ port }) {
+function startRpcServer({
+  port,
+  sessionToken,
+ }) {
+
+  if (
+    typeof sessionToken !== "string" ||
+    sessionToken.length < 32
+  ) {
+    throw new Error(
+      "RPC server requires a valid session token",
+    );
+  }
+
   const server = http.createServer(async (req, res) => {
     // CORS for renderer fetch()
-    res.setHeader("Access-Control-Allow-Origin", "*");
+  const origin =
+    req.headers.origin;
+
+  const allowedOrigins =
+    new Set([
+      "http://localhost:5173",
+      "null",
+    ]);
+
+  if (
+    origin &&
+    allowedOrigins.has(origin)
+  ) {
+    res.setHeader(
+      "Access-Control-Allow-Origin",
+      origin,
+    );
+  }
     res.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS");
-    res.setHeader("Access-Control-Allow-Headers", "content-type");
+    res.setHeader("Access-Control-Allow-Headers", "content-type, x-pl-rpc-token");
 
     if (req.method === "OPTIONS") {
       res.writeHead(204);
       res.end();
+      return;
+    }
+
+    const suppliedToken =
+      req.headers["x-pl-rpc-token"];
+
+    if (
+      typeof suppliedToken !== "string" ||
+      suppliedToken !== sessionToken
+    ) {
+      res.writeHead(403, {
+        "Content-Type": "application/json",
+      });
+
+      res.end(
+        JSON.stringify({
+          error: "Forbidden",
+        }),
+      );
+
       return;
     }
 
@@ -580,31 +307,100 @@ function startRpcServer({ port }) {
     }
 
     let body = "";
-    req.on("data", (chunk) => (body += chunk));
-    req.on("end", async () => {
-      try {
-        const msg = JSON.parse(body || "{}");
-        const { id, method, params } = msg;
+    let bodyTooLarge = false;
 
-        const fn = METHODS[method];
-        if (!fn) throw new Error(`Unknown method: ${method}`);
+    req.on("data", (chunk) => {
+      if (bodyTooLarge) return;
 
-        const result = await fn(params);
-        const payload = makeJsonRpcResponse(id, result, null);
+      body += chunk;
 
-        res.writeHead(200, { "Content-Type": "application/json" });
-        res.end(JSON.stringify(payload));
-      } catch (err) {
-        console.error("RPC request failed:", err);
+      if (
+        Buffer.byteLength(
+          body,
+          "utf8",
+        ) > 1024 * 1024
+      ) {
+        bodyTooLarge = true;
 
-        const payload = makeJsonRpcResponse(
-          null,
-          null,
-          new Error("Internal RPC error"),
+        res.writeHead(413, {
+          "Content-Type": "application/json",
+        });
+
+        res.end(
+          JSON.stringify({
+            error: "Request Too Large",
+          }),
         );
 
-        res.writeHead(200, { "Content-Type": "application/json" });
-        res.end(JSON.stringify(payload));
+        req.destroy();
+      }
+    });
+    req.on("end", async () => {
+      if (bodyTooLarge) {
+        return;
+      }
+      let requestId = null;
+      const correlationId =
+        createCorrelationId();
+
+      try {
+        const parsed =
+          JSON.parse(body || "{}");
+
+        const request =
+          validateRpcRequest(parsed);
+
+        requestId = request.id;
+
+        console.log(
+          `[RPC ${correlationId}] ${request.method}`,
+        );
+
+        const result =
+          await executeRpcMethod(
+            request.method,
+            request.params,
+          );
+
+        const payload =
+          makeRpcSuccess(
+            request.id,
+            result,
+            correlationId,
+          );
+
+        res.writeHead(200, {
+          "Content-Type": "application/json",
+        });
+
+        res.end(
+          JSON.stringify(payload),
+        );
+      } catch (error) {
+        const normalized =
+          normalizeRpcError(error);
+
+        console.error(
+          `[RPC ${correlationId}] request failed:`,
+          error,
+        );
+
+        const payload =
+          makeRpcFailure(
+            requestId,
+            serializeRpcError(
+              normalized,
+            ),
+            correlationId,
+          );
+
+        res.writeHead(200, {
+          "Content-Type": "application/json",
+        });
+
+        res.end(
+          JSON.stringify(payload),
+        );
       }
     });
   });

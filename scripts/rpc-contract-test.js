@@ -1,0 +1,334 @@
+const assert = require("assert");
+
+const {
+  RpcError,
+  RpcInvalidRequestError,
+  RpcMethodNotFoundError,
+  RpcTimeoutError,
+  normalizeRpcError,
+  serializeRpcError,
+} = require("../apps/desktop/rpc/errors");
+
+const {
+  validateRpcRequest,
+  createCorrelationId,
+  makeRpcSuccess,
+  makeRpcFailure,
+} = require("../apps/desktop/rpc/protocol");
+
+let passed = 0;
+let failed = 0;
+
+function isValidSessionToken(token) {
+  return (
+    typeof token === "string" &&
+    token.length >= 32
+  );
+}
+
+async function test(name, fn) {
+  try {
+    await fn();
+    passed += 1;
+    console.log(`PASS    ${name}`);
+  } catch (error) {
+    failed += 1;
+    console.error(`FAIL    ${name}`);
+    console.error(`        ${error.message}`);
+  }
+}
+
+async function main() {
+  console.log(
+    "\nPL Creators Suite — RPC Contract Test\n",
+  );
+
+  await test(
+    "valid RPC request normalizes",
+    async () => {
+      const result = validateRpcRequest({
+        jsonrpc: "2.0",
+        id: 1,
+        method: "project.open",
+        params: {
+          projectRoot: "/tmp/test",
+        },
+      });
+
+      assert.strictEqual(
+        result.method,
+        "project.open",
+      );
+
+      assert.deepStrictEqual(
+        result.params,
+        {
+          projectRoot: "/tmp/test",
+        },
+      );
+    },
+  );
+
+  await test(
+    "missing method is rejected",
+    async () => {
+      assert.throws(
+        () =>
+          validateRpcRequest({
+            jsonrpc: "2.0",
+          }),
+        RpcInvalidRequestError,
+      );
+    },
+  );
+
+  await test(
+    "invalid params are rejected",
+    async () => {
+      assert.throws(
+        () =>
+          validateRpcRequest({
+            jsonrpc: "2.0",
+            method: "project.open",
+            params: "bad",
+          }),
+        RpcInvalidRequestError,
+      );
+    },
+  );
+
+  await test(
+    "correlation IDs are generated",
+    async () => {
+      const a =
+        createCorrelationId();
+
+      const b =
+        createCorrelationId();
+
+      assert.ok(a);
+      assert.ok(b);
+      assert.notStrictEqual(a, b);
+    },
+  );
+
+  await test(
+    "success response includes correlation ID",
+    async () => {
+      const result =
+        makeRpcSuccess(
+          4,
+          {
+            ok: true,
+          },
+          "test-id",
+        );
+
+      assert.strictEqual(
+        result.jsonrpc,
+        "2.0",
+      );
+
+      assert.strictEqual(
+        result.meta.correlationId,
+        "test-id",
+      );
+    },
+  );
+
+  await test(
+    "known RPC error preserves public type",
+    async () => {
+      const error =
+        new RpcMethodNotFoundError(
+          "fake.method",
+        );
+
+      const serialized =
+        serializeRpcError(error);
+
+      assert.strictEqual(
+        serialized.code,
+        -32601,
+      );
+
+      assert.strictEqual(
+        serialized.data.type,
+        "METHOD_NOT_FOUND",
+      );
+    },
+  );
+
+  await test(
+    "unexpected errors are sanitized",
+    async () => {
+      const original =
+        new Error(
+          "secret internal filesystem detail",
+        );
+
+      const normalized =
+        normalizeRpcError(original);
+
+      assert.ok(
+        normalized instanceof RpcError,
+      );
+
+      assert.strictEqual(
+        normalized.message,
+        "Internal RPC error",
+      );
+
+      const serialized =
+        serializeRpcError(original);
+
+      assert.strictEqual(
+        serialized.message,
+        "Internal RPC error",
+      );
+
+      assert.strictEqual(
+        serialized.data.type,
+        "INTERNAL_ERROR",
+      );
+    },
+  );
+
+  await test(
+    "timeout error is marked retryable",
+    async () => {
+      const error =
+        new RpcTimeoutError(
+          "assets.import",
+          30000,
+        );
+
+      const serialized =
+        serializeRpcError(error);
+
+      assert.strictEqual(
+        serialized.data.type,
+        "TIMEOUT",
+      );
+
+      assert.strictEqual(
+        serialized.data.retryable,
+        true,
+      );
+    },
+  );
+
+  await test(
+    "failure response preserves request ID",
+    async () => {
+      const error =
+        serializeRpcError(
+          new RpcMethodNotFoundError(
+            "fake.method",
+          ),
+        );
+
+      const result =
+        makeRpcFailure(
+          27,
+          error,
+          "failure-id",
+        );
+
+      assert.strictEqual(
+        result.id,
+        27,
+      );
+
+      assert.strictEqual(
+        result.meta.correlationId,
+        "failure-id",
+      );
+    },
+  );
+
+  await test(
+    "invalid JSON-RPC version is rejected",
+    async () => {
+      assert.throws(
+        () =>
+          validateRpcRequest({
+            jsonrpc: "1.0",
+            method: "project.open",
+          }),
+        RpcInvalidRequestError,
+      );
+    },
+  );
+
+  await test(
+    "serialized internal error exposes no original message",
+    async () => {
+      const serialized =
+        serializeRpcError(
+          new Error(
+            "/home/brandenbarnes/private/secret.txt",
+          ),
+        );
+
+      assert.strictEqual(
+        serialized.message,
+        "Internal RPC error",
+      );
+
+      assert.strictEqual(
+        JSON.stringify(
+          serialized,
+        ).includes(
+          "secret.txt",
+        ),
+        false,
+      );
+    },
+  );
+
+  await test(
+    "RPC session token contract rejects missing token",
+    async () => {
+      assert.strictEqual(
+        isValidSessionToken(undefined),
+        false,
+      );
+    },
+  );
+
+  await test(
+    "RPC session token contract rejects short token",
+    async () => {
+      assert.strictEqual(
+        isValidSessionToken("short"),
+        false,
+      );
+    },
+  );
+
+  await test(
+    "RPC session token contract accepts strong token",
+    async () => {
+      assert.strictEqual(
+        isValidSessionToken(
+          "a".repeat(64),
+        ),
+        true,
+      );
+    },
+  );
+
+  console.log(
+    `\nRPC contract test complete: ${passed} passed, ${failed} failed.`,
+  );
+
+  if (failed > 0) {
+    process.exitCode = 1;
+  }
+}
+
+main().catch((error) => {
+  console.error(error);
+  process.exitCode = 1;
+});

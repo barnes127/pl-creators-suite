@@ -5,7 +5,7 @@ const { PROJECTS_DIR } = require("../storage/paths");
 const { addRecent } = require("./recents");
 const { ensureDir, fileExists, appendLog } = require("../util/fs");
 const {
-  PROJECT_SCHEME_VERSION,
+  PROJECT_SCHEMA_VERSION,
   PROJECT_MANIFEST_NAME,
 } = require("./project/contract");
 

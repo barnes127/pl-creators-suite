@@ -43,6 +43,7 @@
     "capabilities:validate": "node scripts/capabilities/validate-registry.js",
     "capabilities:report": "node scripts/capabilities/report-registry.js",
     "test:projects": "node scripts/project-format-test.js",
+    "test:rpc" : "node scripts/rpc-contract-test.js",
     "dev": "pnpm -r dev",
     "build:renderer": "pnpm --filter renderer build",
     "package:linux": "pnpm build:renderer && electron-builder --linux AppImage --config electron-builder.yml",

@@ -3,12 +3,20 @@ const { app, BrowserWindow, session } = require("electron");
 const { startRpcServer } = require("./backend");
 const { loadWindowState, saveWindowState } = require("./storage/windowState");
 const { createAppMenu } = require("./services/menu");
+const crypto = require("crypto");
 
 let rpcPort = 38741;
+let rpcSesionToken = null;
 
 async function createWindow() {
   // Start JSON-RPC server first
-  const { port } = await startRpcServer({ port: rpcPort });
+  rpcSessionToken = crypto.randomBytes(32).toString("hex");
+
+  const { port } = await startRpcServer({
+    port: rpcPort,
+    sessionToken: rpcSessionToken,
+  });
+
   rpcPort = port;
 
  const state = await loadWindowState();
@@ -55,10 +63,17 @@ win.on("close", async () => {
   // Pass port to renderer via query param (dev)
   if (app.isPackaged) {
     win.loadFile(path.join(app.getAppPath(), "apps/renderer/dist/index.html"), {
-      query: { rpcPort: String(rpcPort) },
+      query: {
+        rpcPort: String(rpcPort),
+        rpcToken: rpcSessionToken,
+      },
     });
   } else {
-    win.loadURL(`http://localhost:5173?rpcPort=${rpcPort}`);
+    win.loadURL(
+      `http://localhost:5173?rpcPort=${rpcPort}&rpcToken=${encodeURIComponent(
+        rpcSessionToken,
+      )}`
+    );
   }
   }
 
