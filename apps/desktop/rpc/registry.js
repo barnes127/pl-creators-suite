@@ -53,8 +53,15 @@ function createRpcMethods({
   logsExport,
   recentList,
   recentAdd,
+  cancelRequest,
 }) {
   return Object.freeze({
+    "rpc.cancel":
+      async (params) =>
+        cancelRequest(
+          params?.requestId,
+        ),
+
     "project.create":
       projects.projectCreate,
 
@@ -117,8 +124,8 @@ function createRpcMethods({
       }),
 
     "ai.local.chat":
-      async (params) =>
-        localAi.chat(params),
+      async (params, context) =>
+        localAi.chat(params, context),
 
     "entitlements.flags":
       async () => ({
@@ -422,6 +429,10 @@ const METHOD_POLICIES =
 
     "ai.local.status": {
       timeoutMs: 5000,
+    },
+
+    "ai.local.chat": {
+      timeoutMs: 125000,
     },
 
     "entitlements.flags": {

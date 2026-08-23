@@ -10,6 +10,16 @@ const {
 } = require("../apps/desktop/rpc/errors");
 
 const {
+  METHOD_CONTRACTS,
+  getMethodContract,
+  validateMethodParams,
+  derivePermissions,
+  assertMethodContractCoverage,
+} = require(
+  "../apps/desktop/rpc/contracts",
+);
+
+const {
   validateRpcRequest,
   createCorrelationId,
   makeRpcSuccess,
@@ -315,6 +325,386 @@ async function main() {
           "a".repeat(64),
         ),
         true,
+      );
+    },
+  );
+
+  await test(
+    "project.open rejects missing projectRoot",
+    () => {
+      assert.throws(
+        () =>
+          validateMethodParams(
+            "project.open",
+            {},
+          ),
+        /projectRoot/,
+      );
+    },
+  );
+
+  await test(
+    "project.open accepts projectRoot",
+    () => {
+      const params =
+        validateMethodParams(
+          "project.open",
+          {
+            projectRoot:
+              "/tmp/example",
+          },
+        );
+
+      assert.equal(
+        params.projectRoot,
+        "/tmp/example",
+      );
+    },
+  );
+
+  await test(
+    "read-only method is marked retryable",
+    () => {
+      const contract =
+        getMethodContract(
+          "docs.list",
+        );
+
+      assert.equal(
+        contract.mutates,
+        false,
+      );
+
+      assert.equal(
+        contract.retryable,
+        true,
+      );
+    },
+  );
+
+  await test(
+    "mutation method is not retryable",
+    () => {
+      const contract =
+        getMethodContract(
+          "docs.save",
+        );
+
+      assert.equal(
+        contract.mutates,
+        true,
+      );
+
+      assert.equal(
+        contract.retryable,
+        false,
+      );
+    },
+  );
+
+  await test(
+    "project export declares shell boundary",
+    () => {
+      const contract =
+        getMethodContract(
+          "project.export",
+        );
+
+      assert.ok(
+        contract.trust.includes(
+          "shell",
+        ),
+      );
+    },
+  );
+
+  await test(
+    "local AI declares network boundary",
+    () => {
+      const contract =
+        getMethodContract(
+          "ai.local.chat",
+        );
+
+      assert.ok(
+        contract.trust.includes(
+          "network",
+        ),
+      );
+
+      assert.ok(
+        contract.trust.includes(
+          "ai",
+        ),
+      );
+    },
+  );
+
+  await test(
+    "all active contract entries total 61",
+    () => {
+      assert.equal(
+        Object.keys(
+          METHOD_CONTRACTS,
+        ).length,
+        61,
+      );
+    },
+  );
+
+
+  await test(
+    "every RPC contract has a validator",
+    () => {
+      for (
+        const contract
+        of Object.values(
+          METHOD_CONTRACTS,
+        )
+      ) {
+        assert.equal(
+          typeof contract.validate,
+          "function",
+        );
+      }
+    },
+  );
+
+
+  await test(
+    "mutating RPC methods are not retryable",
+    () => {
+      for (
+        const [
+          method,
+          contract,
+        ]
+        of Object.entries(
+          METHOD_CONTRACTS,
+        )
+      ) {
+        if (contract.mutates) {
+          assert.equal(
+            contract.retryable,
+            false,
+            `${method} must not be automatically retryable`,
+          );
+        }
+      }
+    },
+  );
+
+
+  await test(
+    "logs.export requires projectRoot",
+    () => {
+      assert.throws(
+        () =>
+          validateMethodParams(
+            "logs.export",
+            {},
+          ),
+        /projectRoot/,
+      );
+    },
+  );
+
+
+  await test(
+    "AI chat requires prompt",
+    () => {
+      assert.throws(
+        () =>
+          validateMethodParams(
+            "ai.local.chat",
+            {},
+          ),
+        /prompt/,
+      );
+    },
+  );
+
+
+  await test(
+    "AI project context requires projectRoot",
+    () => {
+      assert.throws(
+        () =>
+          validateMethodParams(
+            "ai.local.chat",
+            {
+              prompt: "hello",
+              allowProjectContext:
+                true,
+            },
+          ),
+        /projectRoot/,
+      );
+    },
+  );
+
+
+  await test(
+    "asset import requires sourcePath",
+    () => {
+      assert.throws(
+        () =>
+          validateMethodParams(
+            "assets.import",
+            {
+              projectRoot:
+                "/tmp/project",
+            },
+          ),
+        /sourcePath/,
+      );
+    },
+  );
+
+
+  await test(
+    "sheet save requires structured sheet payload",
+    () => {
+      assert.throws(
+        () =>
+          validateMethodParams(
+            "sheets.save",
+            {
+              projectRoot:
+                "/tmp/project",
+              name:
+                "sheet-one",
+            },
+          ),
+        /sheet/,
+      );
+    },
+  );
+
+
+  await test(
+    "workflow save requires workflow payload",
+    () => {
+      assert.throws(
+        () =>
+          validateMethodParams(
+            "workflows.save",
+            {
+              projectRoot:
+                "/tmp/project",
+              name:
+                "workflow-one",
+            },
+          ),
+        /workflow/,
+      );
+    },
+  );
+
+
+  await test(
+    "registry coverage detects an uncontracted method",
+    () => {
+      const methods = {};
+
+      for (
+        const method
+        of Object.keys(
+          METHOD_CONTRACTS,
+        )
+      ) {
+        methods[method] =
+          () => {};
+      }
+
+      methods[
+        "unregistered.test"
+      ] = () => {};
+
+      assert.throws(
+        () =>
+          assertMethodContractCoverage(
+            methods,
+          ),
+        /Missing contracts/,
+      );
+    },
+  );
+
+  await test(
+    "RPC cancel method has contract",
+    () => {
+      const contract =
+        getMethodContract(
+          "rpc.cancel",
+        );
+
+      assert.ok(contract);
+    },
+  );
+
+
+  await test(
+    "local AI chat supports cancellation",
+    () => {
+      const contract =
+        getMethodContract(
+          "ai.local.chat",
+        );
+
+      assert.equal(
+        contract
+          .supportsCancellation,
+        true,
+      );
+    },
+  );
+
+
+  await test(
+    "filesystem mutation does not support implicit cancellation",
+    () => {
+      const contract =
+        getMethodContract(
+          "docs.save",
+        );
+
+      assert.equal(
+        contract
+          .supportsCancellation,
+        false,
+      );
+    },
+  );
+
+
+  await test(
+    "retryable methods receive bounded attempts",
+    () => {
+      const contract =
+        getMethodContract(
+          "docs.list",
+        );
+
+      assert.equal(
+        contract.maxAttempts,
+        2,
+      );
+    },
+  );
+
+
+  await test(
+    "mutating methods receive one attempt",
+    () => {
+      const contract =
+        getMethodContract(
+          "docs.save",
+        );
+
+      assert.equal(
+        contract.maxAttempts,
+        1,
       );
     },
   );

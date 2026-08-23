@@ -11,10 +11,22 @@ const {
 } = require("./rpc/registry");
 const {
   RpcMethodNotFoundError,
-  RpcTimeoutError,
   normalizeRpcError,
   serializeRpcError,
 } = require("./rpc/errors");
+
+const {
+  createRpcExecutionManager,
+} = require(
+  "./rpc/execution",
+);
+
+const {
+  validateMethodParams,
+  assertMethodContractCoverage,
+} = require(
+  "./rpc/contracts",
+);
 
 const {
   validateRpcRequest,
@@ -189,53 +201,56 @@ async function recent_add(params) {
   return { items };
 }
 
+let rpcExecutionManager =
+  null;
+
 const METHODS =
   createRpcMethods({
     logsExport: logs_export,
     recentList: recent_list,
     recentAdd: recent_add,
+    cancelRequest: (requestId) => {
+      if (!rpcExecutionManager) {
+        return {
+          cancelled: false,
+          requestId,
+          reason: "RPC execution manager is not ready.",
+        };
+      }
+
+      return (rpcExecutionManager.cancel(requestId));
+    },
   });
 
-async function executeRpcMethod(method, params) {
-  const fn = METHODS[method];
+  assertMethodContractCoverage(
+    METHODS,
+  );
 
-  if (!fn) {
-    throw new RpcMethodNotFoundError(method);
-  }
+rpcExecutionManager =
+  createRpcExecutionManager({
+    methods:
+      METHODS,
 
-  const policy = METHOD_POLICIES[method] || null;
+    policies:
+      METHOD_POLICIES,
 
-  if (
-    !policy ||
-    !Number.isInteger(policy.timeoutMs) ||
-    policy.timeoutMs <= 0
-  ) {
-    return fn(params);
-  }
+    onProgress:
+      ({
+        correlationId,
+        method,
+        progress,
+      }) => {
+        const percent =
+          progress.percent ===
+          null
+            ? ""
+            : ` ${progress.percent}%`;
 
-  let timeoutId;
-
-  try {
-    return await Promise.race([
-      fn(params),
-
-      new Promise((_, reject) => {
-        timeoutId = setTimeout(() => {
-          reject(
-            new RpcTimeoutError(
-              method,
-              policy.timeoutMs,
-            ),
-          );
-        }, policy.timeoutMs);
-      }),
-    ]);
-  } finally {
-    if (timeoutId) {
-      clearTimeout(timeoutId);
-    }
-  }
-}
+        console.log(
+          `[RPC ${correlationId}] ${method} progress: ${progress.phase}${percent}${progress.message ? ` - ${progress.message}` : ""}`,
+        );
+      },
+  });
 
 function startRpcServer({
   port,
@@ -356,16 +371,33 @@ function startRpcServer({
           `[RPC ${correlationId}] ${request.method}`,
         );
 
-        const result =
-          await executeRpcMethod(
-            request.method,
-            request.params,
-          );
+       if (
+         typeof METHODS[
+           request.method
+         ] !== "function"
+       ) {
+         throw new RpcMethodNotFoundError(
+           request.method,
+         );
+       }
+
+        const execution =
+          await rpcExecutionManager
+            .execute({
+              requestId:
+                request.id,
+
+              method: request.method,
+
+              rawParams: request.params,
+
+              correlationId,
+            });
 
         const payload =
           makeRpcSuccess(
             request.id,
-            result,
+            execution.result,
             correlationId,
           );
 

@@ -3,7 +3,7 @@ const http = require("http");
 const OLLAMA_HOST = "127.0.0.1";
 const OLLAMA_PORT = 11434;
 
-function requestJson({ hostname, port, path, method = "GET", body = null, timeoutMs = 1500 }) {
+function requestJson({ hostname, port, path, method = "GET", body = null, timeoutMs = 1500, signal = null }) {
   return new Promise((resolve, reject) => {
     const payload = body ? JSON.stringify(body) : null;
 
@@ -29,6 +29,15 @@ function requestJson({ hostname, port, path, method = "GET", body = null, timeou
         });
 
         res.on("end", () => {
+          if (
+            signal &&
+            abortHandler
+          ) {
+            signal.removeEventListener(
+              "abort",
+              abortHandler,
+            );
+          }
           try {
             const parsed = raw ? JSON.parse(raw) : null;
             resolve({ ok: res.statusCode >= 200 && res.statusCode < 300, statusCode: res.statusCode, data: parsed });
@@ -39,11 +48,50 @@ function requestJson({ hostname, port, path, method = "GET", body = null, timeou
       }
     );
 
+    let abortHandler = null;
+
+    if (signal) {
+      abortHandler = () => {
+        req.destroy(
+          new Error(
+            "Request cancelled",
+          ),
+        );
+      };
+
+      if (signal.aborted) {
+        abortHandler();
+      } else {
+        signal.addEventListener(
+          "abort",
+          abortHandler,
+          {
+            once: true,
+          },
+        );
+      }
+    }
+
     req.on("timeout", () => {
       req.destroy(new Error("Request timed out"));
     });
 
-    req.on("error", reject);
+    req.on(
+      "error",
+      (error) => {
+        if (
+          signal &&
+          abortHandler
+        ) {
+          signal.removeEventListener(
+            "abort",
+            abortHandler,
+          );
+        }
+
+        reject(error);
+      },
+    );
 
     if (payload) req.write(payload);
     req.end();
@@ -99,7 +147,9 @@ async function getLocalAiStatus() {
   };
 }
 
-async function chat(params) {
+async function chat(params, context = {}) {
+  const signal = context?.signal || null;
+  const reportProgress = typeof context ?.reportProgress === "function" ? context.reportProgress : () => {};
   const prompt = String(params?.prompt || "").trim();
   const requestedModel = String(params?.model || "").trim();
   const allowProjectContext = Boolean(params?.allowProjectContext);
@@ -108,6 +158,14 @@ async function chat(params) {
   if (!prompt) {
     throw new Error("prompt is required");
   }
+
+  reportProgress({
+    phase:
+      "checking-provider",
+    percent: 10,
+    message:
+      "Checking local AI provider.",
+  });
 
   const status = await getLocalAiStatus();
 
@@ -136,11 +194,20 @@ async function chat(params) {
       ? `Project context is allowed for this request.\nProject root: ${projectRoot}\n\nUser prompt:\n${prompt}`
       : prompt;
 
+  reportProgress({
+    phase:
+      "generating",
+    percent: 30,
+    message:
+      "Generating local AI response.",
+  });
+
   const result = await requestJson({
     hostname: OLLAMA_HOST,
     port: OLLAMA_PORT,
     path: "/api/generate",
     method: "POST",
+    signal,
     timeoutMs: 120000,
     body: {
       model,
@@ -157,6 +224,14 @@ async function chat(params) {
       status,
     };
   }
+
+  reportProgress({
+    phase:
+      "finalizing",
+    percent: 90,
+    message:
+      "Finalizing local AI response.",
+  });
 
   return {
     ok: true,
