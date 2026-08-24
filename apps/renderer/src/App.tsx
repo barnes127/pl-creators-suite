@@ -5,6 +5,35 @@ import { Modal } from "./components/Modal";
 import { ThreeModelViewport } from "./components/modeling";
 import { CollapsiblePanel } from "./components/CollapsiblePanel";
 import { Panel, WorkspaceHeader } from "./components/pl-ui";
+import { DocsWorkspace } from "./components/workspaces/DocsWorkspace";
+import { SheetsWorkspace } from "./components/workspaces/SheetsWorkspace";
+import { CodeWorkspace } from "./components/workspaces/CodeWorkspace";
+import type {
+  AppId,
+  AssetInfo,
+  AppMetadata,
+  LocalAiChatResult,
+  LocalAiStatus,
+  PluginInfo,
+  FeatureFlags,
+  DocInfo,
+  CodeFileInfo,
+  SheetInfo,
+  SheetData,
+  MovieInfo,
+  MovieClip,
+  MovieData,
+  ModelInfo,
+  ModelObject,
+  ModelData,
+  ModelVectorField,
+  ModelVectorAxis,
+  GameInfo,
+  GameScene,
+  GameEntity,
+  GameData,
+  WorkflowInfo,
+} from "./types/app";
 import {
   applyGravity2D,
   convertDistance,
@@ -87,6 +116,7 @@ import {
   searchWorkflowTemplates,
   type WorkflowTemplate,
 } from "./engines";
+import { NAV_ITEMS } from "./config/navigation";
 
 declare global {
   interface Window {
@@ -96,196 +126,6 @@ declare global {
   }
 }
 
-type AppId = "code" | "game" | "movie" | "docs" | "sheets" | "modeler";
-
-type AssetInfo = {
-  id: string;
-  name: string;
-  type: string;
-  relativePath: string;
-  sourcePath: string;
-  createdAt: string;
-  updatedAt: string;
-};
-
-type AppMetadata = {
-  name: string;
-  productName: string;
-  version: string;
-  description: string;
-  appId: string;
-  isPackaged: boolean;
-};
-
-type LocalAiChatResult = {
-  ok: boolean;
-  message: string;
-  response: string;
-  model?: string;
-};
-
-type LocalAiModel = {
-  name: string;
-  modifiedAt: string;
-  size: number;
-};
-
-type LocalAiStatus = {
-  available: boolean;
-  provider: string;
-  model: string | null;
-  models?: LocalAiModel[];
-  reason: string;
-  host?: string;
-};
-
-type PluginInfo = {
-  id: string;
-  name: string;
-  version: string;
-  enabled: boolean;
-  type: string;
-  description: string;
-};
-
-type FeatureFlags = {
-  plugins: boolean;
-  localAi: boolean;
-  cloudSync: boolean;
-  paidExtensions: boolean;
-  marketplace: boolean;
-};
-
-type NavItem = {
-  id: AppId;
-  label: string;
-  hint: string;
-};
-
-type DocInfo = {
-  name: string;
-  path: string;
-};
-
-type CodeFileInfo = {
-  name: string;
-  path: string;
-  language: string;
-};
-
-type SheetInfo = {
-  name: string;
-  path: string;
-};
-
-type SheetData = {
-  version: number;
-  name: string;
-  rows: number;
-  columns: number;
-  cells: string[][];
-  createdAt: string;
-  updatedAt: string;
-};
-
-type MovieInfo = {
-  name: string;
-  path: string;
-};
-
-type MovieClip = {
-  id: string;
-  name: string;
-  startSeconds: number;
-  durationSeconds: number;
-};
-
-type MovieTrack = {
-  id: string;
-  name: string;
-  type: string;
-  clips: MovieClip[];
-};
-
-type MovieData = {
-  version: number;
-  name: string;
-  title: string;
-  fps: number;
-  durationSeconds: number;
-  width: number;
-  height: number;
-  tracks: MovieTrack[];
-  notes: string;
-  createdAt: string;
-  updatedAt: string;
-};
-
-type ModelInfo = {
-  name: string;
-  path: string;
-};
-
-type ModelObject = {
-  id: string;
-  name: string;
-  primitive: string;
-  position: [number, number, number];
-  rotation: [number, number, number];
-  scale: [number, number, number];
-};
-
-type ModelVectorField = "position" | "rotation" | "scale";
-type ModelVectorAxis = 0 | 1 | 2;
-
-type ModelData = {
-  version: number;
-  name: string;
-  title: string;
-  units: string;
-  gridEnabled: boolean;
-  objects: ModelObject[];
-  notes: string;
-  createdAt: string;
-  updatedAt: string;
-};
-
-type GameInfo = {
-  name: string;
-  path: string;
-};
-
-type GameEntity = {
-  id: string;
-  name: string;
-  type: string;
-  x: number;
-  y: number;
-  properties: Record<string, unknown>;
-};
-
-type GameScene = {
-  id: string;
-  name: string;
-  entities: GameEntity[];
-};
-
-type GameData = {
-  version: number;
-  name: string;
-  title: string;
-  targetPlatform: string;
-  genre: string;
-  scenes: GameScene[];
-  notes: string;
-  createdAt: string;
-  updatedAt: string;
-};
-
-type WorkflowInfo = {
-  name: string;
-  path: string;
-};
 
 function readStoredBoolean(key: string, fallback: boolean) {
   try {
@@ -299,20 +139,9 @@ function readStoredBoolean(key: string, fallback: boolean) {
 }
 
 export default function App() {
-  const navItems: NavItem[] = useMemo(
-    () => [
-      { id: "code", label: "Code IDE", hint: "Scripts and local files" },
-      { id: "game", label: "Game Studio", hint: "Scenes and gameplay data" },
-      { id: "movie", label: "Movie Studio", hint: "Timeline and animation" },
-      { id: "docs", label: "Docs", hint: "Markdown notes and writing" },
-      { id: "sheets", label: "Sheets", hint: "Local grids and tables" },
-      { id: "modeler", label: "Modeling", hint: "3D scenes and objects" },
-    ],
-    []
-  );
 
   const [active, setActive] = useState<AppId>("code");
-//  const activeItem = navItems.find((n) => n.id === active)!;
+//  const activeItem = NAV_ITEMS.find((n) => n.id === active)!;
   const [projectRoot, setProjectRoot] = useState<string>("");
   const [status, setStatus] = useState<string>("idle");
   const [showNew, setShowNew] = useState(false);
@@ -2388,12 +2217,12 @@ useEffect(() => {
       <div className="sidebarSectionLabel">Studios</div>
 
       <nav className="nav">
-        {navItems.map((item) => {
+        {NAV_ITEMS.map((item) => {
           const isActive = item.id === active;
           return (
             <button
               key={item.id}
-              className={`navItem ${isActive ? "active" : ""}`}
+              className={`NavItem ${isActive ? "active" : ""}`}
               onClick={() => setActive(item.id)}
               type="button"
             >
@@ -4321,110 +4150,22 @@ function handleFrameSelectedModelObject() {
   switch (active) {
     case "code":
       return (
-        <div className="workspaceSplit">
-          <aside className="workspaceSplitSide">
-            <Panel title="Code Files">
-              {!projectRoot && (
-                <div className="emptyState">Open a project to use Code IDE.</div>
-              )}
-
-              {projectRoot && (
-                <>
-                  <input
-                    className="input"
-                    value={newCodeFileName}
-                    onChange={(e) => setNewCodeFileName(e.target.value)}
-                    placeholder="main.py"
-                  />
-
-                  <button
-                    className="btn btn-primary"
-                    type="button"
-                    onClick={() => void onCreateCodeFile()}
-                  >
-                    Create
-                  </button>
-
-                  <div style={{ marginTop: 12 }}>
-                    {codeFiles.length === 0 ? (
-                      <div className="emptyState">No code files yet</div>
-                    ) : (
-                      codeFiles.map((file) => (
-                        <button
-                          key={file.name}
-                          className={`listNutton ${
-                            activeCodeFileName === file.name ? "listButtonActive" : ""
-                          }`}
-                          type="button"
-                          onClick={() => void onOpenCodeFile(file.name)}
-                        >
-                          <strong>
-                            {file.name}
-                            {activeCodeFileName === file.name ? " ✓" : ""}
-                          </strong>                          
-                          <span className="listButtonMeta">{file.language}</span>
-                        </button>
-                      ))
-                    )}
-                  </div>
-                </>
-              )}
-            </Panel>
-          </aside>
-
-          <section className="workspaceSplitMain">
-            <Panel
-              title={
-                activeCodeFileName
-                  ? `${activeCodeFileName}${codeDirty ? " *" : ""}`
-                  : "No code file selected"
-              }
-            >
-              {activeCodeFileName ? (
-                <>
-                  <div className="codeMeta">
-                    <span>{activeCodeLanguage || "Plain Text"}</span>
-                    <span className={codeDirty ? "docsDirty" : "docsSaved"}>
-                      {codeDirty ? "Unsaved changes" : "Saved"}
-                    </span>
-                  </div>
-
-                  <textarea
-                    className="codeEditor"
-                    value={codeContent}
-                    onChange={(e) => {
-                      setCodeContent(e.target.value);
-                      setCodeDirty(true);
-                    }}
-                    spellCheck={false}
-                  />
-
-                  <div className="docsEditorActions">
-                    <button
-                      className="btn btn-subtle"
-                      type="button"
-                      onClick={() => onCloseCodeFile()}
-                    >
-                      Close File
-                    </button>
-
-                    <button
-                      className="btn btn-primary"
-                      type="button"
-                      onClick={() => void onSaveCodeFile()}
-                    >
-                      Save File
-                    </button>
-                  </div>
-                </>
-              ) : (
-                <div className="emptyState">
-                  No code file open. Create a new file from the sidebar or open an existing project file to start editing.
-                </div>
-              )}
-            </Panel>
-          </section>
-        </div>
+        <CodeWorkspace
+          projectRoot={projectRoot}
+          codeFiles={codeFiles}
+          newCodeFileName={newCodeFileName}
+          activeCodeFileName={activeCodeFileName}
+          activeCodeLanguage={activeCodeLanguage}
+          codeContent={codeContent}
+          codeDirty={codeDirty}
+          setNewCodeFileName={setNewCodeFileName}
+          setCodeContent={setCodeContent}
+          setCodeDirty={setCodeDirty}
+          onCreateCodeFile={onCreateCodeFile}
+          onOpenCodeFile={onOpenCodeFile}
+          onSaveCodeFile={onSaveCodeFile}
+          onCloseCodeFile={onCloseCodeFile}
+        />
       );
     case "game":
       return (
@@ -5498,271 +5239,42 @@ function handleFrameSelectedModelObject() {
   );
     case "docs":
       return (
-        <div className="workspaceSplit">
-          <aside className="workspaceSplitSide">
-            <Panel title="Document Library">
-              {!projectRoot && <div className="emptyState">Open a project to use Docs.</div>}
-
-              {projectRoot && (
-                <>
-                  <input
-                    className="input"
-                    value={newDocName}
-                    onChange={(e) => setNewDocName(e.target.value)}
-                    placeholder="new-doc.md"
-                  />
-
-                  <button className="btn btn-primary" type="button" onClick={() => void onCreateDoc()}>
-                    New Document
-                  </button>
-
-                  <div style={{ marginTop: 12 }}>
-                    {docsList.length === 0 ? (
-                      <div className="emptyState">No documents yet</div>
-                    ) : (
-                      docsList.map((doc) => (
-                        <button
-                          key={doc.name}
-                          className={`listButton ${
-                            activeDocName === doc.name ? "ListButtonActive" : ""
-                          }`}
-                          type="button"
-                          onClick={() => void onOpenDoc(doc.name)}
-                        >
-                          <strong>
-                            {doc.name}
-                            {activeDocName === doc.name ? " ✓" : ""}
-                          </strong>
-                          <span className="listButtonMeta">Document</span>                       
-                        </button>
-                      ))
-                    )}
-                  </div>
-                </>
-              )}
-            </Panel>
-          </aside>
-
-          <section className="workspaceSplitMain">
-            <Panel 
-              title={
-                activeDocName
-                  ? `${activeDocName}${docDirty ? " *" : ""}`
-                  : "No document selected"
-              }
-            >
-              {activeDocName ? (
-                <>
-                  <textarea
-                    className="docsEditor"
-                    value={docContent}
-                    onChange={(e) => {
-                      setDocContent(e.target.value);
-                      setDocDirty(true);
-                    }}
-                    spellCheck={true}
-                  />
-
-                  <div className="docsEditorActions">
-
-                    <button
-                      className="btn btn-subtle"
-                      type="button"
-                      onClick={() => onCloseDoc()}
-                    >
-                      Close Document
-                    </button>
-
-                    <button
-                      className="btn btn-primary"
-                      type="button"
-                      onClick={() => void onSaveDoc()}
-                    >
-                      Save Document
-                    </button>
-                  </div>
-                </>
-              ) : (
-                <div className="emptyState">
-                  No document open. Create a new document from the sidebar or open an existing one to start writing.
-                </div>
-              )}
-            </Panel>
-          </section>
-        </div>
+        <DocsWorkspace
+          projectRoot={projectRoot}
+          docsList={docsList}
+          newDocName={newDocName}
+          activeDocName={activeDocName}
+          docContent={docContent}
+          docDirty={docDirty}
+          setNewDocName={setNewDocName}
+          setDocContent={setDocContent}
+          setDocDirty={setDocDirty}
+          onCreateDoc={onCreateDoc}
+          onOpenDoc={onOpenDoc}
+          onSaveDoc={onSaveDoc}
+          onCloseDoc={onCloseDoc}
+        />
       );
     case "sheets":
       return (
-        <div className="workspaceSplit">
-          <aside className="workspaceSplitSide">
-            <Panel title="Sheet Library">
-              {!projectRoot && (
-                <div className="emptyState">Open a project to use Sheets.</div>
-              )}
-
-              {projectRoot && (
-                <>
-                  <input
-                    className="input"
-                    value={newSheetName}
-                    onChange={(e) => setNewSheetName(e.target.value)}
-                    placeholder="budget"
-                  />
-
-                  <button
-                    className="btn btn-primary"
-                    type="button"
-                    onClick={() => void onCreateSheet()}
-                  >
-                    New Sheet
-                  </button>
-
-                  <div style={{ marginTop: 12 }}>
-                    {sheetsList.length === 0 ? (
-                      <div className="emptyState">No sheets yet</div>
-                    ) : (
-                      sheetsList.map((sheet) => (
-                        <button
-                          key={sheet.name}
-                          className={`listButton ${
-                            activeSheetName === sheet.name ? "listButtonActive" : ""
-                          }`}
-                          type="button"
-                          onClick={() => void onOpenSheet(sheet.name)}
-                        >
-                          <strong>
-                            {sheet.name}
-                            {activeSheetName === sheet.name ? " ✓" : ""}
-                          </strong>
-                          <span className="listButtonMeta">Spreadsheet</span>
-                        </button>
-                      ))
-                    )}
-                  </div>
-                </>
-              )}
-            </Panel>
-          </aside>
-
-          <section className="workspaceSplitMain">
-            <Panel
-              title={
-                activeSheetName
-                  ? `${activeSheetName}${sheetDirty ? " *" : ""}`
-                  : "No sheet selected"
-              }
-            >
-              {activeSheetName && sheetData ? (
-                <>
-                  <div className="sheetMeta">
-                    <span>
-                      {sheetData.rows} rows × {sheetData.columns} columns
-                    </span>
-
-                    <span className={sheetDirty ? "docsDirty" : "docsSaved"}>
-                      {sheetDirty ? "Unsaved changes" : "Saved"}
-                    </span>
-                  </div>
-
-                  <div className="sheetToolbar">
-                    <button
-                      className="btn btn-subtle"
-                      type="button"
-                      onClick={() => onAddSheetRow()}
-                    >
-                      Add Row
-                    </button>
-
-                    <button
-                      className="btn btn-subtle"
-                      type="button"
-                      onClick={() => onAddSheetColumn()}
-                    >
-                      Add Column
-                    </button>
-
-                    <button
-                      className="btn btn-danger"
-                      type="button"
-                      onClick={() => onDeleteLastSheetRow()}
-                    >
-                      Delete Last Row
-                    </button>
-
-                    <button
-                      className="btn btn-danger"
-                      type="button"
-                      onClick={() => onDeleteLastSheetColumn()}
-                    >
-                      Delete Last Column
-                    </button>
-                  </div>
-
-                  <div className="sheetGridWrap">
-                    <table className="sheetGrid">
-                      <thead>
-                        <tr>
-                          <th></th>
-                          {Array.from({ length: sheetData.columns }, (_, columnIndex) => (
-                            <th key={columnIndex}>
-                              {String.fromCharCode(65 + columnIndex)}
-                            </th>
-                          ))}
-                        </tr>
-                      </thead>
-
-                      <tbody>
-                        {sheetData.cells.map((row, rowIndex) => (
-                          <tr key={rowIndex}>
-                            <th>{rowIndex + 1}</th>
-
-                            {row.map((cell, columnIndex) => (
-                              <td key={columnIndex}>
-                                <input
-                                  className="sheetCell"
-                                  value={cell}
-                                  onChange={(e) =>
-                                    onUpdateSheetCell(
-                                      rowIndex,
-                                      columnIndex,
-                                      e.target.value
-                                    )
-                                  }
-                                />
-                              </td>
-                            ))}
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
-
-                  <div className="docsEditorActions">
-                    <button
-                      className="btn btn-primary"
-                      type="button"
-                      onClick={() => onCloseSheet()}
-                    >
-                      Close Sheet
-                    </button>
-
-                    <button
-                      className="btn"
-                      type="button"
-                      onClick={() => void onSaveSheet()}
-                    >
-                      Save Sheet
-                    </button>
-                  </div>
-                </>
-              ) : (
-                <div className="emptyState">
-                  No sheet open. Create a new sheet from the sidebar or open an existing spreadsheet to start editing cells.
-                </div>
-              )}
-            </Panel>
-          </section>
-        </div>
+        <SheetsWorkspace
+          projectRoot={projectRoot}
+          sheetsList={sheetsList}
+          newSheetName={newSheetName}
+          activeSheetName={activeSheetName}
+          sheetData={sheetData}
+          sheetDirty={sheetDirty}
+          setNewSheetName={setNewSheetName}
+          onCreateSheet={onCreateSheet}
+          onOpenSheet={onOpenSheet}
+          onSaveSheet={onSaveSheet}
+          onCloseSheet={onCloseSheet}
+          onUpdateSheetCell={onUpdateSheetCell}
+          onAddSheetRow={onAddSheetRow}
+          onAddSheetColumn={onAddSheetColumn}
+          onDeleteLastSheetRow={onDeleteLastSheetRow}
+          onDeleteLastSheetColumn={onDeleteLastSheetColumn}
+        />
       );
     case "modeler":
       return (
