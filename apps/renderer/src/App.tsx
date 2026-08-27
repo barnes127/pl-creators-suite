@@ -2,13 +2,14 @@ import { useEffect,  useMemo, useState } from "react";
 import { rpc } from "./rpc";
 import "./app.css";
 import { Modal } from "./components/Modal";
-import { ThreeModelViewport } from "./components/modeling";
 import { CollapsiblePanel } from "./components/CollapsiblePanel";
 import { Panel, WorkspaceHeader } from "./components/pl-ui";
 import { DocsWorkspace } from "./components/workspaces/DocsWorkspace";
 import { SheetsWorkspace } from "./components/workspaces/SheetsWorkspace";
 import { CodeWorkspace } from "./components/workspaces/CodeWorkspace";
 import { GameWorkspace } from "./components/workspaces/GameWorkspace";
+import { MovieWorkspace } from "./components/workspaces/MovieWorkspace";
+import { ModelingWorkspace } from "./components/workspaces/ModelingWorkspace";
 import type {
   AppId,
   AssetInfo,
@@ -3894,6 +3895,35 @@ function Workspace({
       )
     : null;
 
+  function handlePlayMovieTimeline() {
+    setMoviePlayback((current) =>
+      playMovieTimeline(current)
+    );
+  }
+
+  function handlePauseMovieTimeline() {
+    setMoviePlayback((current) =>
+      pauseMovieTimeline(current)
+    );
+  }
+
+  function handleStopMovieTimeline() {
+    setMoviePlayback((current) =>
+      stopMovieTimeline(current)
+    );
+  }
+
+  function handleSeekMovieTimeline(
+    timeSeconds: number,
+  ) {
+    setMoviePlayback((current) =>
+      seekMovieTimeline(
+        current,
+        timeSeconds,
+      )
+    );
+  }
+
   const [selectedModelObjectId, setSelectedModelObjectId] = useState<string | null>(
     null
   );
@@ -4228,567 +4258,48 @@ function handleFrameSelectedModelObject() {
       );
     case "movie":
       return (
-        <div className="workspaceSplit">
-          <aside className="workspaceSplitSide">
-            <Panel title="Movie Projects">
-              {!projectRoot && (
-                <div className="emptyState">Open a project to use Movie Studio.</div>
-              )}
+        <MovieWorkspace
+          projectRoot={projectRoot}
 
-              {projectRoot && (
-                <>
-                  <input
-                    className="input"
-                    value={newMovieName}
-                    onChange={(e) => setNewMovieName(e.target.value)}
-                    placeholder="intro"
-                  />
+          moviesList={moviesList}
+          newMovieName={newMovieName}
+          activeMovieName={activeMovieName}
+          movieData={movieData}
+          movieDirty={movieDirty}
+          moviePlayback={moviePlayback}
+          movieFrame={movieFrame}
+          movieTimelineActivity={movieTimelineActivity}
+          movieTimelineLayout={movieTimelineLayout}
+          movieActiveClips={movieActiveClips}
+          movieTransformSample={movieTransformSample}
+          movieRenderPreviewState={movieRenderPreviewState}
+          movieEngineDrawerOpen={movieEngineDrawerOpen}
 
-                  <button
-                    className="btn btn-primary"
-                    type="button"
-                    onClick={() => void onCreateMovie()}
-                  >
-                    New Movie
-                  </button>
+          newMovieClipName={newMovieClipName}
+          newMovieClipTrackId={newMovieClipTrackId}
+          newMovieClipStart={newMovieClipStart}
+          newMovieClipDuration={newMovieClipDuration}
 
-                  <div style={{ marginTop: 12 }}>
-                    {moviesList.length === 0 ? (
-                      <div className="emptyState">No movies yet</div>
-                    ) : (
-                      moviesList.map((movie) => (
-                        <button
-                          key={movie.name}
-                          className={`listButton ${
-                            activeMovieName === movie.name ? "listButtonActive" : ""
-                          }`}
-                          type="button"
-                          onClick={() => void onOpenMovie(movie.name)}
-                        >
-                          <strong>
-                            {movie.name}
-                            {activeMovieName === movie.name ? " ✓" : ""}
-                          </strong>
-                          <span className="listButtonMeta">Movie timeline</span>
-                        </button>
-                      ))
-                    )}
-                  </div>
-                </>
-              )}
-            </Panel>
-          </aside>
+          setNewMovieName={setNewMovieName}
+          setNewMovieClipName={setNewMovieClipName}
+          setNewMovieClipTrackId={setNewMovieClipTrackId}
+          setNewMovieClipStart={setNewMovieClipStart}
+          setNewMovieClipDuration={setNewMovieClipDuration}
+          setMovieEngineDrawerOpen={setMovieEngineDrawerOpen}
 
-          <section className="workspaceSplitMain">
-            <Panel
-              title={
-                activeMovieName
-                  ? `${activeMovieName}${movieDirty ? " *" : ""}`
-                  : "No movie selected"
-              }
-            >
-              {activeMovieName && movieData ? (
-                <>
-                  <div className="movieMeta">
-                    <span>
-                      {movieData.width}×{movieData.height} · {movieData.fps} FPS ·{" "}
-                      {movieData.durationSeconds}s
-                    </span>
-
-                    <span className={movieDirty ? "docsDirty" : "docsSaved"}>
-                      {movieDirty ? "Unsaved changes" : "Saved"}
-                    </span>
-                  </div>
-
-                  <div className="movieFormGrid">
-                    <label>
-                      Title
-                      <input
-                        className="input"
-                        value={movieData.title}
-                        onChange={(e) =>
-                          onUpdateMovieField("title", e.target.value)
-                        }
-                      />
-                    </label>
-
-                    <label>
-                      FPS
-                      <input
-                        className="input"
-                        type="number"
-                        min={1}
-                        value={movieData.fps}
-                        onChange={(e) =>
-                          onUpdateMovieField("fps", Number(e.target.value))
-                        }
-                      />
-                    </label>
-
-                    <label>
-                      Duration Seconds
-                      <input
-                        className="input"
-                        type="number"
-                        min={1}
-                        value={movieData.durationSeconds}
-                        onChange={(e) =>
-                          onUpdateMovieField(
-                            "durationSeconds",
-                            Number(e.target.value)
-                          )
-                        }
-                      />
-                    </label>
-
-                    <label>
-                      Width
-                      <input
-                        className="input"
-                        type="number"
-                        min={1}
-                        value={movieData.width}
-                        onChange={(e) =>
-                          onUpdateMovieField("width", Number(e.target.value))
-                        }
-                      />
-                    </label>
-
-                    <label>
-                      Height
-                      <input
-                        className="input"
-                        type="number"
-                        min={1}
-                        value={movieData.height}
-                        onChange={(e) =>
-                          onUpdateMovieField("height", Number(e.target.value))
-                        }
-                      />
-                    </label>
-                  </div>
-
-                  <div className="movieClipForm">
-                    <div className="movieTimelineHeader">Add Timeline Clip</div>
-
-                    <div className="movieClipFormGrid">
-                      <label>
-                        Clip Name
-                        <input
-                          className="input"
-                          value={newMovieClipName}
-                          onChange={(e) => setNewMovieClipName(e.target.value)}
-                          placeholder="Scene 1"
-                        />
-                      </label>
-
-                      <label>
-                        Track
-                        <select
-                          className="input"
-                          value={newMovieClipTrackId}
-                          onChange={(e) => setNewMovieClipTrackId(e.target.value)}
-                        >
-                          {movieData.tracks.map((track) => (
-                            <option key={track.id} value={track.id}>
-                              {track.name}
-                            </option>
-                          ))}
-                        </select>
-                      </label>
-
-                      <label>
-                        Start
-                        <input
-                          className="input"
-                          type="number"
-                          min={0}
-                          value={newMovieClipStart}
-                          onChange={(e) => setNewMovieClipStart(e.target.value)}
-                        />
-                      </label>
-
-                      <label>
-                        Duration
-                        <input
-                          className="input"
-                          type="number"
-                          min={0.1}
-                          step={0.1}
-                          value={newMovieClipDuration}
-                          onChange={(e) => setNewMovieClipDuration(e.target.value)}
-                        />
-                      </label>
-
-                      <button
-                        className="btn"
-                        type="button"
-                        onClick={() => onAddMovieClip()}
-                      >
-                        Add Clip
-                      </button>
-                    </div>
-                  </div>
-
-                  <div className={`movieEngineDrawer ${movieEngineDrawerOpen ? "open" : "closed"}`}>
-                    <div className="movieEngineDrawerHeader">
-                      <button
-                        className="panelTitle"
-                        type="button"
-                        onClick={() => setMovieEngineDrawerOpen((value) => !value)}
-                      >
-                        {movieEngineDrawerOpen ? "▼" : "▲"} Timeline Diagnostics
-                      </button>
-
-                      <div className="movieEngineDrawerMeta">
-                        {moviePlayback.status} · frame {movieFrame} ·{" "}
-                        {moviePlayback.currentTimeSeconds.toFixed(2)}s /{" "}
-                        {moviePlayback.durationSeconds.toFixed(2)}s
-                      </div>
-                    </div>
-
-                    {movieEngineDrawerOpen && (
-                      <div className="movieEngineDrawerBody">
-
-                    <div className="moviePlaybackControls">
-                      <button
-                        className="btn"
-                        type="button"
-                        onClick={() =>
-                          setMoviePlayback((current) =>
-                            playMovieTimeline(current)
-                          )
-                        }
-                      >
-                        Play
-                      </button>
-
-                      <button
-                        className="btn"
-                        type="button"
-                        onClick={() =>
-                          setMoviePlayback((current) =>
-                            pauseMovieTimeline(current)
-                          )
-                        }
-                      >
-                        Pause
-                      </button>
-
-                      <button
-                        className="btn"
-                        type="button"
-                        onClick={() =>
-                          setMoviePlayback((current) =>
-                            stopMovieTimeline(current)
-                          )
-                        }
-                      >
-                        Stop
-                      </button>
-
-                      <input
-                        className="movieScrubber"
-                        type="range"
-                        min={0}
-                        max={moviePlayback.durationSeconds || 1}
-                        step={1 / Math.max(moviePlayback.fps, 1)}
-                        value={moviePlayback.currentTimeSeconds}
-                        onChange={(e) =>
-                          setMoviePlayback((current) =>
-                            seekMovieTimeline(current, Number(e.target.value))
-                          )
-                        }
-                      />
-                    </div>
-
-                    <div className="movieRenderPreview">
-                      <div className="movieRenderPreviewHeader">
-                        <strong>Preview</strong>
-                        <span>
-                          {movieRenderPreviewState
-                            ? `${movieRenderPreviewState.width}×${movieRenderPreviewState.height} @ ${movieRenderPreviewState.fps}fps`
-                            : "No preview"}
-                        </span>
-                      </div>
-
-                      <div className="movieRenderViewport">
-                        {movieRenderPreviewState &&
-                        movieRenderPreviewState.layers.length > 0 ? (
-                          movieRenderPreviewState.layers.map((layer, index) => (
-                            <div
-                              className={`movieRenderLayer movieRenderLayer-${layer.type}`}
-                              key={`${layer.trackId}-${layer.id}`}
-                              style={{
-                                left: `${Math.min(
-                                  Math.max(
-                                    10 +
-                                      layer.transform.position.x /
-                                        Math.max(movieRenderPreviewState.width, 1) *
-                                        60,
-                                    0
-                                  ),
-                                  80
-                                )}%`,
-                                top: `${Math.min(
-                                  Math.max(
-                                    12 +
-                                      layer.transform.position.y /
-                                        Math.max(movieRenderPreviewState.height, 1) *
-                                        60,
-                                    0
-                                  ),
-                                  80
-                                )}%`,
-                                opacity: Math.min(
-                                  Math.max(layer.transform.opacity, 0),
-                                  1
-                                ),
-                                transform: `scale(${layer.transform.scale.x}) rotate(${layer.transform.rotation}deg)`,
-                                zIndex: index + 1,
-                              }}
-                              title={`${layer.name} · ${layer.trackName}`}
-                            >
-                              <strong>{layer.name}</strong>
-                              <span>{layer.type}</span>
-                              <span>{(layer.progress * 100).toFixed(0)}%</span>
-                            </div>
-                          ))
-                        ) : (
-                          <div className="movieRenderEmpty">
-                            No active preview layers at current time
-                          </div>
-                        )}
-                      </div>
-                    </div>
-
-                    <div className="moviePreviewState">
-                      <div className="movieTimelineActivitySummary">
-                        <span>
-                          Previous start:{" "}
-                          {movieTimelineActivity?.previousClipStartSeconds === null ||
-                          movieTimelineActivity?.previousClipStartSeconds === undefined
-                            ? "none"
-                            : `${movieTimelineActivity.previousClipStartSeconds.toFixed(2)}s`}
-                        </span>
-
-                        <span>
-                          Next start:{" "}
-                          {movieTimelineActivity?.nextClipStartSeconds === null ||
-                          movieTimelineActivity?.nextClipStartSeconds === undefined
-                            ? "none"
-                            : `${movieTimelineActivity.nextClipStartSeconds.toFixed(2)}s`}
-                        </span>
-
-                        <span>
-                          Active tracks:{" "}
-                          {movieTimelineActivity
-                            ? movieTimelineActivity.trackActivities.filter(
-                                (trackActivity) =>
-                                  trackActivity.activeClips.length > 0
-                              ).length
-                            : 0}
-                        </span>
-                      </div>
-                      <div className="moviePreviewBox">
-                        <strong>Active Clips</strong>
-
-                        {movieActiveClips.length === 0 ? (
-                          <span className="emptyState">
-                            No clips active at current time
-                          </span>
-                        ) : (
-                          movieActiveClips.map((activeClip) => (
-                            <div
-                              className="movieActiveClip"
-                              key={`${activeClip.track.id}-${activeClip.clip.id}`}
-                            >
-                              <span>{activeClip.clip.name}</span>
-                              <span>{activeClip.track.name}</span>
-                              <span>
-                                local {activeClip.localTimeSeconds.toFixed(2)}s
-                              </span>
-                              <span>
-                                {(activeClip.progress * 100).toFixed(0)}%
-                              </span>
-                            </div>
-                          ))
-                        )}
-                      </div>
-
-                      <div className="moviePreviewBox">
-                        <strong>Transform Sample</strong>
-
-                        <div className="movieTransformSampleGrid">
-                          <span>
-                            position [{movieTransformSample.position.x.toFixed(2)},{" "}
-                            {movieTransformSample.position.y.toFixed(2)}]
-                          </span>
-
-                          <span>
-                            scale [{movieTransformSample.scale.x.toFixed(2)},{" "}
-                            {movieTransformSample.scale.y.toFixed(2)}]
-                          </span>
-
-                          <span>
-                            opacity {movieTransformSample.opacity.toFixed(2)}
-                          </span>
-
-                          <span>
-                            rotation {movieTransformSample.rotation.toFixed(2)}°
-                          </span>
-
-                          <span>
-                            brightness {movieTransformSample.brightness.toFixed(2)}
-                          </span>
-
-                          <span>blur {movieTransformSample.blur.toFixed(2)}</span>
-                        </div>
-                      </div>
-
-                      <div className="moviePreviewBox">
-                        <strong>Preview Layers</strong>
-
-                        {movieRenderPreviewState &&
-                        movieRenderPreviewState.layers.length > 0 ? (
-                          <div className="moviePreviewLayerList">
-                            {movieRenderPreviewState.layers.map((layer) => (
-                              <div
-                                className="moviePreviewLayerRow"
-                                key={`${layer.trackId}-${layer.id}`}
-                              >
-                                <span>{layer.name}</span>
-                                <span>{layer.trackName}</span>
-                                <span>{layer.type}</span>
-                                <span>
-                                  local {layer.localTimeSeconds.toFixed(2)}s
-                                </span>
-                              </div>
-                            ))}
-                          </div>
-                        ) : (
-                          <span className="emptyState">No active layers</span>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                )}
-              </div>
-
-              <div className="movieTimelinePreview">
-                <div className="movieTimelineHeader">
-                  Timeline Tracks ·{" "}
-                  {movieTimelineLayout
-                    ? `${movieTimelineLayout.durationSeconds.toFixed(2)}s`
-                    : "0.00s"}
-                </div>
-
-                <div className="movieTimelineRuler">
-                  <span>0s</span>
-                  <span>
-                    {movieTimelineLayout
-                      ? `${Math.floor(movieTimelineLayout.durationSeconds / 2)}s`
-                      : "0s"}
-                  </span>
-                  <span>
-                    {movieTimelineLayout
-                      ? `${movieTimelineLayout.durationSeconds.toFixed(0)}s`
-                      : "0s"}
-                  </span>
-                </div>
-
-                <div className="movieTimelineLayout">
-                  {movieTimelineLayout && (
-                    <div
-                      className="movieTimelinePlayhead"
-                      style={{
-                        left: `${movieTimelineLayout.playheadPercent}%`,
-                      }}
-                    />
-                  )}
-
-                  {movieTimelineLayout?.tracks.map((trackLayout) => (
-                    <div className="movieTrackLayoutRow" key={trackLayout.track.id}>
-                      <div className="movieTrackLabel">
-                        <strong>{trackLayout.track.name}</strong>
-                        <span>
-                          {trackLayout.track.type} ·{" "}
-                          {trackLayout.track.clips.length} clips
-                        </span>
-                      </div>
-
-                      <div className="movieTrackLane">
-                        {trackLayout.clips.map((clipLayout) => (
-                          <div
-                            className={`movieClipBlock movieClipBlock-${clipLayout.status}`}
-                            key={clipLayout.clip.id}
-                            style={{
-                              left: `${clipLayout.leftPercent}%`,
-                              width: `${clipLayout.widthPercent}%`,
-                            }}
-                            title={`${clipLayout.clip.name} ${clipLayout.clip.startSeconds}s-${(
-                              clipLayout.clip.startSeconds +
-                              clipLayout.clip.durationSeconds
-                            ).toFixed(2)}s`}
-                          >
-                            <span>{clipLayout.clip.name}</span>
-
-                            <button
-                              className="btn btn-danger"
-                              type="button"
-                              onClick={() =>
-                                onDeleteMovieClip(
-                                  trackLayout.track.id,
-                                  clipLayout.clip.id
-                                )
-                              }
-                            >
-                              Delete
-                            </button>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              <label className="movieNotes">
-                Notes
-                <textarea
-                  className="docsEditor"
-                  value={movieData.notes}
-                  onChange={(e) =>
-                    onUpdateMovieField("notes", e.target.value)
-                  }
-                />
-              </label>
-
-              <div className="docsEditorActions">
-                <button
-                  className="btn btn-subtle"
-                  type="button"
-                  onClick={() => onCloseMovie()}
-                >
-                  Close Movie
-                </button>
-
-                <button
-                  className="btn btn-primary"
-                  type="button"
-                  onClick={() => void onSaveMovie()}
-                >
-                  Save Movie
-                </button>
-              </div>
-            </>
-          ) : (
-            <div className="emptyState">Create or open a movie.</div>
-          )}
-        </Panel>
-      </section>
-    </div>
-  );
+          onCreateMovie={onCreateMovie}
+          onOpenMovie={onOpenMovie}
+          onSaveMovie={onSaveMovie}
+          onCloseMovie={onCloseMovie}
+          onUpdateMovieField={onUpdateMovieField}
+          onAddMovieClip={onAddMovieClip}
+          onDeleteMovieClip={onDeleteMovieClip}
+          onPlayMovieTimeline={handlePlayMovieTimeline}
+          onPauseMovieTimeline={handlePauseMovieTimeline}
+          onStopMovieTimeline={handleStopMovieTimeline}
+          onSeekMovieTimeline={handleSeekMovieTimeline}
+        />
+      );
     case "docs":
       return (
         <DocsWorkspace
@@ -4830,585 +4341,105 @@ function handleFrameSelectedModelObject() {
       );
     case "modeler":
       return (
-        <div className="workspaceSplit">
-          <aside className="workspaceSplitSide">
-            <Panel title="Model Library">
-              {!projectRoot && (
-                <div className="emptyState">Open a project to use Modeling Studio.</div>
-              )}
+        <ModelingWorkspace
+          projectRoot={projectRoot}
 
-              {projectRoot && (
-                <>
-                  <input
-                    className="input"
-                    value={newModelName}
-                    onChange={(e) => setNewModelName(e.target.value)}
-                    placeholder="scene"
-                  />
+          modelsList={modelsList}
+          newModelName={newModelName}
+          activeModelName={activeModelName}
+          modelData={modelData}
+          modelDirty={modelDirty}
 
-                  <button
-                    className="btn btn-primary"
-                    type="button"
-                    onClick={() => void onCreateModel()}
-                  >
-                    New Scene
-                  </button>
+          newModelObjectName={newModelObjectName}
+          newModelPrimitive={newModelPrimitive}
 
-                  <div style={{ marginTop: 12 }}>
-                    {modelsList.length === 0 ? (
-                      <div className="emptyState">No model scenes yet</div>
-                    ) : (
-                      modelsList.map((model) => (
-                        <button
-                          key={model.name}
-                          className={`listButton ${
-                            activeModelName === model.name ? "listButtonActive" : ""
-                          }`}
-                          type="button"
-                          onClick={() => void onOpenModel(model.name)}
-                        >
-                          <strong>
-                            {model.name}
-                            {activeModelName === model.name ? " ✓" : ""}
-                          </strong>
-                          <span className="listButtonMeta">3D scene</span>
-                        </button>
-                      ))
-                    )}
-                  </div>
-                </>
-              )}
-            </Panel>
-          </aside>
+          setNewModelName={setNewModelName}
+          setNewModelObjectName={setNewModelObjectName}
+          setNewModelPrimitive={setNewModelPrimitive}
 
-          <section className="workspaceSplitMain">
-            <Panel
-              title={
-                activeModelName
-                  ? `${activeModelName}${modelDirty ? " *" : ""}`
-                  : "No model scene selected"
-              }
-            >
-              {activeModelName && modelData ? (
-                <>
-                  <div className="modelMeta">
-                    <span>
-                      {modelData.objects.length} objects · units: {modelData.units}
-                    </span>
+          onCreateModel={onCreateModel}
+          onOpenModel={onOpenModel}
+          onSaveModel={onSaveModel}
+          onCloseModel={onCloseModel}
 
-                    <span className={modelDirty ? "docsDirty" : "docsSaved"}>
-                      {modelDirty ? "Unsaved changes" : "Saved"}
-                    </span>
-                  </div>
+          onUpdateModelField={onUpdateModelField}
+          onUpdateModelObjectVector={
+            onUpdateModelObjectVector
+          }
 
-                  <div className="modelFormGrid">
-                    <label>
-                      Title
-                      <input
-                        className="input"
-                        value={modelData.title}
-                        onChange={(e) =>
-                          onUpdateModelField("title", e.target.value)
-                        }
-                      />
-                    </label>
+          onAddModelObject={onAddModelObject}
+          onDeleteModelObject={
+            onDeleteModelObject
+          }
 
-                    <label>
-                      Units
-                      <select
-                        className="input"
-                        value={modelData.units}
-                        onChange={(e) =>
-                          onUpdateModelField("units", e.target.value)
-                        }
-                      >
-                        <option value="meters">meters</option>
-                        <option value="centimeters">centimeters</option>
-                        <option value="millimeters">millimeters</option>
-                        <option value="inches">inches</option>
-                      </select>
-                    </label>
+          selectedModelObjectId={
+            selectedModelObjectId
+          }
 
-                    <label className="modelCheckbox">
-                      <input
-                        type="checkbox"
-                        checked={modelData.gridEnabled}
-                        onChange={(e) =>
-                          onUpdateModelField("gridEnabled", e.target.checked)
-                        }
-                      />
-                      Grid enabled
-                    </label>
-                  </div>
+          setSelectedModelObjectId={
+            setSelectedModelObjectId
+          }
 
-                  <div className="modelPreviewBox">
-                    <div className="modelPreviewTitle">Viewport</div>
-                    <div className="modelPreviewGrid">
-                      {modelData.objects.length === 0 ? (
-                        <div className="emptyState">No objects yet</div>
-                      ) : (
-                        modelData.objects.map((object) => (
-                          <div 
-                            className={
-                              selectedModelObjectId === object.id
-                                ? "modelObject modelObjectSelected"
-                                : "modelObject"
-                            }
-                            key={object.id}
-                          >
-                            <strong>{object.name}</strong>
-                            <span>{object.primitive}</span>
-                            <span>pos [{object.position.join(", ")}]</span>
-                            <span>scale [{object.scale.join(", ")}]</span>
+          selectedModelObject={
+            selectedModelObject
+          }
 
-                            <button
-                              className="btn btn-ghost"
-                              type="button"
-                              onClick={() => setSelectedModelObjectId(object.id)}
-                            >
-                              Select
-                            </button>
+          modelEngineDrawerOpen={
+            modelEngineDrawerOpen
+          }
 
-                            <button
-                              className="btn btn-danger"
-                              type="button"
-                              onClick={() => onDeleteModelObject(object.id)}
-                            >
-                              Delete
-                            </button>
-                          </div>
-                        ))
-                      )}
-                    </div>
-                  </div>
+          setModelEngineDrawerOpen={
+            setModelEngineDrawerOpen
+          }
 
-                  <div className="modelObjectForm">
-                    <div className="modelSectionTitle">Add Primitive Object</div>
+          modelViewportCamera={
+            modelViewportCamera
+          }
 
-                    <div className="modelObjectFormGrid">
-                      <label>
-                        Object Name
-                        <input
-                          className="input"
-                          value={newModelObjectName}
-                          onChange={(e) => setNewModelObjectName(e.target.value)}
-                          placeholder="Cube 1"
-                        />
-                      </label>
+          modelingScene={
+            modelingScene
+          }
 
-                      <label>
-                        Primitive
-                        <select
-                          className="input"
-                          value={newModelPrimitive}
-                          onChange={(e) => setNewModelPrimitive(e.target.value)}
-                        >
-                          <option value="cube">Cube</option>
-                          <option value="sphere">Sphere</option>
-                          <option value="plane">Plane</option>
-                          <option value="cylinder">Cylinder</option>
-                          <option value="cone">Cone</option>
-                        </select>
-                      </label>
+          modelingViewportScene={
+            modelingViewportScene
+          }
 
-                      <button
-                        className="btn"
-                        type="button"
-                        onClick={() => onAddModelObject()}
-                      >
-                        Add Object
-                      </button>
-                    </div>
-                  </div>
+          modelingViewportState={
+            modelingViewportState
+          }
 
-                  <div className="modelViewportPanel">
-                    <div className="modelViewportHeader">
-                      <strong>3D Viewport</strong>
-                      <span>
-                        {modelingScene
-                          ? `${modelingScene.objects.length} objects · ${modelingScene.units}`
-                          : "No scene"}
-                      </span>
-                    </div>
+          visibleModelObjects={
+            visibleModelObjects
+          }
 
-                   <div className="modelCameraControls">
-                     <div className="modelCameraMeta">
-                       <span>mode: {modelViewportCamera.mode}</span>
-                       <span>zoom: {modelViewportCamera.zoom.toFixed(2)}</span>
-                       <span>
-                         pos [{modelViewportCamera.position.x.toFixed(2)},{" "}
-                         {modelViewportCamera.position.y.toFixed(2)},{" "}
-                         {modelViewportCamera.position.z.toFixed(2)}]
-                       </span>
-                       <span>
-                         target [{modelViewportCamera.target.x.toFixed(2)},{" "}
-                         {modelViewportCamera.target.y.toFixed(2)},{" "}
-                         {modelViewportCamera.target.z.toFixed(2)}]
-                       </span>
-                     </div>
+          lockedModelObjects={
+            lockedModelObjects
+          }
 
-                     <div className="modelCameraButtons">
-                       <button
-                         className="btn btn-ghost"
-                         type="button"
-                         onClick={() => handleZoomModelViewport(0.2)}
-                       >
-                         Zoom In
-                       </button>
+          onZoomModelViewport={
+            handleZoomModelViewport
+          }
 
-                       <button
-                         className="btn btn-ghost"
-                         type="button"
-                         onClick={() => handleZoomModelViewport(-0.2)}
-                       >
-                         Zoom Out
-                       </button>
+          onResetModelViewportCamera={
+            handleResetModelViewportCamera
+          }
 
-                       <button
-                         className="btn btn-ghost"
-                         type="button"
-                         onClick={handleToggleModelViewportCameraMode}
-                       >
-                         Toggle {modelViewportCamera.mode === "perspective" ? "Ortho" : "Perspective"}
-                       </button>
+          onToggleModelViewportCameraMode={
+            handleToggleModelViewportCameraMode
+          }
 
-                       <button
-                         className="btn btn-ghost"
-                         type="button"
-                         onClick={handleResetModelViewportCamera}
-                       >
-                         Reset Camera
-                       </button>
+          onNudgeModelViewportCamera={
+            handleNudgeModelViewportCamera
+          }
 
-                       <button
-                         className="btn btn-ghost"
-                         type="button"
-                         onClick={() => handleSetModelViewportView("front")}
-                       >
-                         Front View
-                       </button>
+          onSetModelViewportView={
+            handleSetModelViewportView
+          }
 
-                       <button
-                         className="btn btn-ghost"
-                         type="button"
-                         onClick={() => handleSetModelViewportView("top")}
-                       >
-                         Top View
-                       </button>
-
-                       <button
-                         className="btn btn-ghost"
-                         type="button"
-                         onClick={() => handleSetModelViewportView("right")}
-                       >
-                         Right View
-                       </button>
-
-                       <button
-                         className="btn btn-ghost"
-                         type="button"
-                         onClick={handleFrameSelectedModelObject}
-                         disabled={!selectedModelObject}
-                       >
-                         Frame Selected
-                       </button>
-                     </div>
-
-                     <div className="modelCameraNudgeGrid">
-                       <button
-                         className="btn btn-ghost"
-                         type="button"
-                         onClick={() => handleNudgeModelViewportCamera(0, 1)}
-                       >
-                         Up
-                       </button>
-
-                       <button
-                         className="btn btn-ghost"
-                         type="button"
-                         onClick={() => handleNudgeModelViewportCamera(-1, 0)}
-                       >
-                         Left
-                       </button>
-
-                       <button
-                         className="btn btn-ghost"
-                         type="button"
-                         onClick={() => handleNudgeModelViewportCamera(1, 0)}
-                       >
-                         Right
-                       </button>
-
-                       <button
-                         className="btn btn-ghost"
-                         type="button"
-                         onClick={() => handleNudgeModelViewportCamera(0, -1)}
-                       >
-                         Down
-                       </button>
-
-                       <button
-                         className="btn btn-ghost"
-                         type="button"
-                         onClick={() => handleNudgeModelViewportCamera(0, 0, 1)}
-                       >
-                         Back
-                       </button>
-
-                       <button
-                         className="btn btn-ghost"
-                         type="button"
-                         onClick={() => handleNudgeModelViewportCamera(0, 0, -1)}
-                       >
-                         Forward
-                       </button>
-                     </div>
-                   </div>
-
-                    {modelingViewportScene ? (
-                      <ThreeModelViewport
-                        scene={modelingViewportScene}
-                        selectedObjectId={selectedModelObjectId}
-                        onSelectObject={setSelectedModelObjectId}
-                      />
-                    ) : (
-                      <div className="emptyState">No modeling scene loaded.</div>
-                    )}
-
-                    <div className="modelTransformInspector">
-                      <div className="modelTransformInspectorHeader">
-                        <strong>Transform Inspector</strong>
-                        {selectedModelObject ? (
-                          <span>
-                            {selectedModelObject.name} · {selectedModelObject.primitive}
-                          </span>
-                        ) : (
-                          <span>No object selected</span>
-                        )}
-                      </div>
-
-                      {selectedModelObject ? (
-                        <>
-                          <div className="modelTransformInspectorGrid">
-                            {(["position", "rotation", "scale"] as ModelVectorField[]).map((field) => (
-                              <div className="modelTransformGroup" key={field}>
-                                <strong>{field}</strong>
-
-                                {(["X", "Y", "Z"] as const).map((axisLabel, axisIndex) => {
-                                  const axis = axisIndex as ModelVectorAxis;
-                                  const axisKey = axisLabel.toLowerCase() as "x" | "y" | "z";
-                                  const value = selectedModelObject.transform[field][axisKey];
-
-                                  return (
-                                    <label key={`${field}-${axisLabel}`}>
-                                      {axisLabel}
-                                      <input
-                                        className="input"
-                                        type="number"
-                                        step={field === "rotation" ? 5 : 0.1}
-                                        min={field === "scale" ? 0.01 : undefined}
-                                        value={value}
-                                        onChange={(event) =>
-                                          onUpdateModelObjectVector(
-                                            selectedModelObject.id,
-                                            field,
-                                            axis,
-                                            Number(event.target.value)
-                                          )
-                                        }
-                                      />
-                                    </label>
-                                  );
-                                })}
-                              </div>
-                            ))}
-                          </div>
-
-                          <div className={`modelEngineDrawer ${modelEngineDrawerOpen ? "open" : "closed"}`}>
-                            <div className="modelEngineDrawerHeader">
-                              <button
-                                className="panelTitle"
-                                type="button"
-                                onClick={() => setModelEngineDrawerOpen((value) => !value)}
-                              >
-                                {modelEngineDrawerOpen ? "▼" : "▲"} Modeling Engine
-                              </button>
-
-                              <div className="modelEngineDrawerMeta">
-                                {modelingScene
-                                  ? `${modelingScene.objects.length} objects · ${modelViewportCamera.mode}`
-                                  : "No scene"}
-                              </div>
-                            </div>
-
-                            {modelEngineDrawerOpen && (
-                              <div className="modelEngineDrawerBody">
-                                <div className="modelEngineDebugGrid">
-                                  <div className="modelEngineDebugCard">
-                                    <strong>Scene</strong>
-                                    <span>id: {modelingScene?.id ?? "none"}</span>
-                                    <span>title: {modelingScene?.title ?? "none"}</span>
-                                    <span>units: {modelingScene?.units ?? "none"}</span>
-                                    <span>materials: {modelingScene?.materials.length ?? 0}</span>
-                                  </div>
-
-                                  <div className="modelEngineDebugCard">
-                                    <strong>Objects</strong>
-                                    <span>total: {modelingScene?.objects.length ?? 0}</span>
-                                    <span>visible: {visibleModelObjects}</span>
-                                    <span>locked: {lockedModelObjects}</span>
-                                    <span>
-                                      selected: {selectedModelObject ? selectedModelObject.name : "none"}
-                                    </span>
-                                  </div>
-
-                                  <div className="modelEngineDebugCard">
-                                    <strong>Camera</strong>
-                                    <span>mode: {modelViewportCamera.mode}</span>
-                                    <span>zoom: {modelViewportCamera.zoom.toFixed(2)}</span>
-                                    <span>
-                                      pos [{modelViewportCamera.position.x.toFixed(2)},{" "}
-                                      {modelViewportCamera.position.y.toFixed(2)},{" "}
-                                      {modelViewportCamera.position.z.toFixed(2)}]
-                                    </span>
-                                    <span>
-                                      target [{modelViewportCamera.target.x.toFixed(2)},{" "}
-                                      {modelViewportCamera.target.y.toFixed(2)},{" "}
-                                      {modelViewportCamera.target.z.toFixed(2)}]
-                                    </span>
-                                  </div>
-
-                                  <div className="modelEngineDebugCard">
-                                    <strong>Viewport</strong>
-                                    <span>
-                                      size: {modelingViewportState?.viewport.width ?? 0}×
-                                      {modelingViewportState?.viewport.height ?? 0}
-                                    </span>
-                                    <span>
-                                      grid: {modelingViewportState?.viewport.gridEnabled ? "on" : "off"}
-                                    </span>
-                                    <span>
-                                      snap: {modelingViewportState?.viewport.snapEnabled ? "on" : "off"}
-                                    </span>
-                                    <span>
-                                      projected: {modelingViewportState?.projectedObjects.length ?? 0}
-                                    </span>
-                                  </div>
-                                </div>
-
-                                <div className="modelEngineProjectedList">
-                                  <strong>Projected Objects</strong>
-
-                                  {modelingViewportState &&
-                                  modelingViewportState.projectedObjects.length > 0 ? (
-                                    modelingViewportState.projectedObjects.map((projected) => (
-                                      <div className="modelEngineProjectedRow" key={projected.object.id}>
-                                        <span>{projected.object.name}</span>
-                                        <span>{projected.object.primitive}</span>
-                                        <span>
-                                          screen [{projected.screenPosition.x.toFixed(1)},{" "}
-                                          {projected.screenPosition.y.toFixed(1)}]
-                                        </span>
-                                        <span>
-                                          size [{projected.screenSize.x.toFixed(1)},{" "}
-                                          {projected.screenSize.y.toFixed(1)}]
-                                        </span>
-                                        <span>{projected.selected ? "selected" : "idle"}</span>
-                                      </div>
-                                    ))
-                                  ) : (
-                                    <span className="emptyState">No projected objects</span>
-                                  )}
-                                </div>
-                              </div>
-                            )}
-                          </div>
-
-                          <div className="modelTransformQuickActions">
-                            <button
-                              className="btn btn-ghost"
-                              type="button"
-                              onClick={() => {
-                                onUpdateModelObjectVector(selectedModelObject.id, "position", 0, 0);
-                                onUpdateModelObjectVector(selectedModelObject.id, "position", 1, 0);
-                                onUpdateModelObjectVector(selectedModelObject.id, "position", 2, 0);
-                              }}
-                            >
-                              Center Position
-                            </button>
-
-                            <button
-                              className="btn btn-ghost"
-                              type="button"
-                              onClick={() => {
-                                onUpdateModelObjectVector(selectedModelObject.id, "rotation", 0, 0);
-                                onUpdateModelObjectVector(selectedModelObject.id, "rotation", 1, 0);
-                                onUpdateModelObjectVector(selectedModelObject.id, "rotation", 2, 0);
-                              }}
-                            >
-                              Reset Rotation
-                            </button>
-
-                            <button
-                              className="btn btn-ghost"
-                              type="button"
-                              onClick={() => {
-                                onUpdateModelObjectVector(selectedModelObject.id, "scale", 0, 1);
-                                onUpdateModelObjectVector(selectedModelObject.id, "scale", 1, 1);
-                                onUpdateModelObjectVector(selectedModelObject.id, "scale", 2, 1);
-                              }}
-                            >
-                              Reset Scale
-                            </button>
-                          </div>
-                        </>
-                      ) : (
-                        <div className="emptyState">Click an object in the viewport or object list.</div>
-                      )}
-                    </div>
-                  </div>
-
-                  <label className="modelNotes">
-                    Notes
-                    <div className="docsMeta">
-                      <span>Text / Markdown document</span>
-                      <span className={docDirty ? "docsDirty" : "docsSaved"}>
-                        {docDirty ? "Unsaved changes" : "Saved"}
-                      </span>
-                    </div>
-                    <textarea
-                      className="docsEditor"
-                      value={modelData.notes}
-                      onChange={(e) =>
-                        onUpdateModelField("notes", e.target.value)
-                      }
-                    />
-                  </label>
-
-                  <div className="docsEditorActions">
-                    <button
-                      className="btn btn-subtle"
-                      type="button"
-                      onClick={() => onCloseModel()}
-                    >
-                      Close Model
-                    </button>
-
-                    <button
-                      className="btn btn-primary"
-                      type="button"
-                      onClick={() => void onSaveModel()}
-                    >
-                      Save Model
-                    </button>
-                  </div>
-                </>
-              ) : (
-                <div className="emptyState">Create or open a model scene.</div>
-              )}
-            </Panel>
-          </section>
-        </div>
+          onFrameSelectedModelObject={
+            handleFrameSelectedModelObject
+          }
+        />
       );
     default:
       return null;
