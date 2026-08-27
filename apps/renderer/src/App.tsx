@@ -4,12 +4,15 @@ import "./app.css";
 import { Modal } from "./components/Modal";
 import { CollapsiblePanel } from "./components/CollapsiblePanel";
 import { Panel, WorkspaceHeader } from "./components/pl-ui";
-import { DocsWorkspace } from "./components/workspaces/DocsWorkspace";
-import { SheetsWorkspace } from "./components/workspaces/SheetsWorkspace";
-import { CodeWorkspace } from "./components/workspaces/CodeWorkspace";
-import { GameWorkspace } from "./components/workspaces/GameWorkspace";
-import { MovieWorkspace } from "./components/workspaces/MovieWorkspace";
-import { ModelingWorkspace } from "./components/workspaces/ModelingWorkspace";
+import {
+  CodeWorkspace,
+  DocsWorkspace,
+  SheetsWorkspace,
+  MovieWorkspace,
+  ModelingWorkspace,
+  GameWorkspace,
+  WorkspaceErrorBoundary,
+} from "./components/workspaces";
 import type {
   AppId,
   AssetInfo,
@@ -2727,7 +2730,10 @@ useEffect(() => {
           title={active}
           subtitle={projectRoot ? `Project: ${projectRoot}` : "No project open"}
         />
-
+      <WorkspaceErrorBoundary
+        key={active}
+        workspace={active}
+      >
         <Workspace 
           active={active}
           projectRoot={projectRoot}
@@ -2834,6 +2840,7 @@ useEffect(() => {
           onDeleteGameEntity={handleDeleteGameEntity}
           onDeleteGameScene={handleDeleteGameScene}
         />
+      </WorkspaceErrorBoundary>
       </section>
 
       <section className={`copilotDrawer ${copilotDrawerOpen ? "open" : "closed"}`}>

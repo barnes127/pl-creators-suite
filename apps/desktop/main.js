@@ -6,7 +6,7 @@ const { createAppMenu } = require("./services/menu");
 const crypto = require("crypto");
 
 let rpcPort = 38741;
-let rpcSesionToken = null;
+let rpcSessionToken = null;
 
 async function createWindow() {
   // Start JSON-RPC server first

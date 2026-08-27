@@ -45,6 +45,7 @@
     "test:projects": "node scripts/project-format-test.js",
     "test:rpc" : "node scripts/rpc-contract-test.js",
     "test:rpc-execution": "node scripts/rpc-execution-test.js",
+    "test:renderer-architecture": "node scripts/renderer-architecture-test.js",
     "rpc:inventory": "node scripts/rpc-inventory.js",
     "dev": "pnpm -r dev",
     "build:renderer": "pnpm --filter renderer build",
