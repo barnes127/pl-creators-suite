@@ -58,6 +58,7 @@ function createRpcExecutionManager({
   methods,
   policies = {},
   onProgress = null,
+  authorize = null,
 }) {
   const activeRequests =
     new Map();
@@ -200,6 +201,16 @@ function createRpcExecutionManager({
       getMethodContract(
         method,
       );
+
+    if (
+      typeof authorize ===
+      "function"
+    ) {
+      authorize(
+        method,
+        contract,
+      );
+    }
 
     const params =
       validateMethodParams(

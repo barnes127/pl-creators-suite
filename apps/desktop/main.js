@@ -7,17 +7,50 @@ const crypto = require("crypto");
 
 let rpcPort = 38741;
 let rpcSessionToken = null;
+let rpcServer = null;
+let rpcServerPromise = null;
+
+async function ensureRpcServer() {
+  if (rpcServerPromise) {
+    return rpcServerPromise;
+  }
+
+  rpcServerPromise = (async () => {
+    rpcSessionToken =
+      crypto.randomBytes(32)
+        .toString("hex");
+
+    const {
+      server,
+      port,
+    } = await startRpcServer({
+      port: rpcPort,
+      sessionToken:
+        rpcSessionToken,
+    });
+
+    rpcServer = server;
+    rpcPort = port;
+
+    return {
+      server,
+      port,
+    };
+  })();
+
+  try {
+    return await rpcServerPromise;
+  } catch (error) {
+    rpcServerPromise = null;
+    rpcServer = null;
+
+    throw error;
+  }
+}
 
 async function createWindow() {
   // Start JSON-RPC server first
-  rpcSessionToken = crypto.randomBytes(32).toString("hex");
-
-  const { port } = await startRpcServer({
-    port: rpcPort,
-    sessionToken: rpcSessionToken,
-  });
-
-  rpcPort = port;
+  await ensureRpcServer();
 
  const state = await loadWindowState();
 
@@ -92,6 +125,18 @@ app.whenReady().then(() => {
     if (BrowserWindow.getAllWindows().length === 0) createWindow();
   });
 });
+
+app.on(
+  "will-quit",
+  () => {
+    if (rpcServer) {
+      rpcServer.close();
+      rpcServer = null;
+    }
+
+    rpcServerPromise = null;
+  },
+);
 
 app.on("window-all-closed", () => {
   if (process.platform !== "darwin") app.quit();

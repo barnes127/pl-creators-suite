@@ -22,6 +22,18 @@ const {
 );
 
 const {
+  createRpcAuthorizer,
+} = require(
+  "./rpc/authorization",
+);
+
+const {
+  createRpcLogger,
+} = require(
+  "./rpc/logging",
+);
+
+const {
   validateMethodParams,
   assertMethodContractCoverage,
 } = require(
@@ -226,6 +238,12 @@ const METHODS =
     METHODS,
   );
 
+const rpcAuthorizer =
+  createRpcAuthorizer();
+
+const rpcLogger =
+  createRpcLogger();
+
 rpcExecutionManager =
   createRpcExecutionManager({
     methods:
@@ -234,21 +252,20 @@ rpcExecutionManager =
     policies:
       METHOD_POLICIES,
 
+    authorize:
+      rpcAuthorizer.authorize,
+
     onProgress:
       ({
         correlationId,
         method,
         progress,
       }) => {
-        const percent =
-          progress.percent ===
-          null
-            ? ""
-            : ` ${progress.percent}%`;
-
-        console.log(
-          `[RPC ${correlationId}] ${method} progress: ${progress.phase}${percent}${progress.message ? ` - ${progress.message}` : ""}`,
-        );
+        rpcLogger.progress({
+          correlationId,
+          method,
+          progress,
+        });
       },
   });
 
@@ -355,6 +372,7 @@ function startRpcServer({
         return;
       }
       let requestId = null;
+      let requestMethod = null;
       const correlationId =
         createCorrelationId();
 
@@ -366,10 +384,16 @@ function startRpcServer({
           validateRpcRequest(parsed);
 
         requestId = request.id;
+        requestMethod =
+          request.method;
 
-        console.log(
-          `[RPC ${correlationId}] ${request.method}`,
-        );
+        rpcLogger.request({
+          correlationId,
+          requestId:
+            request.id,
+          method:
+            request.method,
+        });
 
        if (
          typeof METHODS[
@@ -394,6 +418,14 @@ function startRpcServer({
               correlationId,
             });
 
+        rpcLogger.success({
+          correlationId,
+          requestId:
+            request.id,
+          method:
+            request.method,
+        });
+
         const payload =
           makeRpcSuccess(
             request.id,
@@ -412,10 +444,14 @@ function startRpcServer({
         const normalized =
           normalizeRpcError(error);
 
-        console.error(
-          `[RPC ${correlationId}] request failed:`,
-          error,
-        );
+        rpcLogger.failure({
+          correlationId,
+          requestId,
+          method:
+            requestMethod,
+          error:
+            normalized,
+        });
 
         const payload =
           makeRpcFailure(
@@ -438,10 +474,30 @@ function startRpcServer({
   });
 
   return new Promise((resolve, reject) => {
-    server.on("error", reject);
-    server.listen(port, "127.0.0.1", () => {
-      resolve({ server, port });
-    });
+    server.on(
+      "error",
+      reject,
+    );
+
+    server.listen(
+      port,
+      "127.0.0.1",
+      () => {
+        const address =
+          server.address();
+
+        const boundPort =
+          typeof address === "object" &&
+          address !== null
+            ? address.port
+            : port;
+
+        resolve({
+          server,
+          port: boundPort,
+        });
+      },
+    );
   });
 }
 

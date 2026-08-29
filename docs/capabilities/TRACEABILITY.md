@@ -11,9 +11,9 @@ This report is the Wave 1.1.2 no-omission traceability snapshot for the Official
 
 ### Status
 
-- complete: 26
+- complete: 27
 - missing: 247
-- partial: 56
+- partial: 55
 
 ### Milestones
 
@@ -216,7 +216,7 @@ This report is the Wave 1.1.2 no-omission traceability snapshot for the Official
 | PL-CORE-PHYSICS-001 | CORE | physics | partial | v1.8 | core.json | — | docs/releases/stage-4-physics-simulation-engine-validation.md | — |
 | PL-CORE-PROJECT-001 | CORE | project | complete | v1.1.3 | core.json | apps/desktop/services/project/contract.js<br>apps/desktop/services/project/schemas.js<br>apps/desktop/services/project/persistence.js<br>apps/desktop/services/project/integrity.js<br>apps/desktop/services/projects.js | scripts/project-format-test.js<br>docs/releases/wave-1.1.3-project-format-validation.md | — |
 | PL-CORE-RENDER-001 | CORE | rendering | partial | v1.7 | core.json | — | — | PL-CORE-TASK-001 |
-| PL-CORE-RPC-001 | CORE | rpc | partial | v1.1.4 | core.json | apps/desktop/backend.js | — | — |
+| PL-CORE-RPC-001 | CORE | rpc | complete | v1.1.4 | core.json | apps/desktop/backend.js<br>apps/desktop/rpc/protocol.js<br>apps/desktop/rpc/errors.js<br>apps/desktop/rpc/contracts.js<br>apps/desktop/rpc/registry.js<br>apps/desktop/rpc/execution.js<br>apps/desktop/rpc/authorization.js<br>apps/desktop/rpc/logging.js<br>apps/renderer/src/rpc.ts | scripts/rpc-contract-test.js<br>scripts/rpc-execution-test.js<br>scripts/rpc-authorization-test.js<br>scripts/rpc-backend-integration-test.js<br>scripts/desktop-lifecycle-test.js<br>scripts/rpc-logging-test.js<br>docs/architecture/TRUST_BOUNDARIES.md<br>docs/architecture/FAILURE_ISOLATION.md | — |
 | PL-CORE-SEARCH-001 | CORE | search | missing | v1.2 | core.json | — | — | PL-CORE-INDEX-001<br>PL-CORE-PROJECT-001 |
 | PL-CORE-SERVICE-001 | CORE | services | missing | v1.2 | core.json | — | — | PL-CORE-PERMISSION-001<br>PL-CORE-RPC-001 |
 | PL-CORE-SETTINGS-001 | CORE | settings | missing | v1.2 | core.json | — | — | PL-CORE-PROJECT-001 |
@@ -430,7 +430,7 @@ This report is the Wave 1.1.2 no-omission traceability snapshot for the Official
 ## Traceability Gaps
 
 - Capabilities without implementation links: 273
-- Capabilities without validation links: 280
+- Capabilities without validation links: 279
 
 Missing implementation or validation links are expected for future milestone capabilities that have not entered active development yet. They must be populated as those capabilities move into implementation.
 

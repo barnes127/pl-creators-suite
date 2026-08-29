@@ -52,12 +52,16 @@ Current protections include:
 - timeout policy for selected safe operations
 - explicit mutation/retry metadata
 - trust-boundary metadata
+- runtime permission authorization
+- structured RPC event logging
+- cooperative cancellation for declared methods
+- bounded retry enforcement
 
 RPC handlers are deny-by-registration: an unknown method is rejected.
 
 Every active RPC method must have a matching method contract.
 
-RPC parameter validation occurs before the service handler executes.
+RPC authorization and parameter validation occur before the service handler executes.
 
 ## Filesystem Boundary
 
@@ -220,14 +224,18 @@ Mutations are limited to one attempt by default.
 
 ## Known Wave 1.1.4 Limitations
 
-The following remain intentionally open for the next batch:
+Wave 1.1.4 establishes the current application-level RPC, renderer, trust, and failure boundaries, but it does not provide complete process isolation.
 
-- standardized cancellation
-- standardized progress reporting
-- safe retry execution policy
-- stronger crash isolation
-- worker/engine failure containment
-- runtime integration coverage
-- renderer App.tsx decomposition
+Known remaining limitations include:
 
-The RPC session token is currently available to renderer JavaScript through renderer startup state. This is an interim authenticated loopback design, not the final possible Electron transport architecture.
+- renderer startup currently exposes the RPC session token to renderer JavaScript
+- the RPC token uses the current authenticated loopback transport rather than a final preload-mediated capability channel
+- renderer-side engines remain in-process
+- the shared worker/job platform is not yet complete
+- third-party extension sandboxing is not yet complete
+- future cloud providers require their own provider-specific permission policies
+- timeout does not imply rollback
+- non-cancellable underlying operations may continue after the caller stops waiting
+- full filesystem path-capability sandboxing is not yet implemented
+
+These are documented architectural limits rather than untracked Wave 1.1.4 failures.

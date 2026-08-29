@@ -55,14 +55,31 @@
       "description": "Provide a stable renderer-to-main RPC contract with structured responses and typed failure behavior.",
       "slice": "CORE",
       "area": "rpc",
-      "status": "partial",
+      "status": "complete",
       "targetMilestone": "v1.1.4",
       "source": "Wave 1.1.4 — RPC and Error Boundaries",
       "implementation": [
-        "apps/desktop/backend.js"
+        "apps/desktop/backend.js",
+        "apps/desktop/rpc/protocol.js",
+        "apps/desktop/rpc/errors.js",
+        "apps/desktop/rpc/contracts.js",
+        "apps/desktop/rpc/registry.js",
+        "apps/desktop/rpc/execution.js",
+        "apps/desktop/rpc/authorization.js",
+        "apps/desktop/rpc/logging.js",
+        "apps/renderer/src/rpc.ts"
       ],
-      "validation": [],
-      "notes": "JSON-RPC behavior exists and raw internal stack exposure has been hardened, but the complete contract remains unfinished.",
+      "validation": [
+        "scripts/rpc-contract-test.js",
+        "scripts/rpc-execution-test.js",
+        "scripts/rpc-authorization-test.js",
+        "scripts/rpc-backend-integration-test.js",
+        "scripts/desktop-lifecycle-test.js",
+        "scripts/rpc-logging-test.js",
+        "docs/architecture/TRUST_BOUNDARIES.md",
+        "docs/architecture/FAILURE_ISOLATION.md"
+      ],
+      "notes": "Wave 1.1.4 establishes authenticated loopback transport, structured JSON-RPC responses, typed failures, method contracts, parameter validation, runtime permission authorization, bounded retries, timeout and cooperative cancellation behavior, progress reporting, structured diagnostics, application-owned RPC lifecycle, and backend integration coverage. Process-level worker, engine, and extension isolation remain later platform work.",
       "blockedBy": [],
       "deferralReason": null
     },
