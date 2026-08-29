@@ -1,0 +1,8 @@
+{
+  "fixtureVersion": 1,
+  "id": "docs-baseline",
+  "slice": "docs",
+  "purpose": "Baseline save, reopen, and compatibility validation.",
+  "expectedState": "valid",
+  "knownLimitations": []
+}

@@ -1,0 +1,446 @@
+{
+  "baseline": "v1.1",
+  "generatedAt": "2026-08-29T20:19:03.893Z",
+  "iterations": 5,
+  "environment": {
+    "platform": "linux",
+    "release": "7.0.11-76070011-generic",
+    "arch": "x64",
+    "node": "v22.12.0",
+    "cpu": "Intel(R) Core(TM) i7-8650U CPU @ 1.90GHz",
+    "cpuCount": 8,
+    "totalMemoryGb": 15.47
+  },
+  "aggregate": {
+    "projectCreate": {
+      "samples": 30,
+      "minMs": 1.165,
+      "medianMs": 2.508,
+      "averageMs": 2.598,
+      "maxMs": 4.347
+    },
+    "projectOpen": {
+      "samples": 30,
+      "minMs": 0.934,
+      "medianMs": 1.541,
+      "averageMs": 1.786,
+      "maxMs": 4.841
+    },
+    "checksumWrite": {
+      "samples": 30,
+      "minMs": 0.72,
+      "medianMs": 1.012,
+      "averageMs": 1.242,
+      "maxMs": 3.215
+    },
+    "checksumValidate": {
+      "samples": 30,
+      "minMs": 0.394,
+      "medianMs": 0.896,
+      "averageMs": 1.003,
+      "maxMs": 2.884
+    },
+    "integrityInspect": {
+      "samples": 30,
+      "minMs": 0.737,
+      "medianMs": 1.28,
+      "averageMs": 1.408,
+      "maxMs": 2.433
+    },
+    "projectExport": {
+      "samples": 30,
+      "minMs": 3.681,
+      "medianMs": 5.812,
+      "averageMs": 5.844,
+      "maxMs": 16.929
+    },
+    "projectImport": {
+      "samples": 30,
+      "minMs": 9.656,
+      "medianMs": 14.934,
+      "averageMs": 14.521,
+      "maxMs": 25.516
+    },
+    "importedProjectOpen": {
+      "samples": 30,
+      "minMs": 0.859,
+      "medianMs": 1.874,
+      "averageMs": 1.842,
+      "maxMs": 3.542
+    }
+  },
+  "fixtures": [
+    {
+      "id": "docs-baseline",
+      "slice": "docs",
+      "metrics": {
+        "projectCreate": {
+          "samples": 5,
+          "minMs": 3.385,
+          "medianMs": 3.569,
+          "averageMs": 3.74,
+          "maxMs": 4.347
+        },
+        "projectOpen": {
+          "samples": 5,
+          "minMs": 1.969,
+          "medianMs": 2.406,
+          "averageMs": 2.78,
+          "maxMs": 4.841
+        },
+        "checksumWrite": {
+          "samples": 5,
+          "minMs": 1.423,
+          "medianMs": 1.619,
+          "averageMs": 1.888,
+          "maxMs": 3.215
+        },
+        "checksumValidate": {
+          "samples": 5,
+          "minMs": 1.267,
+          "medianMs": 1.33,
+          "averageMs": 1.689,
+          "maxMs": 2.884
+        },
+        "integrityInspect": {
+          "samples": 5,
+          "minMs": 1.558,
+          "medianMs": 2.023,
+          "averageMs": 1.997,
+          "maxMs": 2.433
+        },
+        "projectExport": {
+          "samples": 5,
+          "minMs": 4.462,
+          "medianMs": 6.422,
+          "averageMs": 8.155,
+          "maxMs": 16.929
+        },
+        "projectImport": {
+          "samples": 5,
+          "minMs": 10.502,
+          "medianMs": 17.65,
+          "averageMs": 16.824,
+          "maxMs": 20.34
+        },
+        "importedProjectOpen": {
+          "samples": 5,
+          "minMs": 1.058,
+          "medianMs": 2.156,
+          "averageMs": 2.096,
+          "maxMs": 2.706
+        }
+      }
+    },
+    {
+      "id": "sheets-baseline",
+      "slice": "sheets",
+      "metrics": {
+        "projectCreate": {
+          "samples": 5,
+          "minMs": 1.165,
+          "medianMs": 2.19,
+          "averageMs": 2.086,
+          "maxMs": 2.932
+        },
+        "projectOpen": {
+          "samples": 5,
+          "minMs": 0.974,
+          "medianMs": 1.33,
+          "averageMs": 1.242,
+          "maxMs": 1.575
+        },
+        "checksumWrite": {
+          "samples": 5,
+          "minMs": 0.72,
+          "medianMs": 0.832,
+          "averageMs": 0.892,
+          "maxMs": 1.087
+        },
+        "checksumValidate": {
+          "samples": 5,
+          "minMs": 0.66,
+          "medianMs": 0.702,
+          "averageMs": 0.746,
+          "maxMs": 0.951
+        },
+        "integrityInspect": {
+          "samples": 5,
+          "minMs": 0.912,
+          "medianMs": 1.001,
+          "averageMs": 1.086,
+          "maxMs": 1.42
+        },
+        "projectExport": {
+          "samples": 5,
+          "minMs": 3.957,
+          "medianMs": 4.135,
+          "averageMs": 4.56,
+          "maxMs": 6.402
+        },
+        "projectImport": {
+          "samples": 5,
+          "minMs": 9.99,
+          "medianMs": 10.485,
+          "averageMs": 11.477,
+          "maxMs": 15.49
+        },
+        "importedProjectOpen": {
+          "samples": 5,
+          "minMs": 0.859,
+          "medianMs": 1.367,
+          "averageMs": 1.393,
+          "maxMs": 1.868
+        }
+      }
+    },
+    {
+      "id": "code-baseline",
+      "slice": "code",
+      "metrics": {
+        "projectCreate": {
+          "samples": 5,
+          "minMs": 2.222,
+          "medianMs": 2.57,
+          "averageMs": 2.539,
+          "maxMs": 2.731
+        },
+        "projectOpen": {
+          "samples": 5,
+          "minMs": 1.402,
+          "medianMs": 1.787,
+          "averageMs": 1.827,
+          "maxMs": 2.407
+        },
+        "checksumWrite": {
+          "samples": 5,
+          "minMs": 0.932,
+          "medianMs": 1.234,
+          "averageMs": 1.23,
+          "maxMs": 1.519
+        },
+        "checksumValidate": {
+          "samples": 5,
+          "minMs": 0.746,
+          "medianMs": 1.006,
+          "averageMs": 0.961,
+          "maxMs": 1.039
+        },
+        "integrityInspect": {
+          "samples": 5,
+          "minMs": 1.247,
+          "medianMs": 1.531,
+          "averageMs": 1.476,
+          "maxMs": 1.71
+        },
+        "projectExport": {
+          "samples": 5,
+          "minMs": 5.543,
+          "medianMs": 5.897,
+          "averageMs": 6.559,
+          "maxMs": 8.937
+        },
+        "projectImport": {
+          "samples": 5,
+          "minMs": 14.84,
+          "medianMs": 15.006,
+          "averageMs": 15.298,
+          "maxMs": 16.155
+        },
+        "importedProjectOpen": {
+          "samples": 5,
+          "minMs": 1.361,
+          "medianMs": 1.912,
+          "averageMs": 2.004,
+          "maxMs": 2.921
+        }
+      }
+    },
+    {
+      "id": "modeling-baseline",
+      "slice": "modeling",
+      "metrics": {
+        "projectCreate": {
+          "samples": 5,
+          "minMs": 1.561,
+          "medianMs": 1.838,
+          "averageMs": 1.901,
+          "maxMs": 2.456
+        },
+        "projectOpen": {
+          "samples": 5,
+          "minMs": 0.934,
+          "medianMs": 1.298,
+          "averageMs": 1.247,
+          "maxMs": 1.507
+        },
+        "checksumWrite": {
+          "samples": 5,
+          "minMs": 0.728,
+          "medianMs": 0.907,
+          "averageMs": 0.845,
+          "maxMs": 0.947
+        },
+        "checksumValidate": {
+          "samples": 5,
+          "minMs": 0.394,
+          "medianMs": 0.824,
+          "averageMs": 0.782,
+          "maxMs": 1.187
+        },
+        "integrityInspect": {
+          "samples": 5,
+          "minMs": 0.83,
+          "medianMs": 1.01,
+          "averageMs": 1.108,
+          "maxMs": 1.511
+        },
+        "projectExport": {
+          "samples": 5,
+          "minMs": 3.681,
+          "medianMs": 4.183,
+          "averageMs": 4.949,
+          "maxMs": 8.845
+        },
+        "projectImport": {
+          "samples": 5,
+          "minMs": 9.694,
+          "medianMs": 10.356,
+          "averageMs": 12.382,
+          "maxMs": 21.347
+        },
+        "importedProjectOpen": {
+          "samples": 5,
+          "minMs": 1.251,
+          "medianMs": 1.311,
+          "averageMs": 1.344,
+          "maxMs": 1.488
+        }
+      }
+    },
+    {
+      "id": "movie-baseline",
+      "slice": "movie",
+      "metrics": {
+        "projectCreate": {
+          "samples": 5,
+          "minMs": 1.837,
+          "medianMs": 2.108,
+          "averageMs": 2.543,
+          "maxMs": 4.303
+        },
+        "projectOpen": {
+          "samples": 5,
+          "minMs": 1.017,
+          "medianMs": 1.303,
+          "averageMs": 1.481,
+          "maxMs": 2.542
+        },
+        "checksumWrite": {
+          "samples": 5,
+          "minMs": 0.736,
+          "medianMs": 0.923,
+          "averageMs": 1.076,
+          "maxMs": 2.023
+        },
+        "checksumValidate": {
+          "samples": 5,
+          "minMs": 0.481,
+          "medianMs": 0.69,
+          "averageMs": 0.812,
+          "maxMs": 1.638
+        },
+        "integrityInspect": {
+          "samples": 5,
+          "minMs": 0.737,
+          "medianMs": 1.025,
+          "averageMs": 1.307,
+          "maxMs": 2.042
+        },
+        "projectExport": {
+          "samples": 5,
+          "minMs": 3.751,
+          "medianMs": 4.312,
+          "averageMs": 4.802,
+          "maxMs": 6.617
+        },
+        "projectImport": {
+          "samples": 5,
+          "minMs": 9.656,
+          "medianMs": 10.746,
+          "averageMs": 13.433,
+          "maxMs": 25.516
+        },
+        "importedProjectOpen": {
+          "samples": 5,
+          "minMs": 1.268,
+          "medianMs": 2.141,
+          "averageMs": 2.096,
+          "maxMs": 3.542
+        }
+      }
+    },
+    {
+      "id": "game-baseline",
+      "slice": "game",
+      "metrics": {
+        "projectCreate": {
+          "samples": 5,
+          "minMs": 2.023,
+          "medianMs": 2.781,
+          "averageMs": 2.78,
+          "maxMs": 3.393
+        },
+        "projectOpen": {
+          "samples": 5,
+          "minMs": 1.394,
+          "medianMs": 1.853,
+          "averageMs": 2.138,
+          "maxMs": 2.913
+        },
+        "checksumWrite": {
+          "samples": 5,
+          "minMs": 0.975,
+          "medianMs": 1.365,
+          "averageMs": 1.519,
+          "maxMs": 2.817
+        },
+        "checksumValidate": {
+          "samples": 5,
+          "minMs": 0.582,
+          "medianMs": 1.001,
+          "averageMs": 1.027,
+          "maxMs": 1.645
+        },
+        "integrityInspect": {
+          "samples": 5,
+          "minMs": 1.23,
+          "medianMs": 1.257,
+          "averageMs": 1.473,
+          "maxMs": 2.079
+        },
+        "projectExport": {
+          "samples": 5,
+          "minMs": 5.856,
+          "medianMs": 6.088,
+          "averageMs": 6.037,
+          "maxMs": 6.169
+        },
+        "projectImport": {
+          "samples": 5,
+          "minMs": 15.507,
+          "medianMs": 16.498,
+          "averageMs": 17.71,
+          "maxMs": 23.789
+        },
+        "importedProjectOpen": {
+          "samples": 5,
+          "minMs": 1.227,
+          "medianMs": 2.246,
+          "averageMs": 2.116,
+          "maxMs": 2.778
+        }
+      }
+    }
+  ]
+}

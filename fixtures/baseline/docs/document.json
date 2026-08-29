@@ -1,0 +1,10 @@
+{
+  "title": "PL Creators Suite Docs Baseline",
+  "content": "Canonical v1.1 baseline document.",
+  "blocks": [
+    {
+      "type": "paragraph",
+      "text": "This fixture verifies deterministic document loading and persistence."
+    }
+  ]
+}

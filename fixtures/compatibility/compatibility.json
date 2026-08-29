@@ -1,0 +1,179 @@
+{
+  "compatibilityVersion": 1,
+  "suiteBaseline": "v1.1",
+  "formats": [
+    {
+      "id": "project-plproj",
+      "scope": "project",
+      "format": ".plproj",
+      "mediaType": "application/zip",
+      "direction": [
+        "import",
+        "export",
+        "round-trip"
+      ],
+      "status": "validated",
+      "validation": [
+        "scripts/project-format-test.js",
+        "scripts/fixture-roundtrip-test.js"
+      ],
+      "notes": "Native PL Creators Suite project archive. Archive entries are validated before extraction and project imports use staging."
+    },
+    {
+      "id": "project-manifest-json",
+      "scope": "project",
+      "format": "JSON",
+      "mediaType": "application/json",
+      "direction": [
+        "read",
+        "write",
+        "round-trip"
+      ],
+      "status": "validated",
+      "validation": [
+        "scripts/project-format-test.js",
+        "scripts/fixture-roundtrip-test.js"
+      ],
+      "notes": "Schema-versioned native project manifest."
+    },
+    {
+      "id": "docs-json",
+      "scope": "docs",
+      "format": "JSON",
+      "mediaType": "application/json",
+      "direction": [
+        "fixture-preservation"
+      ],
+      "status": "validated",
+      "validation": [
+        "scripts/fixture-baseline-test.js",
+        "scripts/fixture-roundtrip-test.js"
+      ],
+      "notes": "Current v1.1 canonical Docs fixture payload. This does not claim external DOCX, PDF, ODT, or Markdown round-trip compatibility."
+    },
+    {
+      "id": "sheets-json",
+      "scope": "sheets",
+      "format": "JSON",
+      "mediaType": "application/json",
+      "direction": [
+        "fixture-preservation"
+      ],
+      "status": "validated",
+      "validation": [
+        "scripts/fixture-baseline-test.js",
+        "scripts/fixture-roundtrip-test.js"
+      ],
+      "notes": "Current v1.1 canonical Sheets fixture payload. This does not claim XLSX, ODS, or CSV round-trip compatibility."
+    },
+    {
+      "id": "code-javascript",
+      "scope": "code",
+      "format": ".js",
+      "mediaType": "text/javascript",
+      "direction": [
+        "fixture-preservation"
+      ],
+      "status": "validated",
+      "validation": [
+        "scripts/fixture-baseline-test.js",
+        "scripts/fixture-roundtrip-test.js"
+      ],
+      "notes": "JavaScript source content survives native project round-trip. This is not a claim about language tooling completeness."
+    },
+    {
+      "id": "modeling-json",
+      "scope": "modeling",
+      "format": "JSON",
+      "mediaType": "application/json",
+      "direction": [
+        "fixture-preservation"
+      ],
+      "status": "validated",
+      "validation": [
+        "scripts/fixture-baseline-test.js",
+        "scripts/fixture-roundtrip-test.js"
+      ],
+      "notes": "Current v1.1 canonical Modeling scene payload. No OBJ, STL, FBX, glTF, or GLB interoperability is claimed by this baseline."
+    },
+    {
+      "id": "movie-json",
+      "scope": "movie",
+      "format": "JSON",
+      "mediaType": "application/json",
+      "direction": [
+        "fixture-preservation"
+      ],
+      "status": "validated",
+      "validation": [
+        "scripts/fixture-baseline-test.js",
+        "scripts/fixture-roundtrip-test.js"
+      ],
+      "notes": "Current v1.1 canonical Movie/Animation timeline payload. No external video, audio, or interchange-format round-trip claim is made here."
+    },
+    {
+      "id": "game-json",
+      "scope": "game",
+      "format": "JSON",
+      "mediaType": "application/json",
+      "direction": [
+        "fixture-preservation"
+      ],
+      "status": "validated",
+      "validation": [
+        "scripts/fixture-baseline-test.js",
+        "scripts/fixture-roundtrip-test.js"
+      ],
+      "notes": "Current v1.1 canonical Game project payload."
+    }
+  ],
+  "externalFormats": [
+    {
+      "scope": "docs",
+      "formats": [
+        "DOCX",
+        "PDF",
+        "ODT",
+        "Markdown"
+      ],
+      "status": "not-baselined"
+    },
+    {
+      "scope": "sheets",
+      "formats": [
+        "XLSX",
+        "ODS",
+        "CSV"
+      ],
+      "status": "not-baselined"
+    },
+    {
+      "scope": "modeling",
+      "formats": [
+        "OBJ",
+        "STL",
+        "FBX",
+        "glTF",
+        "GLB"
+      ],
+      "status": "not-baselined"
+    },
+    {
+      "scope": "movie",
+      "formats": [
+        "MP4",
+        "WebM",
+        "WAV",
+        "MP3"
+      ],
+      "status": "not-baselined"
+    },
+    {
+      "scope": "game",
+      "formats": [
+        "external engine/project formats"
+      ],
+      "status": "not-baselined"
+    }
+  ]
+}

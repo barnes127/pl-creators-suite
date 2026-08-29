@@ -1,0 +1,8 @@
+{
+  "fixtureVersion": 1,
+  "id": "modeling-baseline",
+  "slice": "modeling",
+  "purpose": "Baseline scene, transform, save, and reopen validation.",
+  "expectedState": "valid",
+  "knownLimitations": []
+}

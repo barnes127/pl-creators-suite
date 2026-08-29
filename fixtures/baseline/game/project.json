@@ -1,0 +1,19 @@
+{
+  "name": "Baseline Game",
+  "scenes": [
+    {
+      "id": "baseline-scene",
+      "name": "Main",
+      "entities": [
+        {
+          "id": "baseline-entity",
+          "name": "Player",
+          "position": {
+            "x": 0,
+            "y": 0
+          }
+        }
+      ]
+    }
+  ]
+}

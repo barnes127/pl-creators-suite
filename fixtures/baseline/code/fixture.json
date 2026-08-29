@@ -1,0 +1,8 @@
+{
+  "fixtureVersion": 1,
+  "id": "code-baseline",
+  "slice": "code",
+  "purpose": "Baseline source-file read, save, and reopen validation.",
+  "expectedState": "valid",
+  "knownLimitations": []
+}

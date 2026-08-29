@@ -1,0 +1,17 @@
+{
+  "name": "Baseline Movie",
+  "duration": 5,
+  "tracks": [
+    {
+      "id": "baseline-track",
+      "type": "video",
+      "clips": []
+    }
+  ],
+  "markers": [
+    {
+      "time": 0,
+      "label": "Start"
+    }
+  ]
+}

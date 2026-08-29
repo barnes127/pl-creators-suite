@@ -1,0 +1,66 @@
+{
+  "fixtureVersion": 1,
+  "suiteBaseline": "v1.1",
+  "fixtures": [
+    {
+      "id": "docs-baseline",
+      "slice": "docs",
+      "path": "docs",
+      "description": "Canonical Docs workspace baseline fixture.",
+      "requiredFiles": [
+        "fixture.json",
+        "document.json"
+      ]
+    },
+    {
+      "id": "sheets-baseline",
+      "slice": "sheets",
+      "path": "sheets",
+      "description": "Canonical Spreadsheets workspace baseline fixture.",
+      "requiredFiles": [
+        "fixture.json",
+        "sheet.json"
+      ]
+    },
+    {
+      "id": "code-baseline",
+      "slice": "code",
+      "path": "code",
+      "description": "Canonical Code workspace baseline fixture.",
+      "requiredFiles": [
+        "fixture.json",
+        "main.js"
+      ]
+    },
+    {
+      "id": "modeling-baseline",
+      "slice": "modeling",
+      "path": "modeling",
+      "description": "Canonical Modeling workspace baseline fixture.",
+      "requiredFiles": [
+        "fixture.json",
+        "scene.json"
+      ]
+    },
+    {
+      "id": "movie-baseline",
+      "slice": "movie",
+      "path": "movie",
+      "description": "Canonical Movie and Animation workspace baseline fixture.",
+      "requiredFiles": [
+        "fixture.json",
+        "project.json"
+      ]
+    },
+    {
+      "id": "game-baseline",
+      "slice": "game",
+      "path": "game",
+      "description": "Canonical Game workspace baseline fixture.",
+      "requiredFiles": [
+        "fixture.json",
+        "project.json"
+      ]
+    }
+  ]
+}

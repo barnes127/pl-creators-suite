@@ -1,0 +1,8 @@
+{
+  "fixtureVersion": 1,
+  "id": "game-baseline",
+  "slice": "game",
+  "purpose": "Baseline game-project, scene-state, save, and reopen validation.",
+  "expectedState": "valid",
+  "knownLimitations": []
+}
