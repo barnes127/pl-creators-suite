@@ -13,6 +13,15 @@ import {
   GameWorkspace,
   WorkspaceErrorBoundary,
 } from "./components/workspaces";
+import {
+  ApplicationShell,
+  ShellSidebar,
+  ShellMain,
+  ShellTopBar,
+  ShellWorkspaceRegion,
+  ShellBottomPanel,
+  ShellStatusBar,
+} from "./platform/shell";
 import type {
   AppId,
   AssetInfo,
@@ -2192,8 +2201,9 @@ useEffect(() => {
 }, [projectRoot]);
 
   return (
-  <div className="shell">
-    <aside className="sidebar">
+    <ApplicationShell
+      sidebar={
+        <ShellSidebar>
       <div className="brand">
         <div className="brandMarkRow">
           <div className="brandLogoFrame">
@@ -2683,10 +2693,11 @@ useEffect(() => {
           </div>
         )}
       </CollapsiblePanel>
-    </aside>
-
-    <main className="main">
-      <header className="topbar">
+      </ShellSidebar>
+    }
+  >
+    <ShellMain>
+      <ShellTopBar>
         <div className="topbarRight">
           <button className="btn btn-primary" type="button" onClick={handleNewProject}>
             New Project
@@ -2723,9 +2734,9 @@ useEffect(() => {
           </button>
 
         </div>
-      </header>
+      </ShellTopBar>
 
-      <section className="workspace">
+      <ShellWorkspaceRegion>
         <WorkspaceHeader
           title={active}
           subtitle={projectRoot ? `Project: ${projectRoot}` : "No project open"}
@@ -2841,9 +2852,9 @@ useEffect(() => {
           onDeleteGameScene={handleDeleteGameScene}
         />
       </WorkspaceErrorBoundary>
-      </section>
+      </ShellWorkspaceRegion>
 
-      <section className={`copilotDrawer ${copilotDrawerOpen ? "open" : "closed"}`}>
+      <ShellBottomPanel className={`copilotDrawer ${copilotDrawerOpen ? "open" : "closed"}`}>
         <div className="copilotDrawerHeader">
           <button
             className="panelTitle"
@@ -2903,9 +2914,9 @@ useEffect(() => {
             )}
           </div>
         )}
-      </section>
+      </ShellBottomPanel>
 
-      <section className={`physicsDrawer ${physicsDrawerOpen ? "open" : "closed"}`}>
+      <ShellBottomPanel className={`physicsDrawer ${physicsDrawerOpen ? "open" : "closed"}`}>
         <div className="physicsDrawerHeader">
           <button
             className="panelTitle"
@@ -2932,16 +2943,20 @@ useEffect(() => {
             <PhysicsPlaygroundPanel />
           </div>
         )}
-      </section>
+      </ShellBottomPanel>
 
-      <footer className="statusbar">
-        <div className="statusLeft">Status: {status}</div>
-        <div className="statusRight">
-          {appMetadata
-            ? `${appMetadata.productName} v${appMetadata.version}${appMetadata.isPackaged ? " packaged" : "dev"}`
-            : "PL Creators Suite"}
-        </div>
-      </footer>
+      <ShellStatusBar
+        status={status}
+        productLabel={
+          appMetadata
+            ? `${appMetadata.productName} v${appMetadata.version}${
+                appMetadata.isPackaged
+                  ? " packaged"
+                  : "dev"
+              }`
+            : "PL Creators Suite"
+        }
+      />
 
       {showNew && (
         <Modal title="Create New Project" onClose={() => setShowNew(false)}>
@@ -3051,8 +3066,8 @@ useEffect(() => {
           {openError && <div className="errorBox">{openError}</div>}
         </Modal>
       )}
-    </main>
-  </div>
+    </ShellMain>
+  </ApplicationShell>
 );
 }
 

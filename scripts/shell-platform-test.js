@@ -71,6 +71,7 @@ const expected = [
   "defaults.ts",
   "storage.ts",
   "state.ts",
+  "components.tsx",
   "index.ts",
 ];
 
@@ -104,6 +105,11 @@ const storage =
 const state =
   read(
     "state.ts",
+  );
+
+const components =
+  read(
+    "components.tsx",
   );
 
 const defaults =
@@ -191,6 +197,60 @@ check(
   "workspace state helper exists",
 );
 
+check(
+  components.includes(
+    "ApplicationShell",
+  ),
+  "application shell component exists",
+);
+
+
+check(
+  components.includes(
+    "ShellSidebar",
+  ),
+  "shared sidebar region exists",
+);
+
+
+check(
+  components.includes(
+    "ShellMain",
+  ),
+  "shared main region exists",
+);
+
+
+check(
+  components.includes(
+    "ShellTopBar",
+  ),
+  "shared top-bar region exists",
+);
+
+
+check(
+  components.includes(
+    "ShellWorkspaceRegion",
+  ),
+  "shared workspace region exists",
+);
+
+
+check(
+  components.includes(
+    "ShellBottomPanel",
+  ),
+  "shared bottom-panel region exists",
+);
+
+
+check(
+  components.includes(
+    "ShellStatusBar",
+  ),
+  "shared status-bar region exists",
+);
 
 console.log(
   `\nShell platform test complete: ${passed} passed, ${failed} failed.`,
