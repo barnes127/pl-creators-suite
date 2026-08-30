@@ -8,6 +8,7 @@
   "exports": {
     ".": "./src/index.ts",
     "./commands": "./src/commands/index.ts",
-    "./events": "./src/events/index.ts"
+    "./events": "./src/events/index.ts",
+    "./settings": "./src/settings/index.ts"
   }
 }

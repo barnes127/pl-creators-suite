@@ -121,6 +121,12 @@ const platformIndex =
     "utf8",
   );
 
+check(
+  platformIndex.includes(
+    'export * from "./settings"',
+  ),
+  "platform package exports settings",
+);
 
 check(
   platformIndex.includes(
