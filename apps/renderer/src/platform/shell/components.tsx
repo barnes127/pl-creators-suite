@@ -1,20 +1,56 @@
 import type {
+  CSSProperties,
   ReactNode,
 } from "react";
+
+import type {
+  ShellThemeMode,
+} from "./types";
 
 
 export interface ApplicationShellProps {
   sidebar: ReactNode;
   children: ReactNode;
+  zoom?: number;
+  themeMode?: ShellThemeMode;
 }
 
 
 export function ApplicationShell({
   sidebar,
   children,
+  zoom = 1,
+  themeMode = "default",
 }: ApplicationShellProps) {
+  const safeZoom =
+    Math.min(
+      2,
+      Math.max(
+        0.5,
+        zoom,
+      ),
+    );
+
+  const shellStyle: CSSProperties = {
+    transform:
+      `scale(${safeZoom})`,
+
+    transformOrigin:
+      "top left",
+
+    width:
+      `${100 / safeZoom}%`,
+
+    height:
+      `${100 / safeZoom}%`,
+  };
+
   return (
-    <div className="shell">
+    <div className="shell"
+      data-theme={themeMode}
+      data-zoom={safeZoom}
+      style={shellStyle}
+    >
       {sidebar}
 
       {children}

@@ -15,10 +15,12 @@ import {
   setShellZoom,
   setWorkspaceProfile,
   togglePanel,
+  setShellThemeMode,
 } from "./state";
 
 import type {
   ShellPanelId,
+  ShellThemeMode,
   ShellWorkspaceState,
   WorkspaceProfileId,
 } from "./types";
@@ -63,6 +65,17 @@ export function useShellState() {
     );
   }
 
+  function setThemeMode(
+    themeMode: ShellThemeMode,
+  ) {
+    setShellStateValue(
+      (current) =>
+        setShellThemeMode(
+          current,
+          themeMode,
+        ),
+    );
+  }
 
   function setProfile(
     profileId: WorkspaceProfileId,
@@ -143,6 +156,8 @@ export function useShellState() {
       toggleShellPanel,
 
     setZoom,
+
+    setThemeMode,
 
     resetLayout,
   };

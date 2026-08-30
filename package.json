@@ -57,6 +57,7 @@
     "test:performance-baseline": "node scripts/performance-baseline-test.js",
     "test:shell-platform": "node scripts/shell-platform-test.js",
     "test:shell-integration": "node scripts/shell-integration-test.js",
+    "test:shell-accessibility": "node scripts/shell-accessibility-test.js",
     "performance:baseline": "node scripts/performance-baseline.js",
     "rpc:inventory": "node scripts/rpc-inventory.js",
     "dev": "pnpm -r dev",

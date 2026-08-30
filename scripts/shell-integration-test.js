@@ -198,6 +198,44 @@ console.log(
   `\nShell integration test complete: ${passed} passed, ${failed} failed.`,
 );
 
+check(
+  app.includes(
+    "setZoom",
+  ),
+  "App exposes shell zoom control",
+);
+
+
+check(
+  app.includes(
+    "setThemeMode",
+  ),
+  "App exposes shell theme control",
+);
+
+
+check(
+  app.includes(
+    "Interface zoom",
+  ),
+  "App provides accessible zoom selector",
+);
+
+
+check(
+  app.includes(
+    "High Contrast",
+  ),
+  "App provides high-contrast control",
+);
+
+
+check(
+  app.includes(
+    "aria-pressed",
+  ),
+  "contrast toggle exposes pressed state",
+);
 
 if (
   failed > 0

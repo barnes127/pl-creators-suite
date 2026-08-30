@@ -145,7 +145,7 @@ declare global {
 
 export default function App() {
 
-  const {shellState, setWorkspace, setProfile, setPanel, resetLayout} = useShellState();
+  const {shellState, setWorkspace, setProfile, setPanel,  setZoom, setThemeMode, resetLayout} = useShellState();
   const validWorkspaceIds = NAV_ITEMS.map((item) => item.id);
   const active: AppId = validWorkspaceIds.includes(shellState.activeWorkspace as AppId) ? (shellState.activeWorkspace as AppId) : "code";
 
@@ -2230,6 +2230,8 @@ useEffect(() => {
 
   return (
     <ApplicationShell
+      zoom={shellState.zoom}
+      themeMode={shellState.themeMode}
       sidebar={
         <ShellSidebar>
       <div className="brand">
@@ -2783,6 +2785,76 @@ useEffect(() => {
             }
             aria-label="Workspace profile"
           >
+          <label className="shellControl">
+            <span className="shellControlLabel">
+              Zoom
+            </span>
+
+            <select
+              className="input shellControlInput"
+              value={
+                shellState.zoom
+              }
+              onChange={
+                (
+                  event,
+                ) =>
+                  setZoom(
+                    Number(
+                      event.target.value,
+                    ),
+                  )
+              }
+              aria-label="Interface zoom"
+            >
+              <option value={0.75}>
+                75%
+              </option>
+
+              <option value={0.9}>
+                90%
+              </option>
+
+              <option value={1}>
+                100%
+              </option>
+
+              <option value={1.1}>
+                110%
+              </option>
+
+              <option value={1.25}>
+                125%
+              </option>
+
+              <option value={1.5}>
+                150%
+              </option>
+            </select>
+          </label>
+
+          <button
+            className="btn btn-subtle"
+            type="button"
+            aria-pressed={
+              shellState.themeMode ===
+              "high-contrast"
+            }
+            onClick={
+              () =>
+                setThemeMode(
+                  shellState.themeMode ===
+                    "high-contrast"
+                    ? "default"
+                    : "high-contrast",
+                )
+            }
+          >
+            {shellState.themeMode ===
+            "high-contrast"
+              ? "Standard Contrast"
+              : "High Contrast"}
+          </button>
             {BUILT_IN_WORKSPACE_PROFILES.map(
               (profile) => (
                 <option

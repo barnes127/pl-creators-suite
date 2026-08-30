@@ -306,6 +306,46 @@ check(
 );
 
 
+check(
+  state.includes(
+    "setShellThemeMode",
+  ),
+  "shell theme-state helper exists",
+);
+
+
+check(
+  hook.includes(
+    "setThemeMode",
+  ),
+  "shell hook exposes theme switching",
+);
+
+
+check(
+  components.includes(
+    "data-theme",
+  ),
+  "application shell exposes theme state",
+);
+
+
+check(
+  components.includes(
+    "data-zoom",
+  ),
+  "application shell exposes zoom state",
+);
+
+
+check(
+  components.includes(
+    "transformOrigin",
+  ),
+  "application shell supports whole-interface scaling",
+);
+
+
 console.log(
   `\nShell platform test complete: ${passed} passed, ${failed} failed.`,
 );

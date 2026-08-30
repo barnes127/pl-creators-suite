@@ -2719,3 +2719,160 @@ select.input {
     grid-template-columns: 1fr 1fr;
   }
 }
+
+/* Shared shell accessibility and scaling foundation */
+
+.shell {
+  transform-origin: top left;
+}
+
+.topbarLeft {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+  flex-wrap: wrap;
+}
+
+.shellControl {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.shellControlLabel {
+  font-size: 12px;
+  color: #a8a8b3;
+  font-weight: 600;
+}
+
+.shellControlInput {
+  width: auto;
+  min-width: 82px;
+  padding: 8px 9px;
+}
+
+
+/* Keyboard focus */
+
+:where(
+  button,
+  input,
+  select,
+  textarea,
+  [tabindex]
+):focus-visible {
+  outline: 3px solid #8ca8ff;
+  outline-offset: 2px;
+}
+
+.NavItem:focus-visible,
+.navItem:focus-visible,
+.recentItem:focus-visible,
+.listButton:focus-visible,
+.panelTitle:focus-visible {
+  outline: 3px solid #8ca8ff;
+  outline-offset: 2px;
+}
+
+
+/* High contrast */
+
+.shell[data-theme="high-contrast"] {
+  background: #000;
+  color: #fff;
+}
+
+.shell[data-theme="high-contrast"] .sidebar,
+.shell[data-theme="high-contrast"] .topbar,
+.shell[data-theme="high-contrast"] .statusbar,
+.shell[data-theme="high-contrast"] .modalHeader {
+  background: #000;
+  color: #fff;
+  border-color: #fff;
+}
+
+.shell[data-theme="high-contrast"] .card,
+.shell[data-theme="high-contrast"] .modalPanel,
+.shell[data-theme="high-contrast"] .input,
+.shell[data-theme="high-contrast"] .btn,
+.shell[data-theme="high-contrast"] .navItem,
+.shell[data-theme="high-contrast"] .NavItem,
+.shell[data-theme="high-contrast"] .recentItem,
+.shell[data-theme="high-contrast"] .listButton {
+  background: #000;
+  color: #fff;
+  border-color: #fff;
+}
+
+.shell[data-theme="high-contrast"] .muted,
+.shell[data-theme="high-contrast"] .tiny,
+.shell[data-theme="high-contrast"] .navHint,
+.shell[data-theme="high-contrast"] .brandSub,
+.shell[data-theme="high-contrast"] .activeSub,
+.shell[data-theme="high-contrast"] .shellControlLabel,
+.shell[data-theme="high-contrast"] .statusbar {
+  color: #fff;
+}
+
+.shell[data-theme="high-contrast"] .btn:hover,
+.shell[data-theme="high-contrast"] .navItem:hover,
+.shell[data-theme="high-contrast"] .NavItem:hover,
+.shell[data-theme="high-contrast"] .listButton:hover {
+  background: #222;
+  border-color: #fff;
+}
+
+.shell[data-theme="high-contrast"] .navItem.active,
+.shell[data-theme="high-contrast"] .NavItem.active,
+.shell[data-theme="high-contrast"] .listButtonActive {
+  background: #fff;
+  color: #000;
+  border-color: #fff;
+}
+
+.shell[data-theme="high-contrast"]
+:where(
+  button,
+  input,
+  select,
+  textarea,
+  [tabindex]
+):focus-visible {
+  outline-color: #ffff00;
+}
+
+
+/* Disabled controls stay visibly disabled */
+
+:where(
+  button,
+  input,
+  select,
+  textarea
+):disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+.shell[data-theme="high-contrast"]
+:where(
+  button,
+  input,
+  select,
+  textarea
+):disabled {
+  opacity: 0.7;
+  border-style: dashed;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+  }
+}

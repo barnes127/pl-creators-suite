@@ -1,5 +1,6 @@
 import type {
   ShellPanelId,
+  ShellThemeMode,
   ShellWorkspaceState,
   WorkspaceProfileId,
 } from "./types";
@@ -56,6 +57,17 @@ export function setShellZoom(
           zoom,
         ),
       ),
+  };
+}
+
+
+export function setShellThemeMode(
+  state: ShellWorkspaceState,
+  themeMode: ShellThemeMode,
+): ShellWorkspaceState {
+  return {
+    ...state,
+    themeMode,
   };
 }
 
