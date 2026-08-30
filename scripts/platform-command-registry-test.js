@@ -109,6 +109,33 @@ const validation =
     "validation.ts",
   );
 
+const platformIndex =
+  fs.readFileSync(
+    path.join(
+      root,
+      "packages",
+      "platform",
+      "src",
+      "index.ts",
+    ),
+    "utf8",
+  );
+
+
+check(
+  platformIndex.includes(
+    'export * from "./commands"',
+  ),
+  "platform package exports commands",
+);
+
+
+check(
+  platformIndex.includes(
+    'export * from "./events"',
+  ),
+  "platform package exports events",
+);
 
 check(
   types.includes(

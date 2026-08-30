@@ -61,6 +61,7 @@
     "test:shell-states": "node scripts/shell-state-components-test.js",
     "test:shell-shortcuts": "node scripts/shell-shortcut-test.js",
     "test:platform-commands": "node scripts/platform-command-registry-test.js",
+    "test:platform-events": "node scripts/platform-event-bus-test.js",
     "performance:baseline": "node scripts/performance-baseline.js",
     "rpc:inventory": "node scripts/rpc-inventory.js",
     "dev": "pnpm -r dev",
