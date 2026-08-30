@@ -21,6 +21,14 @@ const {
     "./assets",
   );
 
+const {
+  indexProject,
+  getIndexStatus,
+  ProjectIndexJobManager,
+} =
+  require(
+    "./indexing",
+  );
 
 async function inspectProject(
   params = {},
@@ -66,4 +74,7 @@ module.exports = {
   inspectAssets,
   repairMissingAsset,
   inspectProject,
+  indexProject,
+  getIndexStatus,
+  ProjectIndexJobManager,
 };

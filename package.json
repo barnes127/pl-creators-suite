@@ -67,6 +67,8 @@
     "test:platform-project-assets": "node scripts/platform-project-assets-test.js",
     "test:project-platform-bridge": "node scripts/project-platform-bridge-test.js",
     "test:project-platform-service": "node scripts/project-platform-service-test.js",
+    "test:project-indexing-contract": "node scripts/project-indexing-contract-test.js",
+    "test:project-indexing-service": "node scripts/project-indexing-service-test.js",
     "performance:baseline": "node scripts/performance-baseline.js",
     "rpc:inventory": "node scripts/rpc-inventory.js",
     "dev": "pnpm -r dev",
