@@ -2723,7 +2723,7 @@ useEffect(() => {
             )}
           </div>
         ) : (
-          <div className="emptyState"
+          <WarningState
             title="No project open"
             message="Open a project to use workflows."
           />
