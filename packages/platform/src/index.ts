@@ -6,3 +6,4 @@ export * from "./services";
 export * from "./runtime";
 export * from "./projects";
 export * from "./assets";
+export * from "./search";

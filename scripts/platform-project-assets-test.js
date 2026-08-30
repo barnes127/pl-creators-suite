@@ -183,6 +183,36 @@ for (
 }
 
 
+const invalidation =
+  read(
+    "assets",
+    "invalidation.ts",
+  );
+
+
+check(
+  assetRegistry.includes(
+    "markStale(",
+  ),
+  "asset registry can mark derived assets stale",
+);
+
+
+check(
+  invalidation.includes(
+    "invalidateDerivedAssets",
+  ),
+  "derived invalidation coordinator exists",
+);
+
+
+check(
+  invalidation.includes(
+    "collectDerivedInvalidations",
+  ),
+  "invalidation uses dependency graph traversal",
+);
+
 check(
   projectTypes.includes(
     "ProjectMetadata",

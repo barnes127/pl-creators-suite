@@ -160,4 +160,54 @@ export class AssetRegistry {
           "derived",
       );
   }
+
+  markStale(
+    assetIds:
+      readonly AssetId[],
+  ) {
+    const changed:
+      AssetRecord[] =
+        [];
+
+    for (
+      const assetId
+      of assetIds
+    ) {
+      const asset =
+        this.assets.get(
+          assetId,
+        );
+
+      if (
+        !asset ||
+        asset.ownership !==
+          "derived"
+      ) {
+        continue;
+      }
+
+      const staleAsset:
+        AssetRecord = {
+          ...asset,
+
+          state:
+            "stale",
+
+          updatedAt:
+            new Date()
+              .toISOString(),
+        };
+
+      this.assets.set(
+        assetId,
+        staleAsset,
+      );
+
+      changed.push(
+        staleAsset,
+      );
+    }
+
+    return changed;
+  }
 }

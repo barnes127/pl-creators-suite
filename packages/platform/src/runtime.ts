@@ -23,6 +23,9 @@ import {
   SettingsStore,
 } from "./settings";
 
+import {
+  SearchProviderRegistry,
+} from "./search";
 
 export function createPlatformRuntime() {
   return {
@@ -46,6 +49,9 @@ export function createPlatformRuntime() {
 
     assetDependencies:
       new AssetDependencyGraph(),
+
+    search:
+      new SearchProviderRegistry(),
   };
 }
 

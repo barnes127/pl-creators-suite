@@ -30,6 +30,14 @@ const {
     "./indexing",
   );
 
+const {
+  searchProject,
+  SUPPORTED_SEARCH_KINDS,
+} =
+  require(
+    "./search",
+  );
+
 async function inspectProject(
   params = {},
 ) {
@@ -77,4 +85,6 @@ module.exports = {
   indexProject,
   getIndexStatus,
   ProjectIndexJobManager,
+  searchProject,
+  SUPPORTED_SEARCH_KINDS,
 };
