@@ -53,11 +53,9 @@ const app =
     "utf8",
   );
 
-
 console.log(
   "\nPL Creators Suite — Shell Integration Test\n",
 );
-
 
 check(
   app.includes(
@@ -138,7 +136,6 @@ check(
   "App no longer owns raw top-bar markup",
 );
 
-
 check(
   !app.includes(
     '<footer className="statusbar">',
@@ -194,9 +191,6 @@ check(
   "App routes drawer visibility through shell state",
 );
 
-console.log(
-  `\nShell integration test complete: ${passed} passed, ${failed} failed.`,
-);
 
 check(
   app.includes(
@@ -236,6 +230,11 @@ check(
   ),
   "contrast toggle exposes pressed state",
 );
+
+console.log(
+  `\nShell integration test complete: ${passed} passed, ${failed} failed.`,
+);
+
 
 if (
   failed > 0

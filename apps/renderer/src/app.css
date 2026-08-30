@@ -2876,3 +2876,130 @@ select.input {
     animation-iteration-count: 1 !important;
   }
 }
+
+/* Shared shell operation states */
+
+.shellState {
+  display: grid;
+  gap: 8px;
+  padding: 14px;
+  border: 1px solid #2b2b35;
+  border-radius: 12px;
+  background: #121216;
+  color: #e8e8ea;
+}
+
+.shellState-compact {
+  padding: 10px;
+}
+
+.shellStateHeader {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.shellStateIndicator {
+  width: 10px;
+  height: 10px;
+  border-radius: 999px;
+  background: #8c8c9b;
+  flex: 0 0 auto;
+}
+
+.shellStateTitle {
+  font-size: 14px;
+}
+
+.shellStateMessage {
+  color: #bdbdc8;
+  font-size: 13px;
+  line-height: 1.45;
+}
+
+.shellStateActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 2px;
+}
+
+.shellState-loading {
+  border-color: #4d638a;
+}
+
+.shellState-loading .shellStateIndicator {
+  background: #8ca8ff;
+}
+
+.shellState-empty {
+  border-color: #34343d;
+}
+
+.shellState-error {
+  border-color: #7c3838;
+  background: #1a1010;
+}
+
+.shellState-error .shellStateIndicator {
+  background: #ff7474;
+}
+
+.shellState-disabled {
+  opacity: 0.7;
+  border-style: dashed;
+}
+
+.shellState-warning {
+  border-color: #806c2e;
+  background: #1c180c;
+}
+
+.shellState-warning .shellStateIndicator {
+  background: #ffd866;
+}
+
+.shellState-permission {
+  border-color: #5c4b8a;
+  background: #14101f;
+}
+
+.shellState-permission .shellStateIndicator {
+  background: #b9a3ff;
+}
+
+.shellState-destructive {
+  border-color: #9a3232;
+  background: #211010;
+}
+
+.shellState-destructive .shellStateIndicator {
+  background: #ff5252;
+}
+
+
+.shell[data-theme="high-contrast"] .shellState {
+  background: #000;
+  color: #fff;
+  border-color: #fff;
+}
+
+.shell[data-theme="high-contrast"] .shellStateMessage {
+  color: #fff;
+}
+
+.shell[data-theme="high-contrast"] .shellStateIndicator {
+  background: #fff;
+}
+
+.shell[data-theme="high-contrast"]
+.shellState-warning .shellStateIndicator {
+  background: #ffff00;
+}
+
+.shell[data-theme="high-contrast"]
+.shellState-error .shellStateIndicator,
+.shell[data-theme="high-contrast"]
+.shellState-destructive .shellStateIndicator {
+  background: #ff5555;
+}

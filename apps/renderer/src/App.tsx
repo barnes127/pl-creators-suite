@@ -23,6 +23,9 @@ import {
   ShellStatusBar,
   BUILT_IN_WORKSPACE_PROFILES,
   useShellState,
+  EmptyState,
+  LoadingState,
+  WarningState,
 } from "./platform/shell";
 import type {
   AppId,
@@ -2371,9 +2374,10 @@ useEffect(() => {
             )}
           </div>
         ) : (
-          <div className="emptyState">
-            Checking local AI status. The suite can run without AI configured.
-          </div>
+          <LoadingState
+            title="Checking local AI"
+            message="The suite can run without AI configured."
+          />
         )}
       </CollapsiblePanel>
 
@@ -2478,9 +2482,10 @@ useEffect(() => {
             </div>
 
             {assets.length === 0 ? (
-              <div className="emptyState">
-                No assets registered yet. Import or register local files for this project.
-              </div>
+              <EmptyState
+                title="No assets registered"
+                message="Import or register local files for this project."
+              />
             ) : (
               assets.map((asset) => (
                 <div className="recentItem" key={asset.id}>
@@ -2493,7 +2498,10 @@ useEffect(() => {
             )}
           </div>
         ) : (
-          <div className="emptyState">Open a project to use a the asset registry.</div>
+          <WarningState
+            title="No project open"
+            message="Open a project to use a the asset registry."
+          />
         )}
       </CollapsiblePanel>
 
@@ -2590,8 +2598,10 @@ useEffect(() => {
             </button>
 
             {workflowsList.length === 0 ? (
-              <div className="emptyState">
-                No workflows yet. Create one manually or start from a template.</div>
+              <EmptyState
+                title="No workflows yet"
+                message="Create one manually or start from a template."
+              />
             ) : (
               workflowsList.map((workflow) => (
                 <button
@@ -2691,7 +2701,10 @@ useEffect(() => {
                 </div>
               </div>
             ) : (
-              <div className="emptyState">Open a workflow to inspect triggers and actions.</div>
+              <EmptyState
+                title="No workflow selected"
+                message="Open a workflow to inspect triggers and actions."
+              />
             )}
 
             {workflowRunResult && (
@@ -2710,7 +2723,10 @@ useEffect(() => {
             )}
           </div>
         ) : (
-          <div className="emptyState">Open a project to use workflows.</div>
+          <div className="emptyState"
+            title="No project open"
+            message="Open a project to use workflows."
+          />
         )}
       </CollapsiblePanel>
 
