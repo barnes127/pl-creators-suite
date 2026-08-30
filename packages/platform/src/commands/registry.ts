@@ -16,12 +16,6 @@ import {
 } from "./validation";
 
 
-register(
-  validateCommandDefinition(
-    definition,
-  );
-)
-
 export class CommandRegistry {
   private readonly commands =
     new Map<
@@ -42,6 +36,10 @@ export class CommandRegistry {
       TOutput
     >,
   ) {
+    validateCommandDefinition(
+      definition,
+    );
+
     if (
       this.commands.has(
         definition.id,
