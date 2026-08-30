@@ -123,6 +123,29 @@ const platformIndex =
 
 check(
   platformIndex.includes(
+    'export * from "./capabilities"',
+  ),
+  "platform package exports capabilities",
+);
+
+
+check(
+  platformIndex.includes(
+    'export * from "./services"',
+  ),
+  "platform package exports services",
+);
+
+
+check(
+  platformIndex.includes(
+    'export * from "./runtime"',
+  ),
+  "platform package exports runtime",
+);
+
+check(
+  platformIndex.includes(
     'export * from "./settings"',
   ),
   "platform package exports settings",
