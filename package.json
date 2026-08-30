@@ -60,6 +60,7 @@
     "test:shell-accessibility": "node scripts/shell-accessibility-test.js",
     "test:shell-states": "node scripts/shell-state-components-test.js",
     "test:shell-shortcuts": "node scripts/shell-shortcut-test.js",
+    "test:platform-commands": "node scripts/platform-command-registry-test.js",
     "performance:baseline": "node scripts/performance-baseline.js",
     "rpc:inventory": "node scripts/rpc-inventory.js",
     "dev": "pnpm -r dev",
