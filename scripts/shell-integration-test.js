@@ -147,6 +147,53 @@ check(
 );
 
 
+check(
+  app.includes(
+    "useShellState",
+  ),
+  "App consumes persistent shell state",
+);
+
+
+check(
+  app.includes(
+    "BUILT_IN_WORKSPACE_PROFILES",
+  ),
+  "App exposes built-in workspace profiles",
+);
+
+
+check(
+  app.includes(
+    "Reset Layout",
+  ),
+  "App exposes layout reset control",
+);
+
+
+check(
+  !app.includes(
+    "pl.layout.copilotDrawerOpen",
+  ),
+  "legacy Copilot drawer persistence removed",
+);
+
+
+check(
+  !app.includes(
+    "pl.layout.physicsDrawerOpen",
+  ),
+  "legacy physics drawer persistence removed",
+);
+
+
+check(
+  app.includes(
+    'setPanel(',
+  ),
+  "App routes drawer visibility through shell state",
+);
+
 console.log(
   `\nShell integration test complete: ${passed} passed, ${failed} failed.`,
 );

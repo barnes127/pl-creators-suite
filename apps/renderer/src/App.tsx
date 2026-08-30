@@ -21,6 +21,8 @@ import {
   ShellWorkspaceRegion,
   ShellBottomPanel,
   ShellStatusBar,
+  BUILT_IN_WORKSPACE_PROFILES,
+  useShellState,
 } from "./platform/shell";
 import type {
   AppId,
@@ -141,20 +143,18 @@ declare global {
 }
 
 
-function readStoredBoolean(key: string, fallback: boolean) {
-  try {
-    const raw = window.localStorage.getItem(key);
-    if (raw === "true") return true;
-    if (raw === "false") return false;
-    return fallback;
-  } catch {
-    return fallback;
-  }
-}
-
 export default function App() {
 
-  const [active, setActive] = useState<AppId>("code");
+  const {shellState, setWorkspace, setProfile, setPanel, resetLayout} = useShellState();
+  const validWorkspaceIds = NAV_ITEMS.map((item) => item.id);
+  const active: AppId = validWorkspaceIds.includes(shellState.activeWorkspace as AppId) ? (shellState.activeWorkspace as AppId) : "code";
+
+  function setActive(
+    workspace: AppId
+  ) {
+    setWorkspace(workspace);
+  }
+
 //  const activeItem = NAV_ITEMS.find((n) => n.id === active)!;
   const [projectRoot, setProjectRoot] = useState<string>("");
   const [status, setStatus] = useState<string>("idle");
@@ -182,12 +182,62 @@ export default function App() {
   const [newDocName, setNewDocName] = useState("");
   const [activeDocName, setActiveDocName] = useState("");
   const [docContent, setDocContent] = useState("");
-  const [copilotDrawerOpen, setCopilotDrawerOpen] = useState(() =>
-    readStoredBoolean("pl.layout.copilotDrawerOpen", true)
-  );
-  const [physicsDrawerOpen, setPhysicsDrawerOpen] = useState(() =>
-    readStoredBoolean("pl.layout.physicsDrawerOpen", false)
-  );
+  const copilotDrawerOpen =
+    shellState
+      .layout
+      .visibility
+      .copilot;
+
+  function setCopilotDrawerOpen(
+    value:
+      | boolean
+      | (
+          (
+            current: boolean,
+          ) => boolean
+        ),
+  ) {
+    const next =
+      typeof value ===
+        "function"
+        ? value(
+          copilotDrawerOpen,
+        )
+      : value;
+
+    setPanel(
+      "copilot",
+      next,
+    );
+  }
+  const physicsDrawerOpen =
+    shellState
+      .layout
+      .visibility
+      .physics;
+
+  function setPhysicsDrawerOpen(
+    value:
+      | boolean
+      | (
+          (
+            current: boolean,
+          ) => boolean
+        ),
+  ) {
+    const next =
+      typeof value ===
+        "function"
+        ? value(
+            physicsDrawerOpen,
+          )
+        : value;
+
+    setPanel(
+      "physics",
+      next,
+    );
+  }
   const [assets, setAssets] = useState<AssetInfo[]>([]);
   const [docDirty, setDocDirty] = useState(false);
   const [codeFiles, setCodeFiles] = useState<CodeFileInfo[]>([]);
@@ -2150,28 +2200,6 @@ useEffect(() => {
 }, [projectRoot]);
 
 useEffect(() => {
-  try {
-    window.localStorage.setItem(
-      "pl.layout.copilotDrawerOpen",
-      String(copilotDrawerOpen)
-    );
-  } catch {
-    // Ignore storage failures.
-  }
-}, [copilotDrawerOpen]);
-
-useEffect(() => {
-  try {
-    window.localStorage.setItem(
-      "pl.layout.physicsDrawerOpen",
-      String(physicsDrawerOpen)
-    );
-  } catch {
-    // ignore localStorage failures
-  }
-}, [physicsDrawerOpen]);
-
-useEffect(() => {
   const unsubscribe = window.plMenu?.onMenuAction?.((channel) => {
     if (channel === "menu:new-project") {
       handleNewProject();
@@ -2238,7 +2266,28 @@ useEffect(() => {
             <button
               key={item.id}
               className={`NavItem ${isActive ? "active" : ""}`}
-              onClick={() => setActive(item.id)}
+              onClick={
+                () => {
+                  setActive(
+                    item.id,
+                  );
+
+                  const profile =
+                    BUILT_IN_WORKSPACE_PROFILES.find(
+                      (candidate) =>
+                        candidate.workspace ===
+                        item.id,
+                    );
+
+                  if (
+                    profile
+                  ) {
+                    setProfile(
+                      profile.id,
+                    );
+                  }
+                }
+              }
               type="button"
             >
               <div className="navLabel">{item.label}</div>
@@ -2698,6 +2747,74 @@ useEffect(() => {
   >
     <ShellMain>
       <ShellTopBar>
+        <div className="topbarLeft">
+          <select
+            className="input"
+            value={
+              shellState.profileId
+            }
+            onChange={
+              (
+                event,
+              ) => {
+                const profile =
+                  BUILT_IN_WORKSPACE_PROFILES.find(
+                    (candidate) =>
+                      candidate.id ===
+                      event.target.value,
+                  );
+
+                if (!profile) {
+                  return;
+                }
+
+                setProfile(
+                  profile.id,
+                );
+
+                if (
+                  profile.workspace
+                ) {
+                  setWorkspace(
+                    profile.workspace,
+                  );
+                }
+              }
+            }
+            aria-label="Workspace profile"
+          >
+            {BUILT_IN_WORKSPACE_PROFILES.map(
+              (profile) => (
+                <option
+                  key={
+                    profile.id
+                  }
+                  value={
+                    profile.id
+                  }
+                >
+                  {profile.name}
+                </option>
+              ),
+            )}
+          </select>
+
+          <button
+            className="btn btn-subtle"
+            type="button"
+            onClick={
+              () => {
+                resetLayout();
+
+                setStatus(
+                  "Workspace layout reset",
+                );
+              }
+            }
+          >
+            Reset Layout
+          </button>
+        </div>
         <div className="topbarRight">
           <button className="btn btn-primary" type="button" onClick={handleNewProject}>
             New Project

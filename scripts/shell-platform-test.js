@@ -73,6 +73,7 @@ const expected = [
   "state.ts",
   "components.tsx",
   "index.ts",
+  "useShellState.ts",
 ];
 
 
@@ -115,6 +116,11 @@ const components =
 const defaults =
   read(
     "defaults.ts",
+  );
+
+const hook =
+  read(
+    "useShellState.ts",
   );
 
 
@@ -251,6 +257,54 @@ check(
   ),
   "shared status-bar region exists",
 );
+
+check(
+  hook.includes(
+    "loadShellState",
+  ),
+  "shell hook loads persistent state",
+);
+
+
+check(
+  hook.includes(
+    "saveShellState",
+  ),
+  "shell hook persists state",
+);
+
+
+check(
+  hook.includes(
+    "resetShellState",
+  ),
+  "shell hook exposes reset behavior",
+);
+
+
+check(
+  hook.includes(
+    "setWorkspace",
+  ),
+  "shell hook exposes workspace switching",
+);
+
+
+check(
+  hook.includes(
+    "setProfile",
+  ),
+  "shell hook exposes workspace profiles",
+);
+
+
+check(
+  hook.includes(
+    "setPanel",
+  ),
+  "shell hook exposes panel visibility",
+);
+
 
 console.log(
   `\nShell platform test complete: ${passed} passed, ${failed} failed.`,

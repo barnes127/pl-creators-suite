@@ -97,7 +97,7 @@ export const BUILT_IN_WORKSPACE_PROFILES:
 
       name: "Modeling",
 
-      workspace: "modeling",
+      workspace: "modeler",
 
       layout:
         structuredClone(
