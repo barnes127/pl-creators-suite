@@ -4,3 +4,5 @@ export * from "./settings";
 export * from "./capabilities";
 export * from "./services";
 export * from "./runtime";
+export * from "./projects";
+export * from "./assets";

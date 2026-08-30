@@ -3,6 +3,11 @@ import {
 } from "./capabilities";
 
 import {
+  AssetDependencyGraph,
+  AssetRegistry,
+} from "./assets";
+
+import {
   CommandRegistry,
 } from "./commands";
 
@@ -35,6 +40,12 @@ export function createPlatformRuntime() {
 
     services:
       new ServiceRegistry(),
+
+    assets:
+      new AssetRegistry(),
+
+    assetDependencies:
+      new AssetDependencyGraph(),
   };
 }
 
