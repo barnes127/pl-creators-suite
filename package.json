@@ -71,6 +71,7 @@
     "test:project-indexing-service": "node scripts/project-indexing-service-test.js",
     "test:platform-search": "node scripts/platform-search-contract-test.js",
     "test:project-global-search": "node scripts/project-global-search-test.js",
+    "test:platform-types": "tsc --noEmit --target ES2022 --module ESNext --moduleResolution Bundler --skipLibCheck packages/platform/src/index.ts",
     "performance:baseline": "node scripts/performance-baseline.js",
     "rpc:inventory": "node scripts/rpc-inventory.js",
     "dev": "pnpm -r dev",
