@@ -26,6 +26,7 @@ import {
   EmptyState,
   LoadingState,
   WarningState,
+  useShellShortcuts,
 } from "./platform/shell";
 import type {
   AppId,
@@ -291,6 +292,154 @@ export default function App() {
     useState<WorkflowRunResult | null>(null);
   const [workflowBusy, setWorkflowBusy] = useState(false);
   const [workflowTemplateSearch, setWorkflowTemplateSearch] = useState("");
+
+  const suiteHasUnsavedChanges =
+    docDirty ||
+    codeDirty ||
+    sheetDirty ||
+    movieDirty ||
+    modelDirty ||
+    gameDirty;
+
+  const shellShortcuts =
+    useMemo(
+      () => [
+        {
+          id:
+            "workspace.code",
+          label:
+            "Open Code workspace",
+          shortcut:
+            "ctrl+1",
+          execute:
+            () =>
+              setActive(
+                "code",
+              ),
+        },
+        {
+          id:
+            "workspace.docs",
+          label:
+            "Open Docs workspace",
+          shortcut:
+            "ctrl+2",
+          execute:
+            () =>
+              setActive(
+                "docs",
+              ),
+        },
+        {
+          id:
+            "workspace.sheets",
+          label:
+            "Open Sheets workspace",
+          shortcut:
+            "ctrl+3",
+          execute:
+            () =>
+              setActive(
+                "sheets",
+              ),
+        },
+        {
+          id:
+            "workspace.modeler",
+          label:
+            "Open Modeling workspace",
+          shortcut:
+            "ctrl+4",
+          execute:
+            () =>
+              setActive(
+                "modeler",
+              ),
+        },
+        {
+          id:
+            "workspace.movie",
+          label:
+            "Open Movie workspace",
+          shortcut:
+            "ctrl+5",
+          execute:
+            () =>
+              setActive(
+                "movie",
+              ),
+        },
+        {
+          id:
+            "workspace.game",
+          label:
+            "Open Game workspace",
+          shortcut:
+            "ctrl+6",
+          execute:
+            () =>
+              setActive(
+                "game",
+              ),
+        },
+        {
+          id:
+            "shell.zoom.reset",
+          label:
+            "Reset interface zoom",
+          shortcut:
+            "ctrl+0",
+
+          execute:
+            () =>
+              setZoom(
+                1,
+              ),
+        },
+        {
+          id:
+            "shell.contrast.toggle",
+          label:
+            "Toggle high contrast",
+          shortcut:
+            "ctrl+shift+h",
+          execute:
+            () =>
+              setThemeMode(
+                shellState.themeMode ===
+                  "high-contrast"
+                  ? "default"
+                  : "high-contrast",
+              ),
+        },
+        {
+          id:
+            "shell.layout.reset",
+          label:
+            "Reset workspace layout",
+          shortcut:
+            "ctrl+shift+l",
+          execute:
+            () => {
+              resetLayout();
+              setStatus(
+                "Workspace layout reset",
+              );
+            },
+        },
+      ],
+      [
+        resetLayout,
+        setActive,
+        setThemeMode,
+        setZoom,
+        shellState.themeMode,
+      ],
+    );
+
+  useShellShortcuts(
+    shellShortcuts,
+  );
 
 async function handleOpenProject() {
   try {
@@ -2297,6 +2446,20 @@ useEffect(() => {
             >
               <div className="navLabel">{item.label}</div>
               <div className="navHint">{item.hint}</div>
+              <div className="navShortcut">
+                {item.id === "code" &&
+                  "Ctrl+1"}
+                {item.id === "docs" &&
+                  "Ctrl+2"}
+                {item.id === "sheets" &&
+                  "Ctrl+3"}
+                {item.id === "modeler" &&
+                  "Ctrl+4"}
+                {item.id === "movie" &&
+                  "Ctrl+5"}
+                {item.id === "game" &&
+                  "Ctrl+6"}
+              </div>
             </button>
           );
         })}
@@ -3161,6 +3324,13 @@ useEffect(() => {
               }`
             : "PL Creators Suite"
         }
+        saveState={{
+          dirty:
+            suiteHasUnsavedChanges,
+
+          saving:
+            false,
+        }}
       />
 
       {showNew && (

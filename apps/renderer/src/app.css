@@ -3003,3 +3003,71 @@ select.input {
 .shellState-destructive .shellStateIndicator {
   background: #ff5555;
 }
+
+/* Shared save-state indicator */
+
+.statusLeft {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+}
+
+.shellSaveIndicator {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap;
+}
+
+.shellSaveDot {
+  width: 8px;
+  height: 8px;
+  border-radius: 999px;
+  background: #7f8790;
+}
+
+.shellSaveIndicator-saved
+.shellSaveDot {
+  background: #6dbb7a;
+}
+
+.shellSaveIndicator-dirty
+.shellSaveDot {
+  background: #e2b84f;
+}
+
+.shellSaveIndicator-saving
+.shellSaveDot {
+  background: #8ca8ff;
+}
+
+.shellSaveIndicator-error
+.shellSaveDot {
+  background: #ff6464;
+}
+
+.shell[data-theme="high-contrast"]
+.shellSaveDot {
+  border: 1px solid #fff;
+}
+
+.shell[data-theme="high-contrast"]
+.shellSaveIndicator-dirty
+.shellSaveDot {
+  background: #ffff00;
+}
+
+
+/* Shortcut hints */
+
+.navShortcut {
+  margin-top: 5px;
+  font-size: 11px;
+  color: #7f7f8c;
+}
+
+.shell[data-theme="high-contrast"]
+.navShortcut {
+  color: #fff;
+}

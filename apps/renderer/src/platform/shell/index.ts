@@ -5,3 +5,5 @@ export * from "./state";
 export * from "./components";
 export * from "./useShellState";
 export * from "./states";
+export * from "./shortcuts";
+export * from "./useShellShortcuts";

@@ -4,6 +4,7 @@ import type {
 } from "react";
 
 import type {
+  ShellSaveState,
   ShellThemeMode,
 } from "./types";
 
@@ -148,24 +149,103 @@ export function ShellBottomPanel({
 
 export interface ShellStatusBarProps {
   status: string;
-
   productLabel: string;
+  saveState?: ShellSaveState;
 }
 
 
 export function ShellStatusBar({
   status,
   productLabel,
+  saveState,
 }: ShellStatusBarProps) {
   return (
     <footer className="statusbar">
       <div className="statusLeft">
-        Status: {status}
+        <span>
+          Status: {status}
+        </span>
+
+        {saveState && (
+          <ShellSaveIndicator
+            state={
+              saveState
+            }
+          />
+        )}
       </div>
 
       <div className="statusRight">
         {productLabel}
       </div>
     </footer>
+  );
+}
+
+export interface ShellSaveIndicatorProps {
+  state: ShellSaveState;
+}
+
+
+export function ShellSaveIndicator({
+  state,
+}: ShellSaveIndicatorProps) {
+  let label =
+    "Saved";
+
+  let kind =
+    "saved";
+
+
+  if (
+    state.error
+  ) {
+    label =
+      "Save error";
+
+    kind =
+      "error";
+  } else if (
+    state.saving
+  ) {
+    label =
+      "Saving…";
+
+    kind =
+      "saving";
+  } else if (
+    state.dirty
+  ) {
+    label =
+      "Unsaved changes";
+
+    kind =
+      "dirty";
+  }
+
+
+  return (
+    <div
+      className={`shellSaveIndicator shellSaveIndicator-${kind}`}
+      data-save-state={
+        kind
+      }
+      role="status"
+      aria-live="polite"
+      title={
+        state.error ??
+        state.lastSavedAt ??
+        label
+      }
+    >
+      <span
+        className="shellSaveDot"
+        aria-hidden="true"
+      />
+
+      <span>
+        {label}
+      </span>
+    </div>
   );
 }

@@ -74,6 +74,8 @@ const expected = [
   "components.tsx",
   "index.ts",
   "useShellState.ts",
+  "shortcuts.ts",
+  "useShellShortcuts.ts"
 ];
 
 
@@ -123,6 +125,39 @@ const hook =
     "useShellState.ts",
   );
 
+const shortcuts =
+  read(
+    "shortcuts.ts",
+  );
+
+const shortcutHook =
+  read(
+    "useShellShortcuts.ts",
+  );
+
+
+check(
+  shortcuts.includes(
+    "findShortcutConflicts",
+  ),
+  "shell shortcut conflict service exists",
+);
+
+
+check(
+  shortcutHook.includes(
+    "useShellShortcuts",
+  ),
+  "shell shortcut React integration exists",
+);
+
+
+check(
+  components.includes(
+    "ShellSaveIndicator",
+  ),
+  "shared save-state indicator exists",
+);
 
 check(
   types.includes(
