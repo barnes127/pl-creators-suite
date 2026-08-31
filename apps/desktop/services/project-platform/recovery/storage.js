@@ -25,6 +25,12 @@ const {
 );
 
 
+const {
+  RecoveryDataError,
+} = require(
+  "./errors",
+);
+
 function createEmptyRecoveryStatus(
   projectRoot,
 ) {
@@ -85,11 +91,19 @@ async function readRecoveryStatusRecord(
   }
 
 
-  const parsed =
-    JSON.parse(
-      raw,
-    );
+  let parsed;
 
+  try {
+    parsed =
+      JSON.parse(
+        raw,
+      );
+  } catch {
+    throw new RecoveryDataError(
+      "Recovery status contains invalid JSON",
+      "CORRUPT_RECOVERY_STATUS",
+    );
+  }
 
   return {
     ...createEmptyRecoveryStatus(

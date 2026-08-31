@@ -28,7 +28,13 @@ const {
 );
 
 
-async function restoreProjectSnapshot(
+const {
+  createPreDestructiveBackup,
+} = require(
+  "./backup",
+);
+
+async function restoreProjectSnapshotUnsafe(
   params = {},
 ) {
   const projectRoot =
@@ -192,7 +198,37 @@ async function restoreProjectSnapshot(
   };
 }
 
+async function restoreProjectSnapshot(
+  params = {},
+) {
+  const backup =
+    await createPreDestructiveBackup({
+      projectRoot:
+        params.projectRoot,
+
+      operation:
+        "snapshot restore",
+
+      description:
+        `Automatic backup before restoring snapshot ${params.snapshotId}.`,
+    });
+
+
+  const result =
+    await restoreProjectSnapshotUnsafe(
+      params,
+    );
+
+
+  return {
+    ...result,
+
+    backupSnapshotId:
+      backup.id,
+  };
+}
 
 module.exports = {
   restoreProjectSnapshot,
+  restoreProjectSnapshotUnsafe,
 };

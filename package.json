@@ -78,6 +78,8 @@
     "test:project-recovery-service": "node scripts/project-recovery-service-test.js",
     "test:project-snapshot-contract": "node scripts/project-snapshot-contract-test.js",
     "test:project-snapshot-service": "node scripts/project-snapshot-service-test.js",
+    "test:project-recovery-drill": "node scripts/project-recovery-drill-test.js",
+    "test:project-recovery-closeout": "node scripts/project-recovery-closeout-test.js",
     "performance:baseline": "node scripts/performance-baseline.js",
     "rpc:inventory": "node scripts/rpc-inventory.js",
     "dev": "pnpm -r dev",

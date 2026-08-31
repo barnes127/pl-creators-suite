@@ -380,6 +380,21 @@ function docsOrCodeSaveParams(params) {
   return params;
 }
 
+function recoveryRestoreParams(
+  params,
+) {
+  projectRootParams(
+    params,
+  );
+
+  requireString(
+    params,
+    "snapshotId",
+  );
+
+  return params;
+}
+
 const PERMISSION =
   Object.freeze({
     FILESYSTEM_READ:
@@ -872,6 +887,59 @@ METHOD_CONTRACTS[
   supportsCancellation: false,
   trust: [
     TRUST.NONE,
+  ],
+};
+
+METHOD_CONTRACTS[
+  "recovery.status"
+] = {
+  validate:
+    projectRootParams,
+
+  mutates:
+    false,
+
+  retryable:
+    true,
+
+  trust: [
+    TRUST.FILESYSTEM,
+  ],
+};
+
+
+METHOD_CONTRACTS[
+  "recovery.snapshots"
+] = {
+  validate:
+    projectRootParams,
+
+  mutates:
+    false,
+
+  retryable:
+    true,
+
+  trust: [
+    TRUST.FILESYSTEM,
+  ],
+};
+
+
+METHOD_CONTRACTS[
+  "recovery.restore"
+] = {
+  validate:
+    recoveryRestoreParams,
+
+  mutates:
+    true,
+
+  retryable:
+    false,
+
+  trust: [
+    TRUST.FILESYSTEM,
   ],
 };
 

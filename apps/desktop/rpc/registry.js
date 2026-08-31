@@ -48,6 +48,10 @@ const games =
 const workflows =
   require("../services/workflows");
 
+const recovery =
+  require(
+    "../services/project-platform/recovery",
+  );
 
 function createRpcMethods({
   logsExport,
@@ -417,8 +421,41 @@ function createRpcMethods({
       async (params) =>
         workflows
           .deleteWorkflow(params),
-  });
-}
+
+    "recovery.status":
+      async (
+        params,
+      ) =>
+        recovery
+          .inspectRecoveryStatus(
+            params?.projectRoot,
+          ),
+
+    "recovery.snapshots":
+      async (
+        params,
+      ) => ({
+        snapshots:
+          await recovery
+            .listProjectSnapshots(
+              params?.projectRoot,
+            ),
+      }),
+
+    "recovery.restore":
+      async (
+        params,
+      ) =>
+        recovery
+          .restoreProjectSnapshot({
+            projectRoot:
+              params?.projectRoot,
+
+            snapshotId:
+              params?.snapshotId,
+          }),
+      });
+    }
 
 
 const METHOD_POLICIES =
@@ -477,6 +514,21 @@ const METHOD_POLICIES =
 
     "workflows.list": {
       timeoutMs: 10000,
+    },
+
+    "recovery.status": {
+      timeoutMs:
+        10000,
+    },
+
+    "recovery.snapshots": {
+      timeoutMs:
+        10000,
+    },
+
+    "recovery.restore": {
+      timeoutMs:
+        120000,
     },
   });
 

@@ -17,6 +17,12 @@ const {
 );
 
 
+const {
+  RecoveryDataError,
+} = require(
+  "./errors",
+);
+
 let journalSequence =
   0;
 
@@ -122,7 +128,6 @@ async function readRecoveryJournal(
 ) {
   let raw;
 
-
   try {
     raw =
       await fs.readFile(
@@ -145,22 +150,37 @@ async function readRecoveryJournal(
     throw error;
   }
 
+  const lines =
+    raw
+      .split(
+        /\r?\n/,
+      )
+      .filter(
+        Boolean,
+      );
 
-  return raw
-    .split(
-      /\r?\n/,
-    )
-    .filter(
-      Boolean,
-    )
-    .map(
-      (
-        line,
-      ) =>
-        JSON.parse(
+  return lines.map(
+    (
+      line,
+      index,
+    ) => {
+      try {
+        return JSON.parse(
           line,
-        ),
-    );
+        );
+      } catch {
+        throw new RecoveryDataError(
+          `Recovery journal entry ${index + 1} contains invalid JSON`,
+          "CORRUPT_RECOVERY_JOURNAL",
+          {
+            line:
+              index +
+              1,
+          },
+        );
+      }
+    },
+  );
 }
 
 

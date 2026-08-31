@@ -137,6 +137,14 @@ import {
   type WorkflowTemplate,
 } from "./engines";
 import { NAV_ITEMS } from "./config/navigation";
+import {
+  RecoveryPanel,
+} from "./components/recovery";
+
+import type {
+  RecoveryUiStatus,
+} from "./components/recovery";
+
 
 declare global {
   interface Window {
@@ -161,6 +169,10 @@ export default function App() {
 
 //  const activeItem = NAV_ITEMS.find((n) => n.id === active)!;
   const [projectRoot, setProjectRoot] = useState<string>("");
+  const [showRecovery, setShowRecovery] = useState(false);
+  const [recoveryStatus, setRecoveryStatus] = useState<RecoveryUiStatus | null>(null);
+  const [recoveryBusy, setRecoveryBusy] = useState(false);
+  const [recoveryError,setRecoveryError] = useState("");
   const [status, setStatus] = useState<string>("idle");
   const [showNew, setShowNew] = useState(false);
   const [newName, setNewName] = useState("TestProject");
@@ -525,6 +537,121 @@ async function handleExportProject() {
 function handleNewProject() {
   setUiError("");
   setShowNew(true);
+}
+
+async function refreshRecovery() {
+  if (
+    !projectRoot
+  ) {
+    setRecoveryStatus(
+      null,
+    );
+
+    return;
+  }
+
+  try {
+    setRecoveryBusy(
+      true,
+    );
+
+    setRecoveryError(
+      "",
+    );
+
+    const result =
+      await rpc<RecoveryUiStatus>(
+        "recovery.status",
+        {
+          projectRoot,
+        },
+      );
+
+    setRecoveryStatus(
+      result,
+    );
+  } catch (
+    error:
+      any
+  ) {
+    setRecoveryError(
+      error?.message ||
+      String(
+        error,
+      ),
+    );
+  } finally {
+    setRecoveryBusy(
+      false,
+    );
+  }
+}
+
+async function handleRestoreRecoverySnapshot(
+  snapshotId:
+    string,
+) {
+  if (
+    !projectRoot
+  ) {
+    return;
+  }
+
+  const confirmed =
+    window.confirm(
+      "Restore this recovery snapshot? A safety backup of the current project will be created first.",
+    );
+
+  if (
+    !confirmed
+  ) {
+    return;
+  }
+
+  try {
+    setRecoveryBusy(
+      true,
+    );
+
+    setRecoveryError(
+      "",
+    );
+
+    const result =
+      await rpc<{
+        snapshotId:
+          string;
+
+        backupSnapshotId:
+          string;
+      }>(
+        "recovery.restore",
+        {
+          projectRoot,
+          snapshotId,
+        },
+      );
+
+    setStatus(
+      `Restored snapshot ${result.snapshotId}. Safety backup: ${result.backupSnapshotId}`,
+    );
+
+    await refreshRecovery();
+  } catch (
+    error:
+      any
+  ) {
+    setRecoveryError(
+      error?.message ||
+      String(
+        error,
+      ),
+    );
+  } finally {
+    setRecoveryBusy(
+      false,
+    );
+  }
 }
 
 async function handleChooseAssetFile() {
@@ -3078,6 +3205,20 @@ useEffect(() => {
           <button
             className="btn btn-subtle"
             type="button"
+            disabled={!projectRoot}
+            onClick={
+              async () => {
+                setShowRecovery(true);
+                await refreshRecovery();
+              }
+            }
+          >
+            Recovery
+          </button>
+
+          <button
+            className="btn btn-subtle"
+            type="button"
             onClick={async () => {
               try {
                 if (!projectRoot) return setStatus("No project open");
@@ -3436,6 +3577,47 @@ useEffect(() => {
             <button className="btn" type="button" onClick={() => setShowOpen(false)}>
               Cancel
             </button>
+
+            {showRecovery && (
+              <Modal
+                title="Project Recovery"
+                onClose={
+                  () =>
+                    setShowRecovery(
+                      false,
+                    )
+                }
+              >
+                <RecoveryPanel
+                  projectRoot={
+                    projectRoot
+                  }
+                  status={
+                    recoveryStatus
+                  }
+                  busy={
+                    recoveryBusy
+                  }
+                  error={
+                    recoveryError
+                  }
+                  onRefresh={
+                    () => {
+                      void refreshRecovery();
+                    }
+                  }
+                  onRestore={
+                    (
+                      snapshotId,
+                    ) => {
+                      void handleRestoreRecoverySnapshot(
+                        snapshotId,
+                      );
+                    }
+                  }
+                />
+              </Modal>
+            )}
           </div>
 
           {openError && <div className="errorBox">{openError}</div>}

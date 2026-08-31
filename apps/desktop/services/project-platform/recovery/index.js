@@ -63,6 +63,17 @@ const retention =
     "./retention",
   );
 
+const errors =
+  require(
+    "./errors",
+  );
+
+
+const backup =
+  require(
+    "./backup",
+  );
+
 module.exports = {
   ...constants,
   ...paths,
@@ -75,4 +86,6 @@ module.exports = {
   ...compare,
   ...restore,
   ...retention,
+  ...errors,
+  ...backup,
 };

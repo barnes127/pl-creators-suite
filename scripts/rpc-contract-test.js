@@ -441,13 +441,13 @@ async function main() {
   );
 
   await test(
-    "all active contract entries total 61",
+    "all active contract entries total 64",
     () => {
       assert.equal(
         Object.keys(
           METHOD_CONTRACTS,
         ).length,
-        61,
+        64,
       );
     },
   );

@@ -25,6 +25,12 @@ const {
 );
 
 
+const {
+  RecoveryDataError,
+} = require(
+  "./errors",
+);
+
 function createAutosaveId(
   resourceId,
 ) {
@@ -193,6 +199,21 @@ async function readAutosave(
   }
 
 
+  try {
+    return JSON.parse(
+      raw,
+    );
+  } catch {
+    throw new RecoveryDataError(
+      `Autosave contains invalid JSON: ${params.resourceId}`,
+      "CORRUPT_AUTOSAVE",
+      {
+        resourceId:
+          params.resourceId,
+      },
+    );
+  }
+
   return JSON.parse(
     raw,
   );
@@ -230,9 +251,7 @@ async function listAutosaves(
       projectRoot,
     );
 
-
   let names;
-
 
   try {
     names =
@@ -249,14 +268,11 @@ async function listAutosaves(
       return [];
     }
 
-
     throw error;
   }
 
-
   const records =
     [];
-
 
   for (
     const name
@@ -270,29 +286,37 @@ async function listAutosaves(
       continue;
     }
 
+    const raw =
+      await fs.readFile(
+        require("path").join(
+          directory,
+          name,
+        ),
+        "utf8",
+      );
+
+    let parsed;
 
     try {
-      const raw =
-        await fs.readFile(
-          require("path").join(
-            directory,
-            name,
-          ),
-          "utf8",
-        );
-
-
-      records.push(
+      parsed =
         JSON.parse(
           raw,
-        ),
-      );
+        );
     } catch {
-      // A damaged autosave should not
-      // prevent inspection of other saves.
+      throw new RecoveryDataError(
+        `Autosave contains invalid JSON: ${name}`,
+        "CORRUPT_AUTOSAVE",
+        {
+          fileName:
+            name,
+        },
+      );
     }
-  }
 
+    records.push(
+      parsed,
+    );
+  }
 
   return records.sort(
     (
@@ -310,7 +334,6 @@ async function listAutosaves(
       ),
   );
 }
-
 
 module.exports = {
   createAutosaveId,

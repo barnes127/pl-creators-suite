@@ -20,6 +20,12 @@ const {
 const JOURNAL_NAME = "pl-project.journal.json";
 const CHECKSUM_NAME = "pl-project.checksums.json";
 
+const {
+  createPreDestructiveBackup,
+} = require(
+  "../project-platform/recovery/backup",
+);
+
 function sha256(data) {
   return crypto
     .createHash("sha256")
@@ -282,6 +288,17 @@ async function repairProject(
   );
 
   if (restoreManifestBackup) {
+
+    await createPreDestructiveBackup({
+      projectRoot,
+
+      operation:
+        "manifest repair",
+
+      description:
+        "Automatic backup before restoring the project manifest backup.",
+    });
+
     const backupPath =
       `${manifestPath}.bak`;
 
