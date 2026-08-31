@@ -8,3 +8,4 @@ export * from "./projects";
 export * from "./assets";
 export * from "./search";
 export * from "./history";
+export * from "./recovery";

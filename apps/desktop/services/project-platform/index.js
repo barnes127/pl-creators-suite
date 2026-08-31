@@ -38,6 +38,11 @@ const {
     "./search",
   );
 
+const recovery =
+  require(
+    "./recovery",
+  );
+
 async function inspectProject(
   params = {},
 ) {
@@ -87,4 +92,5 @@ module.exports = {
   ProjectIndexJobManager,
   searchProject,
   SUPPORTED_SEARCH_KINDS,
+  recovery,
 };

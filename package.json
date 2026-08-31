@@ -74,6 +74,8 @@
     "test:platform-types": "tsc --noEmit --target ES2022 --module ESNext --moduleResolution Bundler --skipLibCheck packages/platform/src/index.ts",
     "test:platform-history": "node scripts/platform-history-test.js",
     "test:platform-history-behavior": "rm -rf .tmp-history-test && tsc --target ES2022 --module commonjs --moduleResolution node --esModuleInterop --skipLibCheck --outDir .tmp-history-test scripts/platform-history-behavior-test.ts && node .tmp-history-test/scripts/platform-history-behavior-test.js && rm -rf .tmp-history-test",
+    "test:project-recovery-contract": "node scripts/project-recovery-contract-test.js",
+    "test:project-recovery-service": "node scripts/project-recovery-service-test.js",
     "performance:baseline": "node scripts/performance-baseline.js",
     "rpc:inventory": "node scripts/rpc-inventory.js",
     "dev": "pnpm -r dev",

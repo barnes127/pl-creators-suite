@@ -15,6 +15,7 @@ const DEFAULT_IGNORED_NAMES =
     ".git",
     "node_modules",
     INDEX_DIR_NAME,
+    ".pl-recovery",
   ]);
 
 
