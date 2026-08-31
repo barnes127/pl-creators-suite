@@ -14,6 +14,73 @@ export type RecoveryEntryKind =
   | "backup";
 
 
+export type SnapshotKind =
+  | "snapshot"
+  | "checkpoint";
+
+
+export interface SnapshotFileRecord {
+  relativePath:
+    string;
+
+  size:
+    number;
+
+  hash:
+    string;
+}
+
+
+export interface ProjectSnapshot {
+  schemaVersion:
+    number;
+
+  id:
+    string;
+
+  kind:
+    SnapshotKind;
+
+  name:
+    string | null;
+
+  description:
+    string | null;
+
+  projectRoot:
+    string;
+
+  createdAt:
+    string;
+
+  files:
+    readonly SnapshotFileRecord[];
+}
+
+
+export interface SnapshotDifference {
+  added:
+    readonly string[];
+
+  changed:
+    readonly string[];
+
+  removed:
+    readonly string[];
+
+  unchanged:
+    readonly string[];
+}
+
+
+export interface SnapshotRetentionPolicy {
+  maxSnapshots:
+    number;
+
+  keepCheckpoints:
+    boolean;
+}
+
 export interface RecoveryEntry {
   id: string;
 

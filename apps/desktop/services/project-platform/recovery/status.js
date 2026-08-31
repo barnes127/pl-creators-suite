@@ -19,6 +19,12 @@ const {
 );
 
 
+const {
+  listProjectSnapshots,
+} = require(
+  "./snapshots",
+);
+
 function latestTimestamp(
   values,
 ) {
@@ -46,6 +52,7 @@ async function inspectRecoveryStatus(
     stored,
     autosaves,
     journal,
+    snapshots,
   ] =
     await Promise.all([
       readRecoveryStatusRecord(
@@ -59,11 +66,15 @@ async function inspectRecoveryStatus(
       readRecoveryJournal(
         projectRoot,
       ),
+
+      listProjectSnapshots(
+        projectRoot,
+      ),
     ]);
 
 
-  const entries =
-    autosaves.map(
+  const entries = [
+    ...autosaves.map(
       (
         autosave,
       ) => ({
@@ -90,7 +101,38 @@ async function inspectRecoveryStatus(
 
         metadata: {},
       }),
-    );
+    ),
+
+    snapshots.map(
+      (
+        snapshot,
+      ) => ({
+        id:
+          snapshot.id,
+
+        kind:
+          snapshot.kind ===
+            "checkpoint"
+            ? "checkpoint"
+            : "snapshot",
+
+        createdAt:
+          snapshot.createdAt,
+        updatedAt:
+          snapshot.createdAt,
+        recoverable:
+          true,
+        metadata: {
+          name:
+            snapshot.name,
+          description:
+            snapshot.description,
+          fileCount:
+            snapshot.file.length,
+        },
+      }),
+    ),
+  ];
 
 
   const interrupted =

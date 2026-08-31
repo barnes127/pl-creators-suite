@@ -7,10 +7,93 @@ const {
   AUTOSAVE_DIR_NAME,
   STATUS_FILE_NAME,
   JOURNAL_FILE_NAME,
+  SNAPSHOT_DIR_NAME,
 } = require(
   "./constants",
 );
 
+
+function getSnapshotDir(
+  projectRoot,
+) {
+  return path.join(
+    getRecoveryDir(
+      projectRoot,
+    ),
+    SNAPSHOT_DIR_NAME,
+  );
+}
+
+
+function sanitizeSnapshotId(
+  snapshotId,
+) {
+  const cleaned =
+    String(
+      snapshotId ||
+      "",
+    )
+      .trim()
+      .replace(
+        /[^a-zA-Z0-9._-]+/g,
+        "_",
+      );
+
+
+  if (
+    !cleaned
+  ) {
+    throw new Error(
+      "snapshotId is required",
+    );
+  }
+
+
+  return cleaned;
+}
+
+
+function getSnapshotRoot(
+  projectRoot,
+  snapshotId,
+) {
+  return path.join(
+    getSnapshotDir(
+      projectRoot,
+    ),
+    sanitizeSnapshotId(
+      snapshotId,
+    ),
+  );
+}
+
+
+function getSnapshotFilesDir(
+  projectRoot,
+  snapshotId,
+) {
+  return path.join(
+    getSnapshotRoot(
+      projectRoot,
+      snapshotId,
+    ),
+    "files",
+  );
+}
+
+
+function getSnapshotMetadataPath(
+  projectRoot,
+  snapshotId,
+) {
+  return path.join(
+    getSnapshotRoot(
+      projectRoot,
+      snapshotId,
+    ),
+    "snapshot.json",
+  );
+}
 
 function cleanProjectRoot(
   projectRoot,
@@ -136,4 +219,9 @@ module.exports = {
   getRecoveryJournalPath,
   getAutosavePath,
   sanitizeResourceId,
+  getSnapshotDir,
+  sanitizeSnapshotId,
+  getSnapshotRoot,
+  getSnapshotFilesDir,
+  getSnapshotMetadataPath,
 };

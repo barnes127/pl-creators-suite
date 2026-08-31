@@ -40,6 +40,29 @@ const status =
   );
 
 
+const snapshots =
+  require(
+    "./snapshots",
+  );
+
+
+const compare =
+  require(
+    "./compare",
+  );
+
+
+const restore =
+  require(
+    "./restore",
+  );
+
+
+const retention =
+  require(
+    "./retention",
+  );
+
 module.exports = {
   ...constants,
   ...paths,
@@ -48,4 +71,8 @@ module.exports = {
   ...journal,
   ...session,
   ...status,
+  ...snapshots,
+  ...compare,
+  ...restore,
+  ...retention,
 };
