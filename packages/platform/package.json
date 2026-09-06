@@ -16,6 +16,8 @@
     "./assets": "./src/assets/index.ts",
     "./search": "./src/search/index.ts",
     "./history": "./src/history/index.ts",
-    "./recovery": "./src/recovery/index.ts"
+    "./recovery": "./src/recovery/index.ts",
+    "./tasks": "./src/tasks/index.ts",
+    "./formats": "./src/formats/index.ts"
   }
 }
