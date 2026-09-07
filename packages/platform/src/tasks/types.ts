@@ -59,6 +59,7 @@ export interface TaskResourceUsage {
 
 export interface TaskDefinition<TInput = unknown> {
   id?: string;
+  handlerId?: string;
   kind: TaskKind;
   title: string;
   description?: string;

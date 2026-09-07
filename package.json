@@ -81,6 +81,7 @@
     "test:project-recovery-drill": "node scripts/project-recovery-drill-test.js",
     "test:project-recovery-closeout": "node scripts/project-recovery-closeout-test.js",
     "test:platform-task-formats": "rm -rf .tmp-task-format-test && tsc --target ES2022 --module commonjs --moduleResolution node --esModuleInterop --skipLibCheck --outDir .tmp-task-format-test scripts/platform-task-format-behavior-test.ts && node .tmp-task-format-test/scripts/platform-task-format-behavior-test.js && rm -rf .tmp-task-format-test",
+    "test:desktop-tasks": "node scripts/desktop-task-service-test.js",
     "performance:baseline": "node scripts/performance-baseline.js",
     "rpc:inventory": "node scripts/rpc-inventory.js",
     "dev": "pnpm -r dev",
