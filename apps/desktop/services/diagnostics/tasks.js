@@ -7,16 +7,22 @@ function createTaskDiagnosticsBridge(
     };
   }
 
+  let writeChain =
+    Promise.resolve();
+
   return {
     onTaskChanged(task) {
-      diagnostics
-        .job(task)
-        .catch((error) => {
-          console.error(
-            "Failed to persist task diagnostics",
-            error,
-          );
-        });
+      writeChain =
+        writeChain
+          .then(() =>
+            diagnostics.job(task),
+          )
+          .catch((error) => {
+            console.error(
+              "Failed to persist task diagnostics",
+              error,
+            );
+          });
     },
   };
 }

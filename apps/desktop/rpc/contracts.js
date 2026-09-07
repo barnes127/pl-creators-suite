@@ -51,6 +51,88 @@ function noParams(params) {
 }
 
 
+function optionalObject(params, field) {
+  const value = params?.[field];
+  if (value !== undefined &&
+    (
+      !value ||
+      typeof value !== "object" ||
+      Array.isArray(value)
+    )
+  ) {
+    invalid(
+      `${field} must be an object when supplied.`,
+      { field },
+    );
+  }
+}
+
+function taskIdParams(params) {
+  requireObject(params);
+  requireString(
+    params,
+    "taskId",
+  );
+
+  return params;
+}
+
+function taskStartParams(params) {
+  requireObject(params);
+  requireObjectField(
+    params,
+    "definition",
+  );
+
+  requireString(
+    params.definition,
+    "kind",
+  );
+
+  requireString(
+    params.definition,
+    "title",
+  );
+
+  optionalString(
+    params.definition,
+    "handlerId",
+  );
+
+  return params;
+}
+
+function diagnosticsQueryParams(
+  params,
+) {
+  requireObject(params);
+
+  requireString(
+    params,
+    "collection",
+  );
+
+  optionalObject(
+    params,
+    "filter",
+  );
+
+  return params;
+}
+
+function diagnosticsResourceParams(
+  params,
+) {
+  requireObject(params);
+
+  optionalString(
+    params,
+    "subsystem",
+  );
+
+  return params;
+}
+
 function requireString(
   params,
   field,
@@ -607,6 +689,91 @@ const METHOD_CONTRACTS = {
       trust: [
         TRUST.DIALOG,
         TRUST.FILESYSTEM,
+      ],
+    },
+
+    "tasks.start": {
+      validate:
+        taskStartParams,
+
+      mutates: true,
+      retryable: false,
+
+      trust: [
+        TRUST.FILESYSTEM,
+        TRUST.SHELL,
+      ],
+    },
+
+    "tasks.get": {
+      validate:
+        taskIdParams,
+
+      mutates: false,
+      retryable: true,
+
+      trust: [
+        TRUST.NONE,
+      ],
+    },
+
+    "tasks.list": {
+      validate:
+        noParams,
+
+      mutates: false,
+      retryable: true,
+
+      trust: [
+        TRUST.NONE,
+      ],
+    },
+
+    "tasks.cancel": {
+      validate:
+        taskIdParams,
+
+      mutates: true,
+      retryable: false,
+
+      trust: [
+        TRUST.NONE,
+      ],
+    },
+
+    "diagnostics.query": {
+      validate:
+        diagnosticsQueryParams,
+
+      mutates: false,
+      retryable: true,
+
+      trust: [
+        TRUST.FILESYSTEM,
+      ],
+    },
+
+    "diagnostics.health": {
+      validate:
+        noParams,
+
+      mutates: false,
+      retryable: true,
+
+      trust: [
+        TRUST.NONE,
+      ],
+    },
+
+    "diagnostics.resources": {
+      validate:
+        diagnosticsResourceParams,
+
+      mutates: true,
+      retryable: false,
+
+      trust: [
+        TRUST.NONE,
       ],
     },
   };

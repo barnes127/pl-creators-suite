@@ -84,6 +84,7 @@
     "test:desktop-tasks": "node scripts/desktop-task-service-test.js",
     "test:desktop-formats": "node scripts/desktop-format-runtime-test.js",
     "test:desktop-diagnostics": "node scripts/desktop-diagnostics-service-test.js",
+    "test:desktop-operations": "node scripts/desktop-operational-rpc-test.js",
     "performance:baseline": "node scripts/performance-baseline.js",
     "rpc:inventory": "node scripts/rpc-inventory.js",
     "dev": "pnpm -r dev",

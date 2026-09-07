@@ -41,6 +41,12 @@ const {
 );
 
 const {
+  desktopRuntime,
+} = require(
+  "./services/runtime",
+);
+
+const {
   validateRpcRequest,
   createCorrelationId,
   makeRpcSuccess,
@@ -242,7 +248,12 @@ const rpcAuthorizer =
   createRpcAuthorizer();
 
 const rpcLogger =
-  createRpcLogger();
+  createRpcLogger({
+    onEntry:
+      desktopRuntime
+        .rpcBridge
+        .persist,
+    });
 
 rpcExecutionManager =
   createRpcExecutionManager({
@@ -282,6 +293,15 @@ function startRpcServer({
       "RPC server requires a valid session token",
     );
   }
+
+  desktopRuntime
+    .initialize()
+    .catch((error) => {
+      console.error(
+        "Desktop runtime initialization failed",
+        error,
+      );
+    });
 
   const server = http.createServer(async (req, res) => {
     // CORS for renderer fetch()

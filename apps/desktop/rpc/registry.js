@@ -1,57 +1,44 @@
 const path = require("path");
 
-const projects =
-  require("../services/projects");
+const projects = require("../services/projects");
 
-const dialogs =
-  require("../services/dialogs");
+const dialogs = require("../services/dialogs");
 
-const plugins =
-  require("../services/plugins/registry");
+const plugins = require("../services/plugins/registry");
 
-const pluginManifest =
-  require("../services/plugins/manifest");
+const pluginManifest = require("../services/plugins/manifest");
 
-const pluginDiscovery =
-  require("../services/plugins/discovery");
+const pluginDiscovery = require("../services/plugins/discovery");
 
-const entitlements =
-  require("../services/entitlements");
+const entitlements = require("../services/entitlements");
 
-const localAi =
-  require("../services/ai/local");
+const localAi = require("../services/ai/local");
 
-const appMetadata =
-  require("../services/app/metadata");
+const appMetadata = require("../services/app/metadata");
 
-const assets =
-  require("../services/assets");
+const assets = require("../services/assets");
 
-const docs =
-  require("../services/docs");
+const docs = require("../services/docs");
 
-const code =
-  require("../services/code");
+const code = require("../services/code");
 
-const sheets =
-  require("../services/sheets");
+const sheets = require("../services/sheets");
 
-const movies =
-  require("../services/movies");
+const movies = require("../services/movies");
 
-const models =
-  require("../services/models");
+const models = require("../services/models");
 
-const games =
-  require("../services/games");
+const games = require("../services/games");
 
-const workflows =
-  require("../services/workflows");
+const workflows = require("../services/workflows");
 
-const recovery =
-  require(
-    "../services/project-platform/recovery",
-  );
+const recovery = require("../services/project-platform/recovery");
+
+const {desktopRuntime} = require("../services/runtime");
+
+const {createOperationalMethods} = require("../services/operations");
+
+const operationalMethods = createOperationalMethods( desktopRuntime );
 
 function createRpcMethods({
   logsExport,
@@ -65,6 +52,43 @@ function createRpcMethods({
         cancelRequest(
           params?.requestId,
         ),
+
+    "tasks.start":
+      async (params) =>
+        operationalMethods
+          .startTask(params),
+
+    "tasks.get":
+      async (params) =>
+        operationalMethods
+          .getTask(params),
+
+    "tasks.list":
+      async () =>
+        operationalMethods
+          .listTasks(),
+
+    "tasks.cancel":
+      async (params) =>
+        operationalMethods
+          .cancelTask(params),
+
+    "diagnostics.query":
+      async (params) =>
+        operationalMethods
+          .queryDiagnostics(
+            params,
+          ),
+
+    "diagnostics.health":
+      async () =>
+        operationalMethods
+          .diagnosticsHealth(),
+
+    "diagnostics.resources":
+      async (params) =>
+        operationalMethods
+          .captureResource(params),
 
     "project.create":
       projects.projectCreate,
@@ -529,6 +553,34 @@ const METHOD_POLICIES =
     "recovery.restore": {
       timeoutMs:
         120000,
+    },
+
+    "tasks.start": {
+      timeoutMs: 10000,
+    },
+
+    "tasks.get": {
+      timeoutMs: 5000,
+    },
+
+    "tasks.list": {
+      timeoutMs: 5000,
+    },
+
+    "tasks.cancel": {
+      timeoutMs: 5000,
+    },
+
+    "diagnostics.query": {
+      timeoutMs: 10000,
+    },
+
+    "diagnostics.health": {
+      timeoutMs: 5000,
+    },
+
+    "diagnostics.resources": {
+      timeoutMs: 5000,
     },
   });
 
