@@ -16,8 +16,11 @@ const {
   createFormatTaskHandlers,
 } = require("./formats");
 
-function createDesktopTaskManager() {
-  const manager = new TaskManager();
+function createDesktopTaskManager(options = {}) {
+  const manager = new TaskManager({
+    onTaskChanged:
+      options.onTaskChanged,
+  });
 
   manager.registerHandler(
     "project.index",

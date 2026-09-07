@@ -91,10 +91,20 @@ function isCancellationError(error, signal) {
 }
 
 class TaskManager {
-  constructor() {
+  constructor(options = {}) {
     this.handlers = new Map();
     this.tasks = new Map();
     this.sequence = 0;
+    this.onTaskChanged =
+      typeof options.onTaskChanged === "function"
+        ? options.onTaskChanged
+        : () => {};
+  }
+
+  notifyTaskChanged(task) {
+    this.onTaskChanged(
+      createTaskSnapshot(task),
+    );
   }
 
   registerHandler(handlerId, handler) {
@@ -174,6 +184,8 @@ class TaskManager {
 
     this.tasks.set(taskId, task);
 
+    this.notifyTaskChanged(task);
+
     task.promise = Promise.resolve()
       .then(async () => {
         if (controller.signal.aborted) {
@@ -184,6 +196,7 @@ class TaskManager {
 
         task.status = "running";
         task.startedAt = nowIso();
+        this.notifyTaskChanged(task);
 
         const context = {
           signal: controller.signal,
@@ -193,6 +206,8 @@ class TaskManager {
               ...task.progress,
               ...progress,
             });
+
+            this.notifyTaskChanged(task);
 
             options.onProgress?.(
               { ...task.progress },
@@ -205,6 +220,8 @@ class TaskManager {
               ...warning,
             });
 
+            this.notifyTaskChanged(task);
+
             options.onWarning?.(
               { ...warning },
               createTaskSnapshot(task),
@@ -216,6 +233,8 @@ class TaskManager {
               ...task.resourceUsage,
               ...usage,
             };
+
+            this.notifyTaskChanged(task);
 
             options.onResourceUsage?.(
               { ...task.resourceUsage },
@@ -239,6 +258,7 @@ class TaskManager {
           task.result = result;
           task.status = "completed";
           task.finishedAt = nowIso();
+          this.notifyTaskChanged(task);
 
           return result;
         } catch (error) {
@@ -264,6 +284,8 @@ class TaskManager {
           }
 
           task.finishedAt = nowIso();
+
+          this.notifyTaskChanged(task);
 
           if (task.status === "cancelled") {
             return undefined;
@@ -313,6 +335,8 @@ class TaskManager {
     }
 
     task.controller.abort();
+
+    this.notifyTaskChanged(task);
 
     return createTaskSnapshot(task);
   }

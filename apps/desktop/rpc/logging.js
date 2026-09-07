@@ -13,6 +13,7 @@ function sanitizeValue(
 
 function createRpcLogger({
   sink = console,
+  onEntry = null,
   now =
     () =>
       new Date()
@@ -33,6 +34,15 @@ function createRpcLogger({
 
       ...event,
     };
+
+    if (
+      typeof onEntry ===
+      "function"
+    ) {
+      Promise.resolve(
+        onEntry(entry),
+      ).catch(() => {});
+    }
 
     const line =
       JSON.stringify(
