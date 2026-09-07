@@ -1,6 +1,5 @@
 const path = require("path");
 const fs = require("fs/promises");
-const { spawn } = require("child_process");
 const { PROJECTS_DIR } = require("../storage/paths");
 const { addRecent } = require("./recents");
 const { ensureDir, fileExists, appendLog } = require("../util/fs");
@@ -14,46 +13,12 @@ const {
   writeProjectManifest,
 } = require("./project/persistence");
 
-
-function runCmd(cmd, args, cwd) {
-  return new Promise((resolve, reject) => {
-    const p = spawn(cmd, args, { cwd, stdio: "pipe" });
-    let out = "";
-    let err = "";
-    p.stdout.on("data", (d) => (out += d.toString()));
-    p.stderr.on("data", (d) => (err += d.toString()));
-    p.on("close", (code) => {
-      if (code === 0) return resolve({ out, err });
-      reject(new Error(`${cmd} ${args.join(" ")} failed (${code}): ${err || out}`));
-    });
-  });
-}
-
-function validateArchiveEntries(entries) {
-  for (const entry of entries) {
-    const normalizedEntry = entry.trim();
-
-    if (!normalizedEntry) continue;
-
-    const segments = normalizedEntry
-      .replace(/\\/g, "/")
-      .split("/")
-      .filter(Boolean);
-
-    const isAbsolute =
-      normalizedEntry.startsWith("/") ||
-      normalizedEntry.startsWith("\\") ||
-      /^[A-Za-z]:/.test(normalizedEntry);
-
-    const escapesRoot = segments.includes("..");
-
-    if (isAbsolute || escapesRoot) {
-      throw new Error(
-        `Unsafe project archive entry: ${normalizedEntry}`,
-      );
-    }
-  }
-}
+const {
+  createZipArchive,
+  extractZipArchive,
+  listZipArchiveEntries,
+  validateArchiveEntries,
+} = require("./formats/archive");
 
 /**
  * Create a new project
@@ -142,7 +107,7 @@ async function projectExport(params = {}) {
   }
   if (!outPath.endsWith(".plproj")) outPath += ".plproj";
 
-  await runCmd("zip", ["-r", outPath, "."], projectRoot);
+  await createZipArchive(projectRoot, outPath);
   await appendLog(projectRoot, `Exported project to "${outPath}"`);
 
   return { outPath };
@@ -183,13 +148,8 @@ async function projectImport(params = {}) {
     );
   }
 
-  const listResult = await runCmd(
-    "unzip",
-    ["-Z1", filePath],
-    process.cwd(),
-  );
-
-  const archiveEntries = listResult.out.split(/\r?\n/);
+  const archiveEntries =
+    await listZipArchiveEntries(filePath);
 
   validateArchiveEntries(archiveEntries);
 
@@ -200,11 +160,7 @@ async function projectImport(params = {}) {
   let installed = false;
 
   try {
-    await runCmd(
-      "unzip",
-      ["-q", filePath, "-d", stagingRoot],
-      process.cwd(),
-    );
+    await extractZipArchive(filePath, stagingRoot);
 
     const manifestPath = path.join(
       stagingRoot,
