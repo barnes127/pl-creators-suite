@@ -226,6 +226,35 @@ check(
 
 
 check(
+  serviceTypes.includes(
+    "ServiceCategory",
+  ),
+  "services declare categories",
+);
+
+check(
+  serviceTypes.includes(
+    "ServiceStability",
+  ),
+  "services declare stability",
+);
+
+check(
+  serviceTypes.includes(
+    "\"data-source\"",
+  ),
+  "future data-source category is reserved",
+);
+
+check(
+  serviceTypes.includes(
+    "\"query\"",
+  ),
+  "future query category is reserved",
+);
+
+
+check(
   serviceRegistry.includes(
     "class ServiceRegistry",
   ),
@@ -256,6 +285,19 @@ check(
   "non-throwing discovery check exists",
 );
 
+check(
+  serviceRegistry.includes(
+    "listByCategory(",
+  ),
+  "service category filtering exists",
+);
+
+check(
+  serviceRegistry.includes(
+    "listDiscoverable(",
+  ),
+  "discoverable service listing exists",
+);
 
 check(
   runtime.includes(

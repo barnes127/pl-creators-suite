@@ -64,6 +64,7 @@
     "test:platform-events": "node scripts/platform-event-bus-test.js",
     "test:platform-settings": "node scripts/platform-settings-test.js",
     "test:platform-services": "node scripts/platform-service-discovery-test.js",
+    "test:platform-service-behavior": "rm -rf .tmp-service-test && tsc --target ES2022 --module commonjs --moduleResolution node --esModuleInterop --skipLibCheck --outDir .tmp-service-test scripts/platform-service-behavior-test.ts && node .tmp-service-test/scripts/platform-service-behavior-test.js && rm -rf .tmp-service-test",
     "test:platform-project-assets": "node scripts/platform-project-assets-test.js",
     "test:project-platform-bridge": "node scripts/project-platform-bridge-test.js",
     "test:project-platform-service": "node scripts/project-platform-service-test.js",

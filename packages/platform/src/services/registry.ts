@@ -77,6 +77,10 @@ export class ServiceRegistry {
           requiredPermissions:
             descriptor.requiredPermissions ??
             [],
+
+          requiredCapabilities:
+            descriptor.requiredCapabilities ??
+            [],
         },
 
         service,
@@ -141,6 +145,37 @@ export class ServiceRegistry {
       );
   }
 
+  listByCategory(
+    category:
+      ServiceDescriptor["category"],
+  ) {
+    return this
+      .list()
+      .filter(
+        (
+          descriptor,
+        ) =>
+          descriptor.category ===
+          category,
+      );
+  }
+
+  listDiscoverable(
+    context:
+      ServiceDiscoveryContext,
+  ) {
+    return this
+      .list()
+      .filter(
+        (
+          descriptor,
+        ) =>
+          this.canDiscover(
+            descriptor.id,
+            context,
+          ),
+      );
+  }
 
   discover<
     TService,
