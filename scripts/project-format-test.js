@@ -4,7 +4,7 @@ const path = require("path");
 const os = require("os");
 const Module = require("module");
 const { spawn } = require("child_process");
-
+const { listZipArchiveEntries } = require("../apps/desktop/services/formats/archive");
 const testRoot = path.join(
   os.tmpdir(),
   `pl-project-format-test-${process.pid}-${Date.now()}`,
@@ -386,6 +386,58 @@ async function main() {
   );
 
   await test(
+    "pre-cancelled project export aborts",
+    async () => {
+      const tempRoot =
+      await fs.mkdtemp(
+        path.join(
+          os.tmpdir(),
+          "pl-project-cancel-test-",
+        ),
+      );
+      const sourceRoot =
+        path.join(
+          tempRoot,
+          "CancelledProjectExport",
+        );
+      await fs.mkdir(
+        sourceRoot,
+        { recursive: true },
+      );
+      await fs.writeFile(
+        path.join(
+          sourceRoot,
+          "pl-project.json",
+        ),
+        JSON.stringify({
+          schemaVersion: 1,
+          name: "Cancelled Project",
+        }),
+        "utf8",
+      );
+      const archivePath =
+        path.join(
+          tempRoot,
+          "cancelled-project.plproj",
+        );
+      const controller =
+        new AbortController();
+      controller.abort();
+      await assert.rejects(
+        () =>
+          projectExport({
+            projectRoot: sourceRoot,
+            outPath: archivePath,
+            signal: controller.signal,
+          }),
+        (error) =>
+          error.name === "AbortError" ||
+          error.code === "OPERATION_CANCELLED",
+      );
+    },
+  );
+
+  await test(
     "missing manifest import fails and cleans staging",
     async () => {
       const badRoot = path.join(
@@ -737,6 +789,181 @@ async function main() {
       assert.strictEqual(
         result.healthy,
         true,
+      );
+    },
+  );
+
+  await test(
+    "project export refuses silent overwrite",
+    async () => {
+      const tempRoot =
+        await fs.mkdtemp(
+          path.join(
+            os.tmpdir(),
+            "pl-project-overwrite-test-",
+          ),
+        );
+
+      const sourceRoot =
+        path.join(
+          tempRoot,
+          "Project",
+        );
+
+      const archivePath =
+        path.join(
+          tempRoot,
+          "project.plproj",
+        );
+
+      await fs.mkdir(
+        sourceRoot,
+        { recursive: true },
+      );
+
+      await fs.writeFile(
+        path.join(
+          sourceRoot,
+          "pl-project.json",
+        ),
+        JSON.stringify({
+          schemaVersion: 1,
+          name: "Overwrite Test",
+        }),
+        "utf8",
+      );
+
+      await fs.writeFile(
+        archivePath,
+        "do-not-overwrite",
+        "utf8",
+      );
+
+      await assert.rejects(
+        () =>
+          projectExport({
+            projectRoot:
+              sourceRoot,
+
+            outPath:
+              archivePath,
+          }),
+        (error) =>
+          error.code ===
+          "OUTPUT_EXISTS",
+      );
+
+      const existing =
+        await fs.readFile(
+          archivePath,
+          "utf8",
+        );
+
+      assert.equal(
+        existing,
+        "do-not-overwrite",
+      );
+    },
+  );
+
+  await test(
+    "explicit project overwrite publishes a fresh archive",
+    async () => {
+      const tempRoot =
+        await fs.mkdtemp(
+          path.join(
+            os.tmpdir(),
+            "pl-project-fresh-overwrite-test-",
+          ),
+        );
+
+      const sourceRoot =
+        path.join(
+          tempRoot,
+          "Project",
+        );
+
+      const archivePath =
+        path.join(
+          tempRoot,
+          "project.plproj",
+        );
+      await fs.mkdir(
+        sourceRoot,
+        { recursive: true },
+      );
+
+      await fs.writeFile(
+        path.join(
+          sourceRoot,
+          "pl-project.json",
+        ),
+        JSON.stringify({
+          schemaVersion: 1,
+          name: "Fresh Overwrite Test",
+        }),
+        "utf8",
+      );
+
+      await fs.writeFile(
+        path.join(
+          sourceRoot,
+          "stale.txt",
+        ),
+        "stale\n",
+        "utf8",
+      );
+
+      await projectExport({
+        projectRoot:
+          sourceRoot,
+
+        outPath:
+          archivePath,
+      });
+
+      await fs.rm(
+        path.join(
+          sourceRoot,
+          "stale.txt",
+        ),
+      );
+
+      await fs.writeFile(
+        path.join(
+          sourceRoot,
+          "fresh.txt",
+        ),
+        "fresh\n",
+        "utf8",
+      );
+
+      await projectExport({
+        projectRoot:
+          sourceRoot,
+
+        outPath:
+          archivePath,
+
+        overwrite: true,
+      });
+
+      const entries =
+        await listZipArchiveEntries(
+          archivePath,
+        );
+
+      assert.ok(
+        entries.includes(
+          "fresh.txt",
+        ),
+      );
+
+      assert.equal(
+        entries.includes(
+          "stale.txt",
+        ),
+        false,
       );
     },
   );

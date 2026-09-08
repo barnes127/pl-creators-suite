@@ -37,6 +37,12 @@ const jsonFormatAdapter = {
         type: "number",
         defaultValue: 2,
       },
+      {
+        id: "overwrite",
+        label: "Overwrite existing file",
+        type: "boolean",
+        defaultValue: false,
+      },
     ],
 
     presets: [
@@ -159,6 +165,10 @@ const jsonFormatAdapter = {
         indent:
           request.options?.indent ??
           2,
+
+        overwrite:
+          request.options
+            ?.overwrite === true,
       },
     );
 

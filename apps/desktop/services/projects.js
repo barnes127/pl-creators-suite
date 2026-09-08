@@ -20,6 +20,11 @@ const {
   validateArchiveEntries,
 } = require("./formats/archive");
 
+const {
+  createStagingPath,
+  publishStagedFile,
+} = require("./formats/output");
+
 /**
  * Create a new project
  */
@@ -96,6 +101,8 @@ async function projectOpen({ projectRoot }) {
 }
 
 async function projectExport(params = {}) {
+  const signal = params.signal;
+  const overwrite = params.overwrite === true;
   const projectRoot = (params.projectRoot || "").toString().trim();
   let outPath = (params.outPath || "").toString().trim();
 
@@ -107,13 +114,39 @@ async function projectExport(params = {}) {
   }
   if (!outPath.endsWith(".plproj")) outPath += ".plproj";
 
-  await createZipArchive(projectRoot, outPath);
+  const stagedOutPath =
+    createStagingPath(
+      outPath,
+    );
+
+  try {
+    await createZipArchive(
+      projectRoot,
+      stagedOutPath,
+      { signal },
+    );
+
+    await publishStagedFile(
+      stagedOutPath,
+      outPath,
+      {
+        signal,
+        overwrite,
+      },
+    );
+  } finally {
+    await fs.rm(
+      stagedOutPath,
+      { force: true },
+    ).catch(() => {});
+  }
   await appendLog(projectRoot, `Exported project to "${outPath}"`);
 
   return { outPath };
 }
 
 async function projectImport(params = {}) {
+  const signal = params.signal;
   const filePath = (params.filePath || "").toString().trim();
   const baseDir = (params.baseDir || PROJECTS_DIR).toString();
 
@@ -149,7 +182,7 @@ async function projectImport(params = {}) {
   }
 
   const archiveEntries =
-    await listZipArchiveEntries(filePath);
+    await listZipArchiveEntries(filePath, { signal });
 
   validateArchiveEntries(archiveEntries);
 
@@ -160,7 +193,7 @@ async function projectImport(params = {}) {
   let installed = false;
 
   try {
-    await extractZipArchive(filePath, stagingRoot);
+    await extractZipArchive(filePath, stagingRoot, { signal });
 
     const manifestPath = path.join(
       stagingRoot,

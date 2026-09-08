@@ -2,6 +2,10 @@ const fs = require("fs/promises");
 const path = require("path");
 
 const {
+  writeTextFileSafely,
+} = require("./output");
+
+const {
   throwIfAborted,
 } = require("./archive");
 
@@ -63,42 +67,19 @@ async function writeJsonFile(
       ? ""
       : "\n");
 
-  await fs.mkdir(
-    path.dirname(filePath),
-    { recursive: true },
+  await writeTextFileSafely(
+    filePath,
+    serialized,
+    {
+      signal:
+        options.signal,
+
+      overwrite:
+        options.overwrite === true,
+    },
   );
 
-  const tempPath =
-    `${filePath}.tmp-${process.pid}-${Date.now()}`;
-
-  try {
-    await fs.writeFile(
-      tempPath,
-      serialized,
-      "utf8",
-    );
-
-    throwIfAborted(options.signal);
-
-    await fs.rename(
-      tempPath,
-      filePath,
-    );
-  } finally {
-    await fs.rm(
-      tempPath,
-      { force: true },
-    ).catch(() => {});
-  }
-
-  return {
-    filePath,
-    bytes:
-      Buffer.byteLength(
-        serialized,
-        "utf8",
-      ),
-  };
+  return filePath;
 }
 
 function describeJsonValue(value) {

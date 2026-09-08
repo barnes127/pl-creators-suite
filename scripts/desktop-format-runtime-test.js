@@ -202,6 +202,67 @@ async function main() {
     );
 
     await check(
+      "pre-cancelled project package export aborts",
+      async () => {
+        const projectRoot =
+          path.join(
+            tempRoot,
+            "CancelledProjectExport",
+          );
+
+        await fs.mkdir(
+          projectRoot,
+          { recursive: true },
+        );
+
+        await fs.writeFile(
+          path.join(
+            projectRoot,
+            "pl-project.json",
+          ),
+          JSON.stringify({
+            schemaVersion: 1,
+            name: "Cancelled Export",
+          }),
+          "utf8",
+        );
+
+        const destinationPath =
+          path.join(
+            tempRoot,
+            "cancelled.plproj",
+          );
+
+        const controller =
+          new AbortController();
+
+        controller.abort();
+
+        await assert.rejects(
+          () =>
+            runtime.export(
+              "project.plproj",
+              {
+                value: {
+                  projectRoot,
+                },
+
+                destinationPath,
+              },
+              createContext(
+                controller.signal,
+              ),
+            ),
+          (error) =>
+            error.name ===
+              "AbortError" ||
+            error.code ===
+              "OPERATION_CANCELLED",
+        );
+      },
+    );
+
+    await check(
       "JSON adapter round trips structured data",
       async () => {
         const destination =
@@ -305,6 +366,119 @@ async function main() {
     );
 
     await check(
+      "JSON export refuses silent overwrite",
+      async () => {
+        const destinationPath =
+          path.join(
+            tempRoot,
+            "existing.json",
+          );
+
+        await fs.writeFile(
+          destinationPath,
+          JSON.stringify({
+            original: true,
+          }),
+          "utf8",
+        );
+
+        const controller =
+          new AbortController();
+
+        await assert.rejects(
+          () =>
+            runtime.export(
+              "data.json",
+              {
+                destinationPath,
+
+                value: {
+                  replacement: true,
+                },
+              },
+              createContext(
+                controller.signal,
+              ),
+            ),
+          (error) =>
+            error.code ===
+            "OUTPUT_EXISTS",
+        );
+
+        const existing =
+          JSON.parse(
+            await fs.readFile(
+              destinationPath,
+              "utf8",
+            ),
+          );
+
+        assert.equal(
+          existing.original,
+          true,
+        );
+      },
+    );
+
+    await check(
+      "JSON export replaces only with explicit overwrite",
+      async () => {
+        const destinationPath =
+          path.join(
+            tempRoot,
+            "overwrite.json",
+          );
+
+        await fs.writeFile(
+          destinationPath,
+          JSON.stringify({
+            original: true,
+          }),
+          "utf8",
+        );
+
+        const controller =
+          new AbortController();
+
+        await runtime.export(
+          "data.json",
+          {
+            destinationPath,
+
+            value: {
+              replacement: true,
+            },
+
+            options: {
+              overwrite: true,
+            },
+          },
+          createContext(
+            controller.signal,
+          ),
+        );
+
+        const result =
+          JSON.parse(
+            await fs.readFile(
+              destinationPath,
+              "utf8",
+            ),
+          );
+
+        assert.equal(
+          result.replacement,
+          true,
+        );
+
+        assert.equal(
+          result.original,
+          undefined,
+        );
+      },
+    );
+
+    await check(
       "CSV adapter preserves quoted fields",
       async () => {
         const filePath =
@@ -359,6 +533,60 @@ async function main() {
         assert.deepStrictEqual(
           imported.value,
           rows,
+        );
+      },
+    );
+
+    await check(
+      "CSV export refuses silent overwrite",
+      async () => {
+        const destinationPath =
+          path.join(
+            tempRoot,
+            "existing.csv",
+          );
+
+        await fs.writeFile(
+          destinationPath,
+          "original,data\n",
+          "utf8",
+        );
+
+        const controller =
+          new AbortController();
+
+        await assert.rejects(
+          () =>
+            runtime.export(
+              "data.csv",
+              {
+                destinationPath,
+
+                value: [
+                  [
+                    "replacement",
+                    "data",
+                  ],
+                ],
+              },
+              createContext(
+                controller.signal,
+              ),
+            ),
+          (error) =>
+            error.code ===
+            "OUTPUT_EXISTS",
+        );
+
+        const existing =
+          await fs.readFile(
+            destinationPath,
+            "utf8",
+          );
+
+        assert.equal(
+          existing,
+          "original,data\n",
         );
       },
     );

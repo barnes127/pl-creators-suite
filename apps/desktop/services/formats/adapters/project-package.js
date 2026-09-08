@@ -6,6 +6,7 @@ const {
 
 const {
   listZipArchiveEntries,
+  throwIfAborted,
   validateArchiveEntries,
 } = require("../archive");
 
@@ -21,6 +22,14 @@ const projectPackageFormatAdapter = {
     supportsPreview: true,
     supportsCancellation: true,
     supportsRoundTrip: true,
+    options: [
+      {
+        id: "overwrite",
+        label: "Overwrite existing package",
+        type: "boolean",
+        defaultValue: false,
+      },
+    ],
   },
 
   async preview(request, context) {
@@ -97,6 +106,8 @@ const projectPackageFormatAdapter = {
         "Importing project package",
     });
 
+    throwIfAborted(context.signal);
+
     const {projectImport} = require("../../projects");
 
     const result =
@@ -106,6 +117,9 @@ const projectPackageFormatAdapter = {
 
         baseDir:
           request.destinationPath,
+
+        signal:
+          context.signal,
       });
 
     context.reportProgress({
@@ -146,14 +160,20 @@ const projectPackageFormatAdapter = {
         "Exporting project package",
     });
 
+    throwIfAborted(context.signal);
+
     const {projectExport} = require("../../projects");
 
     const result =
       await projectExport({
         projectRoot,
-
         outPath:
           request.destinationPath,
+        signal:
+          context.signal,
+        overwrite:
+          request.options
+            ?.overwrite === true,
       });
 
     context.reportProgress({

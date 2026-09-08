@@ -1,9 +1,8 @@
 const fs = require("fs/promises");
 
-const {
-  parseCsv,
-  serializeCsv,
-} = require("../csv");
+const {parseCsv, serializeCsv} = require("../csv");
+
+const {writeTextFileSafely} = require("../output");
 
 function throwIfCancelled(context) {
   if (context.signal.aborted) {
@@ -52,6 +51,12 @@ const csvFormatAdapter = {
             label: "Tab",
           },
         ],
+      },
+      {
+        id: "overwrite",
+        label: "Overwrite existing file",
+        type: "boolean",
+        defaultValue: false,
       },
     ],
 
@@ -181,10 +186,17 @@ const csvFormatAdapter = {
       message: "Writing CSV",
     });
 
-    await fs.writeFile(
+    await writeTextFileSafely(
       request.destinationPath,
       `${serialized}\n`,
-      "utf8",
+      {
+        signal:
+          context.signal,
+
+        overwrite:
+          request.options
+            ?.overwrite === true,
+      }
     );
 
     throwIfCancelled(context);
