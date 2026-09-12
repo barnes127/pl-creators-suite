@@ -308,9 +308,9 @@ check(
 
 
 const runtimeServices = [
-  "commands:",
+  "commands,",
   "capabilities:",
-  "events:",
+  "events,",
   "settings,",
   "services:",
 ];

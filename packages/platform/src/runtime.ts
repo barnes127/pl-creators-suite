@@ -8,11 +8,13 @@ import {
 } from "./assets";
 
 import {
+  CommandApi,
   CommandRegistry,
 } from "./commands";
 
 import {
   createPlatformEventBus,
+  EventApi,
 } from "./events";
 
 import {
@@ -25,6 +27,7 @@ import {
 } from "./settings";
 
 import {
+  SearchApi,
   SearchProviderRegistry,
 } from "./search";
 
@@ -35,15 +38,33 @@ import {
 export function createPlatformRuntime() {
   const settings =
     new SettingsStore();
+
+  const commands =
+    new CommandRegistry();
+
+  const events =
+    createPlatformEventBus();
+
+  const search =
+    new SearchProviderRegistry();
+
   return {
-    commands:
-      new CommandRegistry(),
+    commands,
+
+    commandApi:
+      new CommandApi(
+        commands,
+      ),
 
     capabilities:
       new CapabilityRegistry(),
 
-    events:
-      createPlatformEventBus(),
+    events,
+
+    eventApi:
+      new EventApi(
+        events,
+      ),
 
     settings,
 
@@ -64,8 +85,12 @@ export function createPlatformRuntime() {
     assetDependencies:
       new AssetDependencyGraph(),
 
-    search:
-      new SearchProviderRegistry(),
+    search,
+
+    searchApi:
+      new SearchApi(
+        search,
+      ),
   };
 }
 

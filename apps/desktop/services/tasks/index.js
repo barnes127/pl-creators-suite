@@ -16,6 +16,10 @@ const {
   createFormatTaskHandlers,
 } = require("./formats");
 
+const {
+  createTaskApiAdapter,
+} = require("./api");
+
 function createDesktopTaskManager(options = {}) {
   const manager = new TaskManager({
     onTaskChanged:
@@ -59,4 +63,5 @@ module.exports = {
   normalizeProgress,
   createDesktopTaskManager,
   desktopTaskManager,
+  createTaskApiAdapter,
 };
