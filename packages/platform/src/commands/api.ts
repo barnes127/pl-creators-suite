@@ -2,6 +2,7 @@ import type {
   CommandContext,
   CommandExecutionResult,
   RegisteredCommand,
+  CommandDefinition,
 } from "./types";
 
 import type {
@@ -16,6 +17,29 @@ export class CommandApi {
     private readonly registry:
       CommandRegistry,
   ) {}
+
+  register<
+    TInput = unknown,
+    TOutput = unknown,
+  >(
+    definition:
+      CommandDefinition<
+        TInput,
+        TOutput
+      >,
+  ) {
+    return this.registry.register(
+      definition,
+    );
+  }
+
+  unregister(
+    commandId: string,
+  ) {
+    return this.registry.unregister(
+      commandId,
+    );
+  }
 
   get(
     commandId: string,

@@ -42,8 +42,8 @@
         "apps/desktop/services/project/integrity.js"
       ],
       "validation": [
-      "scripts/project-format-test.js",
-      "docs/releases/wave-1.1.3-project-format-validation.md"
+        "scripts/project-format-test.js",
+        "docs/releases/wave-1.1.3-project-format-validation.md"
       ],
       "notes": "Migration boundary, future-version rejection, pre-migration backups, atomic replacement, and migration-safe project loading are established. Schema v1 is the current baseline, so no historical v0-to-v1 migration exists.",
       "blockedBy": [],
@@ -143,11 +143,17 @@
       "description": "Provide reusable undo history, snapshots, autosave, crash recovery, and restore behavior.",
       "slice": "CORE",
       "area": "history",
-      "status": "missing",
+      "status": "complete",
       "targetMilestone": "v1.2",
       "source": "Shared Creator Platform Foundations / History and Recovery",
-      "implementation": [],
-      "validation": [],
+      "implementation": [
+        "packages/platform/src/history",
+        "apps/desktop/services/project-platform/recovery"
+      ],
+      "validation": [
+        "scripts/platform-history-behavior-test.ts",
+        "scripts/project-recovery-closeout-test.js"
+      ],
       "notes": "Individual slices should consume this shared infrastructure rather than invent unrelated recovery systems.",
       "blockedBy": [
         "PL-CORE-PROJECT-001"
@@ -160,11 +166,17 @@
       "description": "Provide reusable importer, exporter, conversion, validation, progress, error, and format-registration infrastructure.",
       "slice": "CORE",
       "area": "interchange",
-      "status": "missing",
+      "status": "complete",
       "targetMilestone": "v1.2",
       "source": "Shared Creator Platform Foundations / Import Export",
-      "implementation": [],
-      "validation": [],
+      "implementation": [
+        "packages/platform/src/formats",
+        "apps/desktop/services/formats"
+      ],
+      "validation": [
+        "scripts/platform-task-format-behavior-test.ts",
+        "scripts/desktop-format-runtime-test.js"
+      ],
       "notes": null,
       "blockedBy": [
         "PL-CORE-TASK-001"
@@ -177,11 +189,17 @@
       "description": "Execute long-running work with progress, cancellation, diagnostics, lifecycle state, and failure isolation.",
       "slice": "CORE",
       "area": "tasks",
-      "status": "partial",
+      "status": "complete",
       "targetMilestone": "v1.2",
       "source": "Shared Creator Platform Foundations / Tasks Workers Diagnostics",
-      "implementation": [],
-      "validation": [],
+      "implementation": [
+        "packages/platform/src/tasks",
+        "apps/desktop/services/tasks"
+      ],
+      "validation": [
+        "scripts/desktop-task-service-test.js",
+        "scripts/desktop-task-api-test.js"
+      ],
       "notes": "Some engine operations exist, but the standard suite-wide job contract remains incomplete.",
       "blockedBy": [
         "PL-CORE-RPC-001"
@@ -194,11 +212,18 @@
       "description": "Register application and slice commands for menus, shortcuts, command palette, automation, and future extensions.",
       "slice": "CORE",
       "area": "commands",
-      "status": "missing",
+      "status": "complete",
       "targetMilestone": "v1.2",
       "source": "Shared Creator Platform Foundations / Reusable UI Infrastructure",
-      "implementation": [],
-      "validation": [],
+      "implementation": [
+        "packages/platform/src/commands",
+        "packages/platform/src/runtime.ts"
+      ],
+      "validation": [
+        "scripts/platform-command-registry-test.js",
+        "scripts/platform-orchestration-api-test.ts",
+        "scripts/platform-two-slice-consumer-test.ts"
+      ],
       "notes": null,
       "blockedBy": [
         "PL-CORE-SHELL-001"
@@ -369,11 +394,17 @@
       "description": "Provide structured diagnostic events, logging, warnings, errors, task state, and engine health visibility.",
       "slice": "CORE",
       "area": "diagnostics",
-      "status": "partial",
+      "status": "complete",
       "targetMilestone": "v1.2",
       "source": "Shared Creator Platform Foundations / Tasks Workers Diagnostics",
-      "implementation": [],
-      "validation": [],
+      "implementation": [
+        "apps/desktop/services/diagnostics",
+        "apps/desktop/services/operations.js"
+      ],
+      "validation": [
+        "scripts/desktop-diagnostics-service-test.js",
+        "scripts/desktop-operational-rpc-test.js"
+      ],
       "notes": "Multiple engines already expose diagnostic information, but one stable shared contract is still needed.",
       "blockedBy": [
         "PL-CORE-RPC-001"
@@ -403,11 +434,18 @@
       "description": "Provide a versioned typed event bus for project, asset, slice, engine, task, terminal, extension, AI, cloud, collaboration, and platform events.",
       "slice": "CORE",
       "area": "events",
-      "status": "missing",
+      "status": "complete",
       "targetMilestone": "v1.2",
       "source": "v1.2 — Wave 1.2.2 Command registry event bus settings and capability services",
-      "implementation": [],
-      "validation": [],
+      "implementation": [
+        "packages/platform/src/events",
+        "packages/platform/src/runtime.ts"
+      ],
+      "validation": [
+        "scripts/platform-event-bus-test.js",
+        "scripts/platform-orchestration-api-test.ts",
+        "scripts/platform-two-slice-consumer-test.ts"
+      ],
       "notes": null,
       "blockedBy": [
         "PL-CORE-RPC-001"
@@ -420,11 +458,18 @@
       "description": "Provide application, profile, project, slice, language, extension, and provider settings scopes through stable shared contracts.",
       "slice": "CORE",
       "area": "settings",
-      "status": "missing",
+      "status": "complete",
       "targetMilestone": "v1.2",
       "source": "v1.2 — Wave 1.2.2 Command registry event bus settings and capability services",
-      "implementation": [],
-      "validation": [],
+      "implementation": [
+        "packages/platform/src/settings",
+        "packages/platform/src/runtime.ts"
+      ],
+      "validation": [
+        "scripts/platform-settings-test.js",
+        "scripts/platform-core-api-behavior-test.ts",
+        "scripts/platform-two-slice-consumer-test.ts"
+      ],
       "notes": null,
       "blockedBy": [
         "PL-CORE-PROJECT-001"
@@ -437,11 +482,18 @@
       "description": "Provide project-wide search across files, documents, cells, symbols, assets, scenes, shots, tasks, workflows, and extension content.",
       "slice": "CORE",
       "area": "search",
-      "status": "missing",
+      "status": "complete",
       "targetMilestone": "v1.2",
       "source": "v1.2 — Wave 1.2.3 Project asset indexing and global search services",
-      "implementation": [],
-      "validation": [],
+      "implementation": [
+        "packages/platform/src/search",
+        "apps/desktop/services/project-platform"
+      ],
+      "validation": [
+        "scripts/platform-search-contract-test.js",
+        "scripts/project-global-search-test.js",
+        "scripts/platform-orchestration-api-test.ts"
+      ],
       "notes": null,
       "blockedBy": [
         "PL-CORE-INDEX-001",
@@ -455,11 +507,18 @@
       "description": "Provide incremental background indexing with content hashing, stale detection, cancellation, status reporting, and update tracking.",
       "slice": "CORE",
       "area": "indexing",
-      "status": "missing",
+      "status": "complete",
       "targetMilestone": "v1.2",
       "source": "v1.2 — Wave 1.2.3 Project asset indexing and global search services",
-      "implementation": [],
-      "validation": [],
+      "implementation": [
+        "apps/desktop/services/project-platform/indexing",
+        "apps/desktop/services/tasks"
+      ],
+      "validation": [
+        "scripts/project-indexing-contract-test.js",
+        "scripts/project-indexing-service-test.js",
+        "scripts/desktop-task-service-test.js"
+      ],
       "notes": null,
       "blockedBy": [
         "PL-CORE-ASSET-001",
@@ -473,11 +532,17 @@
       "description": "Provide consistent application and project notifications through a stable internal Notification API.",
       "slice": "CORE",
       "area": "notifications",
-      "status": "missing",
+      "status": "complete",
       "targetMilestone": "v1.2",
       "source": "v1.2 — Required outcomes and Wave 1.2.6 Initial platform SDK contracts",
-      "implementation": [],
-      "validation": [],
+      "implementation": [
+        "packages/platform/src/notifications",
+        "packages/platform/src/runtime.ts"
+      ],
+      "validation": [
+        "scripts/platform-core-api-behavior-test.ts",
+        "scripts/platform-two-slice-consumer-test.ts"
+      ],
       "notes": null,
       "blockedBy": [
         "PL-CORE-SHELL-001",
@@ -491,11 +556,17 @@
       "description": "Provide versioned service registration and permission-aware service discovery instead of direct cross-module imports.",
       "slice": "CORE",
       "area": "services",
-      "status": "missing",
+      "status": "complete",
       "targetMilestone": "v1.2",
       "source": "v1.2 — Wave 1.2.2 Command registry event bus settings and capability services",
-      "implementation": [],
-      "validation": [],
+      "implementation": [
+         "packages/platform/src/services",
+         "packages/platform/src/runtime.ts"
+      ],
+      "validation": [
+        "scripts/platform-service-discovery-test.js",
+        "scripts/platform-service-behavior-test.ts"
+      ],
       "notes": null,
       "blockedBy": [
         "PL-CORE-PERMISSION-001",
@@ -527,11 +598,17 @@
       "description": "Provide a stable internal Theme API for shared UI styling, extension integration, workspace behavior, accessibility, and future SDK consumers.",
       "slice": "CORE",
       "area": "ui-platform",
-      "status": "missing",
+      "status": "complete",
       "targetMilestone": "v1.2",
       "source": "v1.2 — Wave 1.2.6 Initial platform SDK contracts",
-      "implementation": [],
-      "validation": [],
+      "implementation": [
+        "packages/platform/src/themes",
+        "packages/platform/src/runtime.ts"
+      ],
+      "validation": [
+        "scripts/platform-contribution-api-test.ts",
+        "scripts/platform-two-slice-consumer-test.ts"
+      ],
       "notes": null,
       "blockedBy": [
         "PL-CORE-SHELL-001",
@@ -545,11 +622,17 @@
       "description": "Provide stable project, slice, workflow, and extension-facing template contracts for reusable creator content and workflows.",
       "slice": "CORE",
       "area": "templates",
-      "status": "missing",
+      "status": "complete",
       "targetMilestone": "v1.2",
       "source": "v1.2 — Wave 1.2.6 Initial platform SDK contracts",
-      "implementation": [],
-      "validation": [],
+      "implementation": [
+        "packages/platform/src/templates",
+        "packages/platform/src/runtime.ts"
+      ],
+      "validation": [
+        "scripts/platform-contribution-api-test.ts",
+        "scripts/platform-two-slice-consumer-test.ts"
+      ],
       "notes": null,
       "blockedBy": [
         "PL-CORE-PROJECT-001",

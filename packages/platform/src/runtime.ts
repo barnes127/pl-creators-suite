@@ -64,7 +64,7 @@ export function createPlatformRuntime() {
     new SearchProviderRegistry();
 
   const ui =
-  new UiContributionRegistry();
+    new UiContributionRegistry();
 
   const themes =
     new ThemeRegistry();
