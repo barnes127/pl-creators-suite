@@ -73,9 +73,81 @@ async function main() {
     "PASS    Workflow API reads existing workflow",
   );
 
-  await api.delete(
-    tempRoot,
-    "test-workflow",
+  await assert.rejects(
+    () =>
+      api.save(
+        tempRoot,
+        "test-workflow",
+        {
+          ...read.workflow,
+          description:
+            "Updated workflow.",
+        },
+      ),
+    /Explicit overwrite is required/,
+  );
+
+  console.log(
+    "PASS    Workflow API refuses silent overwrite",
+  );
+
+  const saved =
+    await api.save(
+      tempRoot,
+      "test-workflow",
+      {
+        ...read.workflow,
+        description:
+          "Updated workflow.",
+      },
+      {
+        overwrite:
+          true,
+      },
+    );
+
+  assert.strictEqual(
+    saved.workflow.description,
+    "Updated workflow.",
+  );
+
+  console.log(
+    "PASS    Workflow API allows explicit overwrite",
+  );
+
+  await assert.rejects(
+    () =>
+      api.delete(
+        tempRoot,
+        "test-workflow",
+      ),
+    /explicit destructive approval/,
+  );
+
+  console.log(
+    "PASS    Workflow API refuses implicit destructive delete",
+  );
+
+  const deleted =
+    await api.delete(
+      tempRoot,
+      "test-workflow",
+      {
+        destructive:
+          true,
+      },
+    );
+
+  assert.ok(
+    deleted.recoveryPath,
+  );
+
+  await fs.access(
+    deleted.recoveryPath,
+  );
+
+  console.log(
+    "PASS    Workflow API delete preserves recoverable copy",
   );
 
   const afterDelete =
@@ -104,7 +176,7 @@ async function main() {
   );
 
   console.log(
-    "\nDesktop Workflow API test complete: 4/4 PASS",
+    "\nDesktop Workflow API test complete: 8/8 PASS",
   );
 }
 

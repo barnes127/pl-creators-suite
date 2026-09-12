@@ -2,6 +2,8 @@ import type {
   WorkflowApiAdapter,
   WorkflowDocument,
   WorkflowTaskDefinition,
+  WorkflowSaveOptions,
+  WorkflowDeleteOptions,
 } from "./types";
 
 export const WORKFLOW_API_SERVICE_ID =
@@ -49,21 +51,27 @@ export class WorkflowApi {
     name: string,
     workflow:
       WorkflowDocument,
+    options?:
+      WorkflowSaveOptions,
   ) {
     return this.adapter.save(
       projectRoot,
       name,
       workflow,
+      options,
     );
   }
 
   delete(
     projectRoot: string,
     name: string,
+    options?:
+      WorkflowDeleteOptions,
   ) {
     return this.adapter.delete(
       projectRoot,
       name,
+      options,
     );
   }
 

@@ -245,6 +245,30 @@ async function saveWorkflow(params) {
 
   const name = safeWorkflowName(params?.name);
   const workflowPath = path.join(workflowsDir, name);
+  const overwrite =
+  params?.overwrite ===
+  true;
+
+  let existing = false;
+
+  try {
+    await fs.access(
+      workflowPath,
+    );
+
+    existing = true;
+  } catch {
+    existing = false;
+  }
+
+  if (
+    existing &&
+    !overwrite
+  ) {
+    throw new Error(
+      `Workflow already exists: ${name}. Explicit overwrite is required.`,
+    );
+  }
 
   const workflow = normalizeWorkflow(
     {
@@ -254,10 +278,71 @@ async function saveWorkflow(params) {
     name.replace(WORKFLOW_EXTENSION, "")
   );
 
+  const backupPath =
+    `${workflowPath}.bak`;
+
+  if (existing) {
+    await fs.copyFile(
+      workflowPath,
+      backupPath,
+    );
+  }
+
   const tmpPath = `${workflowPath}.tmp`;
 
-  await fs.writeFile(tmpPath, JSON.stringify(workflow, null, 2), "utf8");
-  await fs.rename(tmpPath, workflowPath);
+  try {
+    await fs.writeFile(
+      tmpPath,
+      JSON.stringify(
+        workflow,
+        null,
+        2,
+      ),
+      "utf8",
+    );
+
+    await fs.rename(
+      tmpPath,
+      workflowPath,
+    );
+
+    if (existing) {
+      await fs.rm(
+        backupPath,
+        {
+          force:
+            true,
+        },
+      );
+    }
+  } catch (error) {
+    await fs.rm(
+      tmpPath,
+      {
+        force:
+          true,
+      },
+    );
+
+    if (existing) {
+      try {
+        await fs.copyFile(
+          backupPath,
+          workflowPath,
+        );
+      } finally {
+        await fs.rm(
+          backupPath,
+          {
+            force:
+              true,
+          },
+        );
+      }
+    }
+
+    throw error;
+  }
 
   return {
     name,
@@ -271,12 +356,46 @@ async function deleteWorkflow(params) {
   const name = safeWorkflowName(params?.name);
   const workflowPath = path.join(workflowsDir, name);
 
-  await fs.unlink(workflowPath);
+  if (
+    params?.destructive !==
+    true
+  ) {
+    throw new Error(
+      `Workflow delete requires explicit destructive approval: ${name}`,
+    );
+  }
+
+  const deletedDir =
+    path.join(
+      workflowsDir,
+      ".deleted",
+    );
+
+  await fs.mkdir(
+    deletedDir,
+    {
+      recursive:
+        true,
+    },
+  );
+
+  const deletedPath =
+    path.join(
+      deletedDir,
+      `${Date.now()}-${name}`,
+    );
+
+  await fs.rename(
+    workflowPath,
+    deletedPath,
+  );
 
   return {
     name,
     path: workflowPath,
     deleted: true,
+    recoveryPath:
+      deletedPath,
   };
 }
 

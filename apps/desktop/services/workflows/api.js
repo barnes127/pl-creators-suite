@@ -43,21 +43,29 @@ function createWorkflowApiAdapter() {
       projectRoot,
       name,
       workflow,
+      options ={},
     ) {
       return saveWorkflow({
         projectRoot,
         name,
         workflow,
+        overwrite:
+          options.overwrite ===
+          true,
       });
     },
 
     async delete(
       projectRoot,
       name,
+      options = {},
     ) {
       return deleteWorkflow({
         projectRoot,
         name,
+        destructive:
+          options.destructive ===
+          true,
       });
     },
   };

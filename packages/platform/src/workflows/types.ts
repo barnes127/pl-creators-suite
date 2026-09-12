@@ -28,6 +28,16 @@ export interface WorkflowReadResult {
 export interface WorkflowCreateResult
   extends WorkflowReadResult {}
 
+export interface WorkflowSaveOptions {
+  overwrite?:
+    boolean;
+}
+
+export interface WorkflowDeleteOptions {
+  destructive?:
+    boolean;
+}
+
 export interface WorkflowDeleteResult {
   name: string;
 
@@ -65,6 +75,8 @@ export interface WorkflowApiAdapter {
     name: string,
     workflow:
       WorkflowDocument,
+    options?:
+      WorkflowSaveOptions,
   ):
     Promise<
       WorkflowReadResult
@@ -73,6 +85,8 @@ export interface WorkflowApiAdapter {
   delete(
     projectRoot: string,
     name: string,
+    options?:
+      WorkflowDeleteOptions,
   ):
     Promise<
       WorkflowDeleteResult
