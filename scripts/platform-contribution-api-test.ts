@@ -310,5 +310,5 @@ pass(
 );
 
 console.log(
-  `\nPlatform contribution API test complete: ${passed}/6 PASS`,
+  `\nPlatform contribution API test complete: ${passed}/7 PASS`,
 );
