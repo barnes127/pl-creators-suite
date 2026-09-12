@@ -20,6 +20,9 @@
     "./tasks": "./src/tasks/index.ts",
     "./formats": "./src/formats/index.ts",
     "./files": "./src/files/index.ts",
-    "./notifications": "./src/notifications/index.ts"
+    "./notifications": "./src/notifications/index.ts",
+    "./ui": "./src/ui/index.ts",
+    "./themes": "./src/themes/index.ts",
+    "./templates": "./src/templates/index.ts"
   }
 }

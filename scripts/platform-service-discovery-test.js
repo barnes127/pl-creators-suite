@@ -253,6 +253,26 @@ check(
   "future query category is reserved",
 );
 
+check(
+  serviceTypes.includes(
+    "capabilities?",
+  ),
+  "service discovery context supports capabilities",
+);
+
+check(
+  serviceTypes.includes(
+    "requiredCapabilities",
+  ),
+  "services declare capability requirements",
+);
+
+check(
+  serviceRegistry.includes(
+    "ServiceCapabilityError",
+  ),
+  "service discovery enforces capabilities",
+);
 
 check(
   serviceRegistry.includes(

@@ -1,6 +1,7 @@
 import {
   DuplicateServiceError,
   ServicePermissionError,
+  ServiceCapabilityError,
   UnknownServiceError,
 } from "./errors";
 
@@ -177,9 +178,7 @@ export class ServiceRegistry {
       );
   }
 
-  discover<
-    TService,
-  >(
+  discover<TService>(
     serviceId: string,
     context:
       ServiceDiscoveryContext,
@@ -218,11 +217,31 @@ export class ServiceRegistry {
       }
     }
 
+    for (
+      const capability
+      of registered
+        .descriptor
+        .requiredCapabilities ??
+      []
+    ) {
+      if (
+        !context
+          .capabilities
+          ?.has(
+            capability,
+          )
+      ) {
+        throw new ServiceCapabilityError(
+          serviceId,
+          capability,
+        );
+      }
+    }
 
     return registered.service as
       TService;
   }
-
+x
 
   canDiscover(
     serviceId: string,

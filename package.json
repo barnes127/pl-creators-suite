@@ -91,6 +91,7 @@
     "test:platform-orchestration-apis": "rm -rf .tmp-orchestration-api-test && tsc --target ES2022 --module commonjs --moduleResolution node --esModuleInterop --skipLibCheck --outDir .tmp-orchestration-api-test scripts/platform-orchestration-api-test.ts && node .tmp-orchestration-api-test/scripts/platform-orchestration-api-test.js && rm -rf .tmp-orchestration-api-test",
     "test:desktop-task-api": "node scripts/desktop-task-api-test.js",
     "test:desktop-workflow-api": "node scripts/desktop-workflow-api-test.js",
+    "test:platform-contribution-apis": "rm -rf .tmp-contribution-api-test && tsc --target ES2022 --module commonjs --moduleResolution node --esModuleInterop --skipLibCheck --outDir .tmp-contribution-api-test scripts/platform-contribution-api-test.ts && node .tmp-contribution-api-test/scripts/platform-contribution-api-test.js && rm -rf .tmp-contribution-api-test",
     "performance:baseline": "node scripts/performance-baseline.js",
     "rpc:inventory": "node scripts/rpc-inventory.js",
     "dev": "pnpm -r dev",

@@ -76,6 +76,27 @@ registry.register(
   {},
 );
 
+registry.register(
+  {
+    id:
+      "capability.protected",
+
+    version:
+      "1.0.0",
+
+    category:
+      "ui",
+
+    stability:
+      "internal",
+
+    requiredCapabilities: [
+      "ui.contribute",
+    ],
+  },
+  {},
+);
+
 const privilegedContext = {
   requesterId:
     "test.privileged",
@@ -92,6 +113,19 @@ const restrictedContext = {
 
   permissions:
     new Set<string>(),
+};
+
+const capabilityContext = {
+  requesterId:
+    "test.capability",
+
+  permissions:
+    new Set<string>(),
+
+  capabilities:
+    new Set([
+      "ui.contribute",
+    ]),
 };
 
 check(
@@ -199,6 +233,29 @@ check(
   },
 );
 
+check(
+  "service discovery enforces required capabilities",
+  () => {
+    assertEqual(
+      registry.canDiscover(
+        "capability.protected",
+        restrictedContext,
+      ),
+      false,
+      "restricted context cannot discover capability-protected service",
+    );
+
+    assertEqual(
+      registry.canDiscover(
+        "capability.protected",
+        capabilityContext,
+      ),
+      true,
+      "capability context can discover capability-protected service",
+    );
+  },
+);
+
 console.log(
-  `\nPlatform service behavior test complete: ${passed}/4 PASS`,
+  `\nPlatform service behavior test complete: ${passed}/5 PASS`,
 );

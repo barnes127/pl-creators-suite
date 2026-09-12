@@ -57,3 +57,18 @@ export class ServicePermissionError
       "ServicePermissionError";
   }
 }
+
+export class ServiceCapabilityError
+  extends ServiceRegistryError {
+  constructor(
+    serviceId: string,
+    capability: string,
+  ) {
+    super(
+      `Service ${serviceId} requires capability: ${capability}`,
+    );
+
+    this.name =
+      "ServiceCapabilityError";
+  }
+}

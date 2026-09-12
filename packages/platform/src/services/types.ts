@@ -62,6 +62,9 @@ export interface ServiceDiscoveryContext {
 
   permissions:
     ReadonlySet<string>;
+
+  capabilities?:
+    ReadonlySet<string>;
 }
 
 

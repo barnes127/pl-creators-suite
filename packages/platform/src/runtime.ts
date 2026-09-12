@@ -35,6 +35,21 @@ import {
   NotificationCenter,
 } from "./notifications";
 
+import {
+  ThemeApi,
+  ThemeRegistry,
+} from "./themes";
+
+import {
+  TemplateApi,
+  TemplateRegistry,
+} from "./templates";
+
+import {
+  UiApi,
+  UiContributionRegistry,
+} from "./ui";
+
 export function createPlatformRuntime() {
   const settings =
     new SettingsStore();
@@ -47,6 +62,15 @@ export function createPlatformRuntime() {
 
   const search =
     new SearchProviderRegistry();
+
+  const ui =
+  new UiContributionRegistry();
+
+  const themes =
+    new ThemeRegistry();
+
+  const templates =
+    new TemplateRegistry();
 
   return {
     commands,
@@ -90,6 +114,27 @@ export function createPlatformRuntime() {
     searchApi:
       new SearchApi(
         search,
+      ),
+
+    ui,
+
+    uiApi:
+      new UiApi(
+        ui,
+      ),
+
+    themes,
+
+    themeApi:
+      new ThemeApi(
+        themes,
+      ),
+
+    templates,
+
+    templateApi:
+      new TemplateApi(
+        templates,
       ),
   };
 }
