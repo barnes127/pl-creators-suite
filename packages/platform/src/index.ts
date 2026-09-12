@@ -11,3 +11,5 @@ export * from "./history";
 export * from "./recovery";
 export * from "./tasks";
 export * from "./formats";
+export * from "./files";
+export * from "./notifications";

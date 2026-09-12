@@ -18,6 +18,8 @@
     "./history": "./src/history/index.ts",
     "./recovery": "./src/recovery/index.ts",
     "./tasks": "./src/tasks/index.ts",
-    "./formats": "./src/formats/index.ts"
+    "./formats": "./src/formats/index.ts",
+    "./files": "./src/files/index.ts",
+    "./notifications": "./src/notifications/index.ts"
   }
 }

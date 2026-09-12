@@ -20,6 +20,7 @@ import {
 } from "./services";
 
 import {
+  SettingsApi,
   SettingsStore,
 } from "./settings";
 
@@ -27,7 +28,13 @@ import {
   SearchProviderRegistry,
 } from "./search";
 
+import {
+  NotificationCenter,
+} from "./notifications";
+
 export function createPlatformRuntime() {
+  const settings =
+    new SettingsStore();
   return {
     commands:
       new CommandRegistry(),
@@ -38,8 +45,15 @@ export function createPlatformRuntime() {
     events:
       createPlatformEventBus(),
 
-    settings:
-      new SettingsStore(),
+    settings,
+
+    settingsApi:
+      new SettingsApi(
+        settings,
+      ),
+
+    notifications:
+      new NotificationCenter(),
 
     services:
       new ServiceRegistry(),

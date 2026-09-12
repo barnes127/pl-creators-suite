@@ -86,6 +86,8 @@
     "test:desktop-formats": "node scripts/desktop-format-runtime-test.js",
     "test:desktop-diagnostics": "node scripts/desktop-diagnostics-service-test.js",
     "test:desktop-operations": "node scripts/desktop-operational-rpc-test.js",
+    "test:platform-core-apis": "rm -rf .tmp-core-api-test && tsc --target ES2022 --module commonjs --moduleResolution node --esModuleInterop --skipLibCheck --outDir .tmp-core-api-test scripts/platform-core-api-behavior-test.ts && node .tmp-core-api-test/scripts/platform-core-api-behavior-test.js && rm -rf .tmp-core-api-test",
+    "test:desktop-file-api": "node scripts/desktop-file-api-test.js",
     "performance:baseline": "node scripts/performance-baseline.js",
     "rpc:inventory": "node scripts/rpc-inventory.js",
     "dev": "pnpm -r dev",

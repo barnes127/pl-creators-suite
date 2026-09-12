@@ -43,6 +43,20 @@ const recovery =
     "./recovery",
   );
 
+const {
+  createProjectApiAdapter,
+} =
+  require(
+    "./api"
+  );
+
+const {
+  createFileApiAdapter,
+} =
+  require(
+    "./files"
+);
+
 async function inspectProject(
   params = {},
 ) {
@@ -93,4 +107,6 @@ module.exports = {
   searchProject,
   SUPPORTED_SEARCH_KINDS,
   recovery,
+  createProjectApiAdapter,
+  createFileApiAdapter,
 };

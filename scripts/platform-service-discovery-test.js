@@ -311,7 +311,7 @@ const runtimeServices = [
   "commands:",
   "capabilities:",
   "events:",
-  "settings:",
+  "settings,",
   "services:",
 ];
 
