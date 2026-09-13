@@ -10,6 +10,11 @@ import type {
 const STORAGE_KEY =
   "pl.shell.workspace-state.v1";
 
+const LEGACY_COPILOT_KEY =
+  "pl.layout.copilotDrawerOpen";
+
+const LEGACY_PHYSICS_KEY =
+  "pl.layout.physicsDrawerOpen";
 
 function cloneDefault():
   ShellWorkspaceState {
@@ -18,6 +23,30 @@ function cloneDefault():
   );
 }
 
+function readLegacyBoolean(
+  key: string,
+): boolean | undefined {
+  const raw =
+    window.localStorage.getItem(
+      key,
+    );
+
+  if (
+    raw ===
+    "true"
+  ) {
+    return true;
+  }
+
+  if (
+    raw ===
+    "false"
+  ) {
+    return false;
+  }
+
+  return undefined;
+}
 
 export function normalizeShellState(
   value: unknown,
@@ -105,7 +134,36 @@ export function loadShellState():
       );
 
     if (!raw) {
-      return cloneDefault();
+      const migrated =
+        cloneDefault();
+
+      const legacyCopilot =
+        readLegacyBoolean(
+          LEGACY_COPILOT_KEY,
+        );
+
+      const legacyPhysics =
+        readLegacyBoolean(
+          LEGACY_PHYSICS_KEY,
+        );
+
+      if (
+        legacyCopilot !==
+        undefined
+      ) {
+        migrated.layout.visibility.copilot =
+          legacyCopilot;
+      }
+
+      if (
+        legacyPhysics !==
+        undefined
+      ) {
+        migrated.layout.visibility.physics =
+          legacyPhysics;
+      }
+
+      return migrated;
     }
 
     return normalizeShellState(
@@ -128,8 +186,21 @@ export function saveShellState(
       state,
     ),
   );
-}
 
+  window.localStorage.setItem(
+    LEGACY_COPILOT_KEY,
+    String(
+      state.layout.visibility.copilot,
+    ),
+  );
+
+  window.localStorage.setItem(
+    LEGACY_PHYSICS_KEY,
+    String(
+      state.layout.visibility.physics,
+    ),
+  );
+}
 
 export function resetShellState():
   ShellWorkspaceState {

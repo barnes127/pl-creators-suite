@@ -93,6 +93,8 @@
     "test:desktop-workflow-api": "node scripts/desktop-workflow-api-test.js",
     "test:platform-contribution-apis": "rm -rf .tmp-contribution-api-test && tsc --target ES2022 --module commonjs --moduleResolution node --esModuleInterop --skipLibCheck --outDir .tmp-contribution-api-test scripts/platform-contribution-api-test.ts && node .tmp-contribution-api-test/scripts/platform-contribution-api-test.js && rm -rf .tmp-contribution-api-test",
     "test:platform-two-slice-consumers": "rm -rf .tmp-two-slice-test && tsc --target ES2022 --module commonjs --moduleResolution node --esModuleInterop --skipLibCheck --outDir .tmp-two-slice-test scripts/platform-two-slice-consumer-test.ts && node .tmp-two-slice-test/scripts/platform-two-slice-consumer-test.js && rm -rf .tmp-two-slice-test",
+    "test:shell-settings-compatibility": "node scripts/shell-settings-compatibility-test.js",
+    "test:modal-keyboard": "node scripts/modal-keyboard-test.js",
     "performance:baseline": "node scripts/performance-baseline.js",
     "rpc:inventory": "node scripts/rpc-inventory.js",
     "dev": "pnpm -r dev",
