@@ -7,8 +7,14 @@ import type {
 } from "./types";
 
 
-export function validateCommandDefinition(
-  command: CommandDefinition,
+export function validateCommandDefinition<
+  TInput = unknown,
+  TOutput = unknown,
+>(
+  command: CommandDefinition<
+    TInput,
+    TOutput
+  >,
 ) {
   if (
     command.id.trim().length === 0

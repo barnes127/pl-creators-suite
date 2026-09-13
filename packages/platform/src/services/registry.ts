@@ -241,7 +241,7 @@ export class ServiceRegistry {
     return registered.service as
       TService;
   }
-x
+
 
   canDiscover(
     serviceId: string,
