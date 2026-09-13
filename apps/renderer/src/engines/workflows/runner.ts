@@ -229,7 +229,7 @@ async function runWorkflowAction(
       message: "Unknown workflow action kind.",
       error: `Unsupported action kind: ${(action as WorkflowAction).kind}`,
     };
-  } catch (error: any) {
+  } catch (error: unknown) {
     return {
       actionId: action.id,
       actionName: action.name,
@@ -237,7 +237,10 @@ async function runWorkflowAction(
       startedAt,
       finishedAt: nowIso(),
       message: "Workflow action failed.",
-      error: error?.message || String(error),
+      error:
+        error instanceof Error
+          ? error.message
+          : String(error),
     };
   }
 }

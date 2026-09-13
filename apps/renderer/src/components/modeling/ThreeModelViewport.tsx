@@ -179,6 +179,8 @@ export function ThreeModelViewport({
       objectGroupRef.current = null;
       gridRef.current = null;
     };
+  // Grid visibility updates are handled by the dedicated effect below.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {

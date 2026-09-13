@@ -83,7 +83,7 @@ function rpcUrl(): string {
 
 let nextId = 1;
 
-export async function rpc<T>(method: string, params?: any): Promise<T> {
+export async function rpc<T>(method: string, params?: unknown): Promise<T> {
   const id = nextId++;
   const res = await fetch(rpcUrl(), {
     method: "POST",

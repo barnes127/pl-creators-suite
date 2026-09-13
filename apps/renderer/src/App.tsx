@@ -1,4 +1,4 @@
-import { useEffect,  useMemo, useState } from "react";
+import { useEffect,  useMemo, useState, useCallback } from "react";
 import { rpc } from "./rpc";
 import "./app.css";
 import { Modal } from "./components/Modal";
@@ -161,11 +161,19 @@ export default function App() {
   const validWorkspaceIds = NAV_ITEMS.map((item) => item.id);
   const active: AppId = validWorkspaceIds.includes(shellState.activeWorkspace as AppId) ? (shellState.activeWorkspace as AppId) : "code";
 
-  function setActive(
-    workspace: AppId
-  ) {
-    setWorkspace(workspace);
-  }
+  const setActive =
+    useCallback(
+      (
+        workspace: AppId,
+      ) => {
+        setWorkspace(
+          workspace,
+        );
+      },
+      [
+        setWorkspace,
+      ],
+    );
 
 //  const activeItem = NAV_ITEMS.find((n) => n.id === active)!;
   const [projectRoot, setProjectRoot] = useState<string>("");
@@ -2435,7 +2443,6 @@ useEffect(() => {
   void refreshFeatureFlags();
   void refreshLocalAiStatus();
   void refreshAppMetadata();
-  // eslint-disable-next-line react-hooks/exhaustive-deps
 }, []);
 
 useEffect(() => {
@@ -4540,7 +4547,7 @@ function Workspace({
     }
 
     setModelViewportCamera(modelingScene.camera);
-  }, [modelingScene?.id]);
+  }, [modelingScene]);
 
   const selectedModelObject =
     modelingScene?.objects.find((object) => object.id === selectedModelObjectId) ??
