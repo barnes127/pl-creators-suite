@@ -13,7 +13,6 @@ const path =
 const {
   indexProject,
   getIndexStatus,
-  readProjectIndex,
   createIndexCancellationToken,
   ProjectIndexJobManager,
 } =
@@ -21,6 +20,13 @@ const {
     "../apps/desktop/services/project-platform/indexing",
   );
 
+const {
+  getIndexPath,
+  readProjectIndex,
+  writeProjectIndex,
+} = require(
+  "../apps/desktop/services/project-platform/indexing/storage",
+);
 
 let passed =
   0;
@@ -327,6 +333,76 @@ async function main() {
       },
     );
 
+
+    await check(
+      "missing index returns empty baseline",
+      async () => {
+        const projectRoot =
+          await fs.mkdtemp(
+            path.join(
+              os.tmpdir(),
+              "pl-index-missing-",
+            ),
+          );
+
+        const index =
+          await readProjectIndex(
+            projectRoot,
+          );
+
+        assert.deepEqual(
+          index.files,
+          {},
+        );
+      },
+    );
+
+    await check(
+      "corrupt persisted index fails visibly",
+      async () => {
+        const projectRoot =
+          await fs.mkdtemp(
+            path.join(
+              os.tmpdir(),
+              "pl-index-corrupt-",
+            ),
+          );
+
+        await writeProjectIndex(
+          projectRoot,
+          {
+            schemaVersion:
+              1,
+
+            generatedAt:
+              new Date()
+                .toISOString(),
+
+            files:
+              {},
+          },
+        );
+
+        const indexPath =
+          getIndexPath(
+            projectRoot,
+          );
+
+        await fs.writeFile(
+          indexPath,
+          "{ corrupt",
+          "utf8",
+        );
+
+        await assert.rejects(
+          () =>
+            readProjectIndex(
+              projectRoot,
+            ),
+          /Failed to read project index/,
+        );
+      },
+    );
 
     await check(
       "index directory does not index itself",

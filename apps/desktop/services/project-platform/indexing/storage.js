@@ -183,8 +183,23 @@ async function readProjectIndex(
 
       files,
     };
-  } catch {
-    return createEmptyIndex();
+  } catch (
+    error
+  ) {
+    if (
+      error?.code ===
+      "ENOENT"
+    ) {
+      return createEmptyIndex();
+    }
+
+    throw new Error(
+      `Failed to read project index: ${error.message}`,
+      {
+        cause:
+          error,
+      },
+    );
   }
 }
 
@@ -230,24 +245,51 @@ async function writeProjectIndex(
 
 
   const tempPath =
-    `${indexPath}.tmp`;
+    [
+      indexPath,
+      process.pid,
+      Date.now(),
+      Math.random()
+        .toString(
+          16,
+        )
+        .slice(
+          2,
+        ),
+      "tmp",
+    ].join(
+      ".",
+    );
 
 
-  await fs.writeFile(
-    tempPath,
-    JSON.stringify(
-      safeIndex,
-      null,
-      2,
-    ),
-    "utf8",
-  );
+  try {
+    await fs.writeFile(
+      tempPath,
+      JSON.stringify(
+        safeIndex,
+        null,
+        2,
+      ),
+      "utf8",
+    );
 
+    await fs.rename(
+      tempPath,
+      indexPath,
+    );
+  } catch (
+    error
+  ) {
+    await fs.rm(
+      tempPath,
+      {
+        force:
+          true,
+      },
+    );
 
-  await fs.rename(
-    tempPath,
-    indexPath,
-  );
+    throw error;
+  }
 
 
   return safeIndex;

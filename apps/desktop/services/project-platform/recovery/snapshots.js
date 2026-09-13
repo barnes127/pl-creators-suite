@@ -380,16 +380,25 @@ async function createProjectSnapshot(
         destination,
       );
 
+      const copiedStat =
+        await fs.stat(
+          destination,
+        );
+
+      const copiedHash =
+        await hashFile(
+          destination,
+        );
 
       fileRecords.push({
         relativePath:
           sourceFile.relativePath,
 
         size:
-          sourceFile.size,
+          copiedStat.size,
 
         hash:
-          sourceFile.hash,
+          copiedHash,
       });
     }
 

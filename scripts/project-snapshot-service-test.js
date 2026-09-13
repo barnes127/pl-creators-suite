@@ -415,6 +415,148 @@ async function main() {
 
 
     await test(
+      "tampered snapshot refuses restore before project mutation",
+      async () => {
+        const projectRoot =
+          await fs.mkdtemp(
+            path.join(
+              os.tmpdir(),
+              "pl-snapshot-tamper-",
+            ),
+          );
+
+        const filePath =
+          path.join(
+            projectRoot,
+            "data.txt",
+          );
+
+        await fs.writeFile(
+          filePath,
+          "known good",
+          "utf8",
+        );
+
+        const snapshot =
+          await createProjectSnapshot({
+            projectRoot,
+          });
+
+        await fs.writeFile(
+          filePath,
+          "current project state",
+          "utf8",
+        );
+
+        const snapshotFile =
+          path.join(
+            projectRoot,
+            ".pl-recovery",
+            "snapshots",
+            snapshot.id,
+            "files",
+            "data.txt",
+          );
+
+        await fs.writeFile(
+          snapshotFile,
+          "tampered snapshot",
+          "utf8",
+        );
+
+        await assert.rejects(
+          () =>
+            restoreProjectSnapshot({
+              projectRoot,
+              snapshotId:
+                snapshot.id,
+            }),
+          /Snapshot file size mismatch|Snapshot checksum mismatch/,
+        );
+
+        assert.equal(
+          await fs.readFile(
+            filePath,
+            "utf8",
+          ),
+          "current project state",
+        );
+      },
+    );
+
+    await test(
+      "missing snapshot file refuses restore before project mutation",
+      async () => {
+        const projectRoot =
+          await fs.mkdtemp(
+            path.join(
+              os.tmpdir(),
+              "pl-snapshot-missing-",
+            ),
+          );
+
+        const filePath =
+          path.join(
+            projectRoot,
+            "data.txt",
+          );
+
+        await fs.writeFile(
+          filePath,
+          "known good",
+          "utf8",
+        );
+
+        const snapshot =
+          await createProjectSnapshot({
+            projectRoot,
+          });
+
+        await fs.writeFile(
+          filePath,
+          "current project state",
+          "utf8",
+        );
+
+        const snapshotFile =
+          path.join(
+            projectRoot,
+            ".pl-recovery",
+            "snapshots",
+            snapshot.id,
+            "files",
+            "data.txt",
+          );
+
+        await fs.rm(
+          snapshotFile,
+          {
+            force:
+              true,
+          },
+        );
+
+        await assert.rejects(
+          () =>
+            restoreProjectSnapshot({
+              projectRoot,
+              snapshotId:
+                snapshot.id,
+            }),
+          /Snapshot file is missing/,
+        );
+
+        assert.equal(
+          await fs.readFile(
+            filePath,
+            "utf8",
+          ),
+          "current project state",
+        );
+      },
+    );
+
+    await test(
       "multiple snapshots can coexist",
       async () => {
         await createProjectSnapshot({

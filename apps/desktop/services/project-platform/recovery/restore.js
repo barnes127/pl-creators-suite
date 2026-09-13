@@ -21,6 +21,7 @@ const {
 
 const {
   assertInsideRoot,
+  hashFile,
   readProjectSnapshot,
   scanProjectFiles,
 } = require(
@@ -61,7 +62,6 @@ async function restoreProjectSnapshotUnsafe(
       params.snapshotId,
     );
 
-
   if (
     !snapshot
   ) {
@@ -70,13 +70,80 @@ async function restoreProjectSnapshotUnsafe(
     );
   }
 
-
   const snapshotFilesRoot =
     getSnapshotFilesDir(
       projectRoot,
       params.snapshotId,
     );
 
+  for (
+    const file
+    of snapshot.files
+  ) {
+    const source =
+      assertInsideRoot(
+        snapshotFilesRoot,
+        path.join(
+          snapshotFilesRoot,
+          ...file.relativePath.split(
+            "/",
+          ),
+        ),
+      );
+
+    let stat;
+
+    try {
+      stat =
+        await fs.stat(
+          source,
+        );
+    } catch (
+      error
+    ) {
+      if (
+        error?.code ===
+        "ENOENT"
+      ) {
+        throw new Error(
+          `Snapshot file is missing: ${file.relativePath}`,
+        );
+      }
+
+      throw error;
+    }
+
+    if (
+      !stat.isFile()
+    ) {
+      throw new Error(
+        `Snapshot entry is not a file: ${file.relativePath}`,
+      );
+    }
+
+    if (
+      stat.size !==
+      file.size
+    ) {
+      throw new Error(
+        `Snapshot file size mismatch: ${file.relativePath}`,
+      );
+    }
+
+    const actualHash =
+      await hashFile(
+        source,
+      );
+
+    if (
+      actualHash !==
+      file.hash
+    ) {
+      throw new Error(
+        `Snapshot checksum mismatch: ${file.relativePath}`,
+      );
+    }
+  }
 
   const currentFiles =
     await scanProjectFiles(
