@@ -64,9 +64,35 @@ const win = new BrowserWindow({
     preload: path.join(__dirname, "preload.js"),
     contextIsolation: true,
     nodeIntegration: false,
+    sandbox: true,
   },
   // keep all your existing options here
 });
+
+win.webContents.setWindowOpenHandler(
+  () => ({
+    action:
+      "deny",
+  }),
+);
+
+win.webContents.on(
+  "will-navigate",
+  (
+    event,
+  ) => {
+    event.preventDefault();
+  },
+);
+
+win.webContents.on(
+  "will-attach-webview",
+  (
+    event,
+  ) => {
+    event.preventDefault();
+  },
+);
 
 createAppMenu({
   onNewProject: () => {
@@ -90,7 +116,14 @@ if (state.isMaximized) {
 win.on("close", async () => {
   try {
     await saveWindowState(win);
-  } catch {}
+  } catch (
+    error
+  ) {
+    console.warn(
+      "Failed to save widow state:",
+      error,
+    );
+  }
 });
 
   // Pass port to renderer via query param (dev)

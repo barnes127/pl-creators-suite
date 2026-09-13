@@ -1,0 +1,81 @@
+name: PL Creators Suite CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    name: Validate
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22.12.0
+
+      - name: Enable pinned pnpm
+        run: |
+          corepack enable
+          corepack prepare pnpm@10.31.0 --activate
+          node --version
+          pnpm --version
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Dependency audit
+        run: pnpm audit
+
+      - name: Renderer lint
+        run: pnpm --filter renderer lint
+
+      - name: Platform types
+        run: pnpm test:platform-types
+
+      - name: RPC contracts
+        run: pnpm test:rpc
+
+      - name: RPC authorization
+        run: pnpm test:rpc-authorization
+
+      - name: Renderer architecture
+        run: pnpm test:renderer-architecture
+
+      - name: Desktop lifecycle
+        run: pnpm test:desktop-lifecycle
+
+      - name: Electron security perimeter
+        run: pnpm test:electron-security
+
+      - name: Project indexing
+        run: pnpm test:project-indexing-service
+
+      - name: Snapshot integrity
+        run: pnpm test:project-snapshot-service
+
+      - name: Recovery drill
+        run: pnpm test:project-recovery-drill
+
+      - name: Global project search
+        run: pnpm test:project-global-search
+
+      - name: Shell accessibility
+        run: pnpm test:shell-accessibility
+
+      - name: Modal keyboard behavior
+        run: pnpm test:modal-keyboard
+
+      - name: Workspace build
+        run: pnpm -r build
