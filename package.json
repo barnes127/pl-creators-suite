@@ -100,6 +100,7 @@
     "test:shell-settings-compatibility": "node scripts/shell-settings-compatibility-test.js",
     "test:modal-keyboard": "node scripts/modal-keyboard-test.js",
     "test:electron-security": "node scripts/electron-security-test.js",
+    "test:desktop-fs-util": "node scripts/desktop-fs-util-test.js",
     "performance:baseline": "node scripts/performance-baseline.js",
     "rpc:inventory": "node scripts/rpc-inventory.js",
     "dev": "pnpm -r dev",

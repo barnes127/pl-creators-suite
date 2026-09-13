@@ -1,5 +1,6 @@
 const fs = require("fs/promises");
 const path = require("path");
+const crypto = require("crypto");
 
 async function ensureDir(dirPath) {
   await fs.mkdir(dirPath, { recursive: true });
@@ -22,11 +23,34 @@ async function writeJsonFileAtomic(filePath, data) {
   const dir = path.dirname(filePath);
   await ensureDir(dir);
 
-  const tmpPath = `${filePath}.tmp`;
+  const tmpPath = `${filePath}.${process.pid}.${crypto.randomUUID()}.tmp`;
   const payload = JSON.stringify(data, null, 2);
 
-  await fs.writeFile(tmpPath, payload, "utf-8");
-  await fs.rename(tmpPath, filePath);
+  try {
+    await fs.writeFile(
+      tmpPath,
+      payload,
+      "utf-8",
+    );
+
+    await fs.rename(
+      tmpPath,
+      filePath,
+    );
+  } catch (
+    error
+  ) {
+    await fs.rm(
+      tmpPath,
+      {
+        force: true,
+      },
+    ).catch(
+      () => {},
+    );
+
+    throw error;
+  }
 }
 
 async function appendLog(projectRoot, line) {

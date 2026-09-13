@@ -58,6 +58,9 @@ jobs:
       - name: Electron security perimeter
         run: pnpm test:electron-security
 
+      - name: Desktop filesystem utility
+        run: pnpm test:desktop-fs-util
+
       - name: Project indexing
         run: pnpm test:project-indexing-service
 
