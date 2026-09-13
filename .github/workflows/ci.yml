@@ -25,10 +25,9 @@ jobs:
         with:
           node-version: 22.12.0
 
-      - name: Enable pinned pnpm
+      - name: Install pinned pnpm
         run: |
-          corepack enable
-          corepack prepare pnpm@10.31.0 --activate
+          npm install --global pnpm@10.31.0
           node --version
           pnpm --version
 
