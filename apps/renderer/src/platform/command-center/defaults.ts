@@ -46,3 +46,45 @@ export function createDefaultDashboardState(
       [],
   };
 }
+
+export function createDefaultWidgetInstance(
+  widgetId:
+    string,
+  widgetVersion:
+    string,
+  order:
+    number,
+): import("./types").DashboardWidgetInstance {
+  return {
+    instanceId:
+      `${widgetId}:default`,
+
+    widgetId,
+
+    widgetVersion,
+
+    position: {
+      column:
+        0,
+
+      row:
+        order,
+
+      order,
+    },
+
+    size: {
+      columns:
+        2,
+
+      rows:
+        2,
+    },
+
+    pinned:
+      false,
+
+    hidden:
+      false,
+  };
+}
