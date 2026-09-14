@@ -4,7 +4,7 @@
   "sliceCode": "DOC",
   "capabilities": [
     {
-      "id": " PL-DOC-FILE-001",
+      "id": "PL-DOC-FILE-001",
       "name": "Create document",
       "description": "Create document",
       "slice": "DOC",

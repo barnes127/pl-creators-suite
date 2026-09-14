@@ -6,9 +6,13 @@ Engineering audit baseline:
 
 `26fa6b0e99fbfe0ab8080be747789d5335806e81`
 
-Final closeout revision:
+Engineering audit closeout revision:
 
-`FINAL_SHA_TBD`
+`e40613236560b65a4911f53c1d1ae969312e452a`
+
+Pre-v1.3 reconciliation revision:
+
+Recorded by the repository commit that completes the foundation reconciliation after this audit closeout.
 
 ## 2. Milestone
 

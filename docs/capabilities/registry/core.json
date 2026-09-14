@@ -89,14 +89,23 @@
       "description": "Provide shared navigation, workspace layout, slice switching, project context, status, commands, and application-level UI infrastructure.",
       "slice": "CORE",
       "area": "shell",
-      "status": "partial",
+      "status": "complete",
       "targetMilestone": "v1.2",
       "source": "Shared Creator Platform Foundations",
       "implementation": [
-        "apps/renderer/src/App.tsx"
+        "apps/renderer/src/App.tsx",
+        "apps/renderer/src/platform/shell"
       ],
-      "validation": [],
-      "notes": "The current shell works but remains heavily concentrated in App.tsx and requires decomposition and shared-component cleanup.",
+      "validation": [
+        "scripts/shell-platform-test.js",
+        "scripts/shell-integration-test.js",
+        "scripts/shell-accessibility-test.js",
+        "scripts/shell-state-components-test.js",
+        "scripts/shell-shortcut-test.js",
+        "scripts/modal-keyboard-test.js",
+        "scripts/renderer-architecture-test.js"
+      ],
+      "notes": "The unified shell, persisted workspace state, profiles, shortcuts, accessibility baseline, workspace routing, and workspace failure isolation are implemented for the v1.2 shared-platform scope. App.tsx remains a large orchestration controller and will be reduced incrementally when later ownership boundaries justify extraction.",
       "blockedBy": [],
       "deferralReason": null
     },
@@ -106,14 +115,20 @@
       "description": "Track project assets, metadata, dependencies, linked and embedded states, missing assets, and reusable asset references.",
       "slice": "CORE",
       "area": "assets",
-      "status": "partial",
+      "status": "complete",
       "targetMilestone": "v1.2",
       "source": "Shared Creator Platform Foundations / Assets",
       "implementation": [
-        "apps/desktop/services/assets/index.js"
+        "packages/platform/src/assets",
+        "apps/desktop/services/assets",
+        "apps/desktop/services/project-platform/assets.js"
       ],
-      "validation": [],
-      "notes": "A shared asset service exists, but the complete cross-slice asset contract is not finished.",
+      "validation": [
+        "scripts/platform-project-assets-test.js",
+        "scripts/project-platform-service-test.js",
+        "scripts/project-global-search-test.js"
+      ],
+      "notes": "The v1.2 shared asset foundation provides typed asset records, ownership and resource states, dependency/reference primitives, derived invalidation, missing-asset inspection, repair, and project-scoped asset handling. Durable cross-slice project links remain a separate v1.9 capability under PL-CORE-LINK-001.",
       "blockedBy": [
         "PL-CORE-PROJECT-001"
       ],
@@ -200,7 +215,7 @@
         "scripts/desktop-task-service-test.js",
         "scripts/desktop-task-api-test.js"
       ],
-      "notes": "Some engine operations exist, but the standard suite-wide job contract remains incomplete.",
+      "notes": "The v1.2 suite-wide task contract provides lifecycle state, progress, warnings, cancellation, failure reporting, resource reporting, handlers, and desktop execution. Stronger process-level worker isolation and later queue-management features remain future runtime work.",
       "blockedBy": [
         "PL-CORE-RPC-001"
       ],
@@ -405,7 +420,7 @@
         "scripts/desktop-diagnostics-service-test.js",
         "scripts/desktop-operational-rpc-test.js"
       ],
-      "notes": "Multiple engines already expose diagnostic information, but one stable shared contract is still needed.",
+      "notes":  "The v1.2 shared diagnostics contract provides persisted logs, problems, crashes, resource records, job records, filtering, health summaries, interrupted-job recovery state, and operational RPC access. The user-facing Operational Health Center is v1.3 work.",
       "blockedBy": [
         "PL-CORE-RPC-001"
       ],
@@ -417,12 +432,20 @@
       "description": "Provide reusable keyboard navigation, focus behavior, semantic controls, scaling, and accessibility patterns.",
       "slice": "CORE",
       "area": "accessibility",
-      "status": "partial",
+      "status": "complete",
       "targetMilestone": "v1.2",
       "source": "Shared Creator Platform Foundations / Accessibility and UI Infrastructure",
-      "implementation": [],
-      "validation": [],
-      "notes": "Existing UI provides portions of standard desktop behavior but has not completed the formal accessibility pass.",
+      "implementation": [
+        "apps/renderer/src/platform/shell",
+        "apps/renderer/src/components/Modal.tsx",
+        "apps/renderer/src/app.css"
+      ],
+      "validation": [
+        "scripts/shell-accessibility-test.js",
+        "scripts/modal-keyboard-test.js",
+        "scripts/shell-shortcut-test.js"
+      ],
+      "notes": "The v1.2 shared accessibility infrastructure establishes keyboard navigation, visible focus behavior, modal focus containment and restoration, high-contrast support, reduced-motion support, scaling, disabled-control behavior, and shell keyboard patterns. Slice-specific accessibility continues with later slice build-out.",
       "blockedBy": [
         "PL-CORE-SHELL-001"
       ],
@@ -580,12 +603,18 @@
       "description": "Provide locally stored operational telemetry and diagnostics with explicit opt-in boundaries for any future cloud diagnostic transmission.",
       "slice": "CORE",
       "area": "telemetry",
-      "status": "missing",
+      "status": "complete",
       "targetMilestone": "v1.2",
       "source": "v1.2 — Shared Creator Platform required outcomes",
-      "implementation": [],
-      "validation": [],
-      "notes": "Operational telemetry remains local unless the user explicitly opts into a future external diagnostic flow.",
+      "implementation": [
+        "apps/desktop/services/diagnostics",
+        "apps/desktop/services/operations.js"
+      ],
+      "validation": [
+        "scripts/desktop-diagnostics-service-test.js",
+        "scripts/desktop-operational-rpc-test.js"
+      ],
+      "notes": "The v1.2 scope provides locally persisted operational diagnostics, task/job history, resource snapshots, health summaries, and query access. No automatic external diagnostic transmission exists. Any future cloud telemetry remains opt-in and belongs to later provider/cloud milestones.",
       "blockedBy": [
         "PL-CORE-DIAG-001",
         "PL-CORE-PERMISSION-001"

@@ -43,6 +43,66 @@ jobs:
       - name: Platform types
         run: pnpm test:platform-types
 
+      - name: Capability registry
+        run: pnpm capabilities:validate
+
+      - name: v1.2 capability milestone gate
+        run: pnpm capabilities:gate:v1.2
+
+      - name: Platform service discovery
+        run: pnpm test:platform-services
+
+      - name: Platform service behavior
+        run: pnpm test:platform-service-behavior
+
+      - name: Platform project and assets
+        run: pnpm test:platform-project-assets
+
+      - name: Project platform bridge
+        run: pnpm test:project-platform-bridge
+
+      - name: Project platform service
+        run: pnpm test:project-platform-service
+
+      - name: Platform history behavior
+        run: pnpm test:platform-history-behavior
+
+      - name: Recovery closeout
+        run: pnpm test:project-recovery-closeout
+
+      - name: Platform core APIs
+        run: pnpm test:platform-core-apis
+
+      - name: Platform orchestration APIs
+        run: pnpm test:platform-orchestration-apis
+
+      - name: Platform contribution APIs
+        run: pnpm test:platform-contribution-apis
+
+      - name: Platform two-slice consumers
+        run: pnpm test:platform-two-slice-consumers
+
+      - name: Renderer platform runtime adoption
+        run: pnpm test:renderer-platform-runtime
+
+      - name: Desktop File API
+        run: pnpm test:desktop-file-api
+
+      - name: Desktop task service
+        run: pnpm test:desktop-tasks
+
+      - name: Desktop Task API
+        run: pnpm test:desktop-task-api
+
+      - name: Desktop Workflow API
+        run: pnpm test:desktop-workflow-api
+
+      - name: Shell platform
+        run: pnpm test:shell-platform
+
+      - name: Shell shortcuts
+        run: pnpm test:shell-shortcuts
+
       - name: RPC contracts
         run: pnpm test:rpc
 

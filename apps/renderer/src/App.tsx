@@ -137,9 +137,12 @@ import {
   type WorkflowTemplate,
 } from "./engines";
 import { NAV_ITEMS } from "./config/navigation";
+import { RecoveryPanel } from "./components/recovery";
+
 import {
-  RecoveryPanel,
-} from "./components/recovery";
+  bindBuiltInSliceConsumers,
+  platformRuntime,
+} from "./platform/runtime";
 
 import type {
   RecoveryUiStatus,
@@ -174,6 +177,35 @@ export default function App() {
         setWorkspace,
       ],
     );
+
+    useEffect(
+    () =>
+      bindBuiltInSliceConsumers(
+        setActive,
+      ),
+    [
+      setActive,
+    ],
+  );
+
+  useEffect(
+    () => {
+      void platformRuntime.eventApi.emit(
+        "slice.activated",
+        {
+          slice:
+            active,
+        },
+        {
+          source:
+            "renderer",
+        },
+      );
+    },
+    [
+      active,
+    ],
+  );
 
 //  const activeItem = NAV_ITEMS.find((n) => n.id === active)!;
   const [projectRoot, setProjectRoot] = useState<string>("");

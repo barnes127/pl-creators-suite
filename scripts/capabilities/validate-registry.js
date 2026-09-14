@@ -50,6 +50,15 @@ function validateCapability(capability, fileName, seenIds) {
     throw new Error(`${fileName}: capability is missing an id`);
   }
 
+  if (
+    capability.id !==
+    capability.id.trim()
+  ) {
+    throw new Error(
+      `${fileName}: capability id contains surrounding whitespace: "${capability.id}"`,
+    );
+  }
+
   if (seenIds.has(capability.id)) {
     throw new Error(`Duplicate capability ID: ${capability.id}`);
   }
@@ -158,6 +167,15 @@ function main() {
   }
 
   for (const dependencyId of capability.blockedBy) {
+    if (
+      dependencyId !==
+      dependencyId.trim()
+    ) {
+      throw new Error(
+        `${capability.id}: blockedBy capability contains surrounding whitespace: "${dependencyId}"`,
+      );
+    }
+
     if (!seenIds.has(dependencyId)) {
       throw new Error(
         `${capability.id}: unknown blockedBy capability "${dependencyId}"`,

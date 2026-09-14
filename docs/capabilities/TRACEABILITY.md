@@ -11,9 +11,9 @@ This report is the Wave 1.1.2 no-omission traceability snapshot for the Official
 
 ### Status
 
-- complete: 27
-- missing: 247
-- partial: 55
+- complete: 44
+- missing: 235
+- partial: 50
 
 ### Milestones
 
@@ -97,7 +97,6 @@ This report is the Wave 1.1.2 no-omission traceability snapshot for the Official
 
 | Capability ID | Domain | Area | Status | Milestone | Registry | Implementation | Validation | Dependencies |
 |---|---|---|---|---|---|---|---|---|
-|  PL-DOC-FILE-001 | DOC | file-management | complete | v1.3.1 | docs.json | apps/desktop/services/docs/index.js<br>apps/renderer/src/App.tsx | — | — |
 | PL-AI-ACTION-001 | AI | actions | missing | v1.16 | copilot.json | — | — | PL-CORE-COMMAND-001<br>PL-CORE-PERMISSION-001<br>PL-CORE-HISTORY-001 |
 | PL-AI-AUDIT-001 | AI | safety | missing | v1.16 | copilot.json | — | — | PL-AI-ACTION-001<br>PL-CORE-HISTORY-001<br>PL-CORE-DIAG-001 |
 | PL-AI-CONTEXT-001 | AI | context | missing | v1.16 | copilot.json | — | — | PL-CORE-PROJECT-001<br>PL-CORE-PERMISSION-001<br>PL-ENG-INDEX-001 |
@@ -196,35 +195,35 @@ This report is the Wave 1.1.2 no-omission traceability snapshot for the Official
 | PL-COLLAB-STACK-001 | COLLAB | extension-stacking | missing | v1.20 | collaboration.json | — | — | PL-EXT-RUNTIME-001<br>PL-EXT-MANIFEST-001<br>PL-ENG-WORKFLOW-001 |
 | PL-COLLAB-STACKSAFE-001 | COLLAB | extension-stacking | missing | v1.20 | collaboration.json | — | — | PL-COLLAB-STACK-001<br>PL-EXT-SAFE-001 |
 | PL-COLLAB-TEAM-001 | COLLAB | teams | missing | v1.20 | collaboration.json | — | — | PL-COLLAB-MODEL-001<br>PL-CLOUD-IDENTITY-001 |
-| PL-CORE-ACCESS-001 | CORE | accessibility | partial | v1.2 | core.json | — | — | PL-CORE-SHELL-001 |
+| PL-CORE-ACCESS-001 | CORE | accessibility | complete | v1.2 | core.json | apps/renderer/src/platform/shell<br>apps/renderer/src/components/Modal.tsx<br>apps/renderer/src/app.css | scripts/shell-accessibility-test.js<br>scripts/modal-keyboard-test.js<br>scripts/shell-shortcut-test.js | PL-CORE-SHELL-001 |
 | PL-CORE-AI-001 | CORE | ai | partial | v1.11 | core.json | — | — | PL-CORE-PERMISSION-001<br>PL-CORE-RPC-001 |
-| PL-CORE-ASSET-001 | CORE | assets | partial | v1.2 | core.json | apps/desktop/services/assets/index.js | — | PL-CORE-PROJECT-001 |
+| PL-CORE-ASSET-001 | CORE | assets | complete | v1.2 | core.json | packages/platform/src/assets<br>apps/desktop/services/assets<br>apps/desktop/services/project-platform/assets.js | scripts/platform-project-assets-test.js<br>scripts/project-platform-service-test.js<br>scripts/project-global-search-test.js | PL-CORE-PROJECT-001 |
 | PL-CORE-CALC-001 | CORE | calculation | missing | v1.4 | core.json | — | — | — |
-| PL-CORE-COMMAND-001 | CORE | commands | missing | v1.2 | core.json | — | — | PL-CORE-SHELL-001 |
-| PL-CORE-DIAG-001 | CORE | diagnostics | partial | v1.2 | core.json | — | — | PL-CORE-RPC-001 |
-| PL-CORE-EVENT-001 | CORE | events | missing | v1.2 | core.json | — | — | PL-CORE-RPC-001 |
+| PL-CORE-COMMAND-001 | CORE | commands | complete | v1.2 | core.json | packages/platform/src/commands<br>packages/platform/src/runtime.ts | scripts/platform-command-registry-test.js<br>scripts/platform-orchestration-api-test.ts<br>scripts/platform-two-slice-consumer-test.ts | PL-CORE-SHELL-001 |
+| PL-CORE-DIAG-001 | CORE | diagnostics | complete | v1.2 | core.json | apps/desktop/services/diagnostics<br>apps/desktop/services/operations.js | scripts/desktop-diagnostics-service-test.js<br>scripts/desktop-operational-rpc-test.js | PL-CORE-RPC-001 |
+| PL-CORE-EVENT-001 | CORE | events | complete | v1.2 | core.json | packages/platform/src/events<br>packages/platform/src/runtime.ts | scripts/platform-event-bus-test.js<br>scripts/platform-orchestration-api-test.ts<br>scripts/platform-two-slice-consumer-test.ts | PL-CORE-RPC-001 |
 | PL-CORE-EXT-001 | CORE | extensions | partial | v1.10 | core.json | apps/desktop/services/plugins/registry.js | — | PL-CORE-PERMISSION-001 |
 | PL-CORE-GEOMETRY-001 | CORE | geometry | partial | v1.6 | core.json | apps/renderer/src/engines/modeling | docs/releases/stage-4-modeling-engine-validation.md | — |
-| PL-CORE-HISTORY-001 | CORE | history | missing | v1.2 | core.json | — | — | PL-CORE-PROJECT-001 |
-| PL-CORE-INDEX-001 | CORE | indexing | missing | v1.2 | core.json | — | — | PL-CORE-ASSET-001<br>PL-CORE-TASK-001 |
-| PL-CORE-IO-001 | CORE | interchange | missing | v1.2 | core.json | — | — | PL-CORE-TASK-001 |
+| PL-CORE-HISTORY-001 | CORE | history | complete | v1.2 | core.json | packages/platform/src/history<br>apps/desktop/services/project-platform/recovery | scripts/platform-history-behavior-test.ts<br>scripts/project-recovery-closeout-test.js | PL-CORE-PROJECT-001 |
+| PL-CORE-INDEX-001 | CORE | indexing | complete | v1.2 | core.json | apps/desktop/services/project-platform/indexing<br>apps/desktop/services/tasks | scripts/project-indexing-contract-test.js<br>scripts/project-indexing-service-test.js<br>scripts/desktop-task-service-test.js | PL-CORE-ASSET-001<br>PL-CORE-TASK-001 |
+| PL-CORE-IO-001 | CORE | interchange | complete | v1.2 | core.json | packages/platform/src/formats<br>apps/desktop/services/formats | scripts/platform-task-format-behavior-test.ts<br>scripts/desktop-format-runtime-test.js | PL-CORE-TASK-001 |
 | PL-CORE-LINK-001 | CORE | links | missing | v1.9 | core.json | — | — | PL-CORE-ASSET-001<br>PL-CORE-PROJECT-001 |
 | PL-CORE-MEDIA-001 | CORE | media | partial | v1.7 | core.json | — | — | PL-CORE-ASSET-001 |
 | PL-CORE-MIGRATION-001 | CORE | project | complete | v1.1.3 | core.json | apps/desktop/services/project/migrations.js<br>apps/desktop/services/project/persistence.js<br>apps/desktop/services/project/integrity.js | scripts/project-format-test.js<br>docs/releases/wave-1.1.3-project-format-validation.md | — |
-| PL-CORE-NOTIFY-001 | CORE | notifications | missing | v1.2 | core.json | — | — | PL-CORE-SHELL-001<br>PL-CORE-EVENT-001 |
+| PL-CORE-NOTIFY-001 | CORE | notifications | complete | v1.2 | core.json | packages/platform/src/notifications<br>packages/platform/src/runtime.ts | scripts/platform-core-api-behavior-test.ts<br>scripts/platform-two-slice-consumer-test.ts | PL-CORE-SHELL-001<br>PL-CORE-EVENT-001 |
 | PL-CORE-PERMISSION-001 | CORE | security | partial | v1.10 | core.json | — | — | — |
 | PL-CORE-PHYSICS-001 | CORE | physics | partial | v1.8 | core.json | — | docs/releases/stage-4-physics-simulation-engine-validation.md | — |
 | PL-CORE-PROJECT-001 | CORE | project | complete | v1.1.3 | core.json | apps/desktop/services/project/contract.js<br>apps/desktop/services/project/schemas.js<br>apps/desktop/services/project/persistence.js<br>apps/desktop/services/project/integrity.js<br>apps/desktop/services/projects.js | scripts/project-format-test.js<br>docs/releases/wave-1.1.3-project-format-validation.md | — |
 | PL-CORE-RENDER-001 | CORE | rendering | partial | v1.7 | core.json | — | — | PL-CORE-TASK-001 |
 | PL-CORE-RPC-001 | CORE | rpc | complete | v1.1.4 | core.json | apps/desktop/backend.js<br>apps/desktop/rpc/protocol.js<br>apps/desktop/rpc/errors.js<br>apps/desktop/rpc/contracts.js<br>apps/desktop/rpc/registry.js<br>apps/desktop/rpc/execution.js<br>apps/desktop/rpc/authorization.js<br>apps/desktop/rpc/logging.js<br>apps/renderer/src/rpc.ts | scripts/rpc-contract-test.js<br>scripts/rpc-execution-test.js<br>scripts/rpc-authorization-test.js<br>scripts/rpc-backend-integration-test.js<br>scripts/desktop-lifecycle-test.js<br>scripts/rpc-logging-test.js<br>docs/architecture/TRUST_BOUNDARIES.md<br>docs/architecture/FAILURE_ISOLATION.md | — |
-| PL-CORE-SEARCH-001 | CORE | search | missing | v1.2 | core.json | — | — | PL-CORE-INDEX-001<br>PL-CORE-PROJECT-001 |
-| PL-CORE-SERVICE-001 | CORE | services | missing | v1.2 | core.json | — | — | PL-CORE-PERMISSION-001<br>PL-CORE-RPC-001 |
-| PL-CORE-SETTINGS-001 | CORE | settings | missing | v1.2 | core.json | — | — | PL-CORE-PROJECT-001 |
-| PL-CORE-SHELL-001 | CORE | shell | partial | v1.2 | core.json | apps/renderer/src/App.tsx | — | — |
-| PL-CORE-TASK-001 | CORE | tasks | partial | v1.2 | core.json | — | — | PL-CORE-RPC-001 |
-| PL-CORE-TELEMETRY-001 | CORE | telemetry | missing | v1.2 | core.json | — | — | PL-CORE-DIAG-001<br>PL-CORE-PERMISSION-001 |
-| PL-CORE-TEMPLATE-001 | CORE | templates | missing | v1.2 | core.json | — | — | PL-CORE-PROJECT-001<br>PL-CORE-IO-001 |
-| PL-CORE-THEME-001 | CORE | ui-platform | missing | v1.2 | core.json | — | — | PL-CORE-SHELL-001<br>PL-CORE-ACCESS-001 |
+| PL-CORE-SEARCH-001 | CORE | search | complete | v1.2 | core.json | packages/platform/src/search<br>apps/desktop/services/project-platform | scripts/platform-search-contract-test.js<br>scripts/project-global-search-test.js<br>scripts/platform-orchestration-api-test.ts | PL-CORE-INDEX-001<br>PL-CORE-PROJECT-001 |
+| PL-CORE-SERVICE-001 | CORE | services | complete | v1.2 | core.json | packages/platform/src/services<br>packages/platform/src/runtime.ts | scripts/platform-service-discovery-test.js<br>scripts/platform-service-behavior-test.ts | PL-CORE-PERMISSION-001<br>PL-CORE-RPC-001 |
+| PL-CORE-SETTINGS-001 | CORE | settings | complete | v1.2 | core.json | packages/platform/src/settings<br>packages/platform/src/runtime.ts | scripts/platform-settings-test.js<br>scripts/platform-core-api-behavior-test.ts<br>scripts/platform-two-slice-consumer-test.ts | PL-CORE-PROJECT-001 |
+| PL-CORE-SHELL-001 | CORE | shell | complete | v1.2 | core.json | apps/renderer/src/App.tsx<br>apps/renderer/src/platform/shell | scripts/shell-platform-test.js<br>scripts/shell-integration-test.js<br>scripts/shell-accessibility-test.js<br>scripts/shell-state-components-test.js<br>scripts/shell-shortcut-test.js<br>scripts/modal-keyboard-test.js<br>scripts/renderer-architecture-test.js | — |
+| PL-CORE-TASK-001 | CORE | tasks | complete | v1.2 | core.json | packages/platform/src/tasks<br>apps/desktop/services/tasks | scripts/desktop-task-service-test.js<br>scripts/desktop-task-api-test.js | PL-CORE-RPC-001 |
+| PL-CORE-TELEMETRY-001 | CORE | telemetry | complete | v1.2 | core.json | apps/desktop/services/diagnostics<br>apps/desktop/services/operations.js | scripts/desktop-diagnostics-service-test.js<br>scripts/desktop-operational-rpc-test.js | PL-CORE-DIAG-001<br>PL-CORE-PERMISSION-001 |
+| PL-CORE-TEMPLATE-001 | CORE | templates | complete | v1.2 | core.json | packages/platform/src/templates<br>packages/platform/src/runtime.ts | scripts/platform-contribution-api-test.ts<br>scripts/platform-two-slice-consumer-test.ts | PL-CORE-PROJECT-001<br>PL-CORE-IO-001 |
+| PL-CORE-THEME-001 | CORE | ui-platform | complete | v1.2 | core.json | packages/platform/src/themes<br>packages/platform/src/runtime.ts | scripts/platform-contribution-api-test.ts<br>scripts/platform-two-slice-consumer-test.ts | PL-CORE-SHELL-001<br>PL-CORE-ACCESS-001 |
 | PL-CORE-TIMELINE-001 | CORE | timeline | partial | v1.7 | core.json | apps/renderer/src/engines/movie/timelineEngine.ts<br>apps/renderer/src/engines/movie/keyframes.ts<br>apps/renderer/src/engines/movie/playback.ts | docs/releases/stage-4-movie-animation-engine-validation.md | — |
 | PL-DOC-AI-001 | DOC | ai | missing | v1.3.6 | docs.json | — | — | PL-CORE-AI-001 |
 | PL-DOC-COLLAB-001 | DOC | collaboration | missing | v1.3 | docs.json | — | — | — |
@@ -234,6 +233,7 @@ This report is the Wave 1.1.2 no-omission traceability snapshot for the Official
 | PL-DOC-EDIT-004 | DOC | editor | partial | v1.3.1 | docs.json | — | — | — |
 | PL-DOC-EDIT-005 | DOC | editor | partial | v1.3.1 | docs.json | — | — | — |
 | PL-DOC-EDIT-006 | DOC | editor | missing | v1.3.1 | docs.json | — | — | — |
+| PL-DOC-FILE-001 | DOC | file-management | complete | v1.3.1 | docs.json | apps/desktop/services/docs/index.js<br>apps/renderer/src/App.tsx | — | — |
 | PL-DOC-FILE-002 | DOC | file-management | complete | v1.3.1 | docs.json | apps/desktop/services/docs/index.js<br>apps/renderer/src/App.tsx | docs/releases/stage-3-docs-v0-validation.md | — |
 | PL-DOC-FILE-003 | DOC | file-management | complete | v1.3.1 | docs.json | apps/desktop/services/docs/index.js<br>apps/renderer/src/App.tsx | docs/releases/stage-3-docs-v0-validation.md | — |
 | PL-DOC-FILE-004 | DOC | file-management | complete | v1.3.1 | docs.json | apps/renderer/src/App.tsx | docs/releases/stage-3-docs-v0-validation.md | — |
@@ -429,8 +429,8 @@ This report is the Wave 1.1.2 no-omission traceability snapshot for the Official
 
 ## Traceability Gaps
 
-- Capabilities without implementation links: 273
-- Capabilities without validation links: 279
+- Capabilities without implementation links: 258
+- Capabilities without validation links: 262
 
 Missing implementation or validation links are expected for future milestone capabilities that have not entered active development yet. They must be populated as those capabilities move into implementation.
 
