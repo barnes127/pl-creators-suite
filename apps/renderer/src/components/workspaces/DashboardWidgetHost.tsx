@@ -2,6 +2,10 @@ import {
   DashboardWidgetErrorBoundary,
 } from "./DashboardWidgetErrorBoundary";
 
+import {
+  FirstPartyDashboardWidget,
+} from "./FirstPartyDashboardWidget";
+
 import type {
   DashboardWidgetDefinition,
   DashboardWidgetInstance,
@@ -14,12 +18,16 @@ export type DashboardWidgetHostProps = {
 
   definition?:
     DashboardWidgetDefinition;
+
+  projectRoot:
+    string;
 };
 
 
 export function DashboardWidgetHost({
   instance,
   definition,
+  projectRoot,
 }: DashboardWidgetHostProps) {
   if (
     !definition
@@ -88,9 +96,21 @@ export function DashboardWidgetHost({
         </div>
 
         <div className="commandCenterWidgetBody">
-          <div className="commandCenterWidgetPending">
-            Widget host ready.
-          </div>
+          {definition.source.kind ===
+          "first-party" ? (
+            <FirstPartyDashboardWidget
+              widgetId={
+                definition.id
+              }
+              projectRoot={
+                projectRoot
+              }
+            />
+          ) : (
+            <div className="commandCenterWidgetPending">
+              Extension widget host ready.
+            </div>
+          )}
         </div>
       </article>
     </DashboardWidgetErrorBoundary>

@@ -4831,6 +4831,9 @@ function handleFrameSelectedModelObject() {
           profileId={
             profileId
           }
+          projectRoot={
+            projectRoot
+          }
         />
       );
     case "code":

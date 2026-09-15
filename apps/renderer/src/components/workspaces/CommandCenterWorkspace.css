@@ -222,3 +222,97 @@
     grid-template-columns: 1fr;
   }
 }
+
+.commandCenterWidgetState {
+  min-height: 72px;
+  display: flex;
+  align-items: center;
+  opacity: 0.64;
+}
+
+.commandCenterWidgetStateError {
+  opacity: 0.9;
+}
+
+.commandCenterWidgetEmptyState {
+  display: flex;
+  min-height: 92px;
+  flex-direction: column;
+  justify-content: center;
+  gap: 5px;
+}
+
+.commandCenterWidgetEmptyState span {
+  font-size: 12px;
+  opacity: 0.64;
+}
+
+.commandCenterWidgetItems {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.commandCenterWidgetItem {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  padding: 9px 10px;
+  border: 1px solid rgba(127, 127, 127, 0.14);
+  border-radius: 8px;
+  background: rgba(127, 127, 127, 0.04);
+}
+
+.commandCenterWidgetItem > span {
+  overflow: hidden;
+  font-size: 11px;
+  opacity: 0.62;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.commandCenterWidgetItemRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.commandCenterWidgetStatus {
+  flex: 0 0 auto;
+  padding: 2px 6px;
+  border-radius: 999px;
+  background: rgba(127, 127, 127, 0.12);
+  font-size: 10px;
+  text-transform: capitalize;
+}
+
+.commandCenterWidgetMetrics {
+  display: grid;
+  grid-template-columns: repeat(
+    2,
+    minmax(0, 1fr)
+  );
+  gap: 8px;
+}
+
+.commandCenterWidgetMetrics > div {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: 3px;
+  padding: 9px 10px;
+  border: 1px solid rgba(127, 127, 127, 0.14);
+  border-radius: 8px;
+}
+
+.commandCenterWidgetMetrics span {
+  font-size: 10px;
+  opacity: 0.58;
+  text-transform: uppercase;
+}
+
+.commandCenterWidgetMetrics strong {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}

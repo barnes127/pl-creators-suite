@@ -8,6 +8,9 @@ import type {
   DashboardWidgetInstance,
 } from "./types";
 
+import {
+  populateFirstPartyDashboardState,
+} from "./firstPartyWidgets";
 
 const STORAGE_PREFIX =
   "pl.command-center.dashboard.v1";
@@ -281,25 +284,30 @@ export function loadDashboardState(
         ),
       );
 
-
     if (
       !raw
     ) {
-      return createDefaultDashboardState(
-        profileId,
+      return populateFirstPartyDashboardState(
+        createDefaultDashboardState(
+          profileId,
+        ),
       );
     }
 
 
-    return normalizeDashboardState(
-      profileId,
-      JSON.parse(
-        raw,
+    return populateFirstPartyDashboardState(
+      normalizeDashboardState(
+        profileId,
+        JSON.parse(
+          raw,
+        ),
       ),
     );
   } catch {
-    return createDefaultDashboardState(
-      profileId,
+    return populateFirstPartyDashboardState(
+      createDefaultDashboardState(
+        profileId,
+      ),
     );
   }
 }
@@ -335,7 +343,9 @@ export function resetDashboardState(
   }
 
 
-  return createDefaultDashboardState(
-    profileId,
+  return populateFirstPartyDashboardState(
+    createDefaultDashboardState(
+      profileId,
+    ),
   );
 }

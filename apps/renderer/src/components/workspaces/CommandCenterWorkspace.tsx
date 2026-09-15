@@ -4,6 +4,7 @@ import {
 
 import {
   DashboardWidgetRegistry,
+  registerFirstPartyDashboardWidgets,
   setDashboardLayoutMode,
 } from "../../platform/command-center";
 
@@ -21,11 +22,15 @@ import "./CommandCenterWorkspace.css";
 export type CommandCenterWorkspaceProps = {
   profileId:
     string;
+
+  projectRoot:
+    string,
 };
 
 
 export function CommandCenterWorkspace({
   profileId,
+  projectRoot
 }: CommandCenterWorkspaceProps) {
   const {
     state,
@@ -39,11 +44,24 @@ export function CommandCenterWorkspace({
 
   const registry =
     useMemo(
-      () =>
-        new DashboardWidgetRegistry(),
+      () => {
+        const nextRegistry =
+           new DashboardWidgetRegistry();
+
+        registerFirstPartyDashboardWidgets(
+          (
+            definition,
+          ) => {
+            nextRegistry.register(
+              definition,
+            );
+          },
+        );
+
+        return nextRegistry;
+      },
       [],
     );
-
 
   const visibleWidgets =
     state.widgets.filter(
@@ -220,6 +238,9 @@ export function CommandCenterWorkspace({
                   registry.get(
                     instance.widgetId,
                   )
+                }
+                projectRoot={
+                  projectRoot
                 }
               />
             ),
