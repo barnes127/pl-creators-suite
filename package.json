@@ -105,6 +105,7 @@
     "test:renderer-platform-runtime": "node scripts/renderer-platform-runtime-test.js",
     "test:command-center-contracts": "rm -rf .tmp-command-center-test && tsc --target ES2022 --module commonjs --moduleResolution node --esModuleInterop --skipLibCheck --outDir .tmp-command-center-test scripts/command-center-contract-test.ts && node .tmp-command-center-test/scripts/command-center-contract-test.js && rm -rf .tmp-command-center-test",
     "test:command-center-layout": "rm -rf .tmp-command-center-layout-test && tsc --target ES2022 --module commonjs --moduleResolution node --esModuleInterop --skipLibCheck --outDir .tmp-command-center-layout-test scripts/command-center-layout-test.ts && node .tmp-command-center-layout-test/scripts/command-center-layout-test.js && rm -rf .tmp-command-center-layout-test",
+    "test:command-center-workspace": "node scripts/command-center-workspace-test.js",
     "performance:baseline": "node scripts/performance-baseline.js",
     "rpc:inventory": "node scripts/rpc-inventory.js",
     "dev": "pnpm -r dev",

@@ -6,6 +6,13 @@ import type {
 export const NAV_ITEMS:
   readonly NavItem[] = [
     {
+      id: "command-center",
+      label: "Command Center",
+      hint:
+        "Suite overview and operations",
+    },
+
+    {
       id: "code",
       label: "Code IDE",
       hint:

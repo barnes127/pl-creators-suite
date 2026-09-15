@@ -1,3 +1,4 @@
+export { CommandCenterWorkspace } from "./CommandCenterWorkspace";
 export { CodeWorkspace } from "./CodeWorkspace";
 export { DocsWorkspace } from "./DocsWorkspace";
 export { SheetsWorkspace } from "./SheetsWorkspace";

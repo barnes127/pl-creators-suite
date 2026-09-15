@@ -5,6 +5,7 @@ import { Modal } from "./components/Modal";
 import { CollapsiblePanel } from "./components/CollapsiblePanel";
 import { Panel, WorkspaceHeader } from "./components/pl-ui";
 import {
+  CommandCenterWorkspace,
   CodeWorkspace,
   DocsWorkspace,
   SheetsWorkspace,
@@ -190,6 +191,13 @@ export default function App() {
 
   useEffect(
     () => {
+      if (
+        active ===
+        "command-center"
+      ) {
+        return;
+      }
+
       void platformRuntime.eventApi.emit(
         "slice.activated",
         {
@@ -3130,6 +3138,21 @@ useEffect(() => {
             }
             aria-label="Workspace profile"
           >
+            {BUILT_IN_WORKSPACE_PROFILES.map(
+              (profile) => (
+                <option
+                  key={
+                    profile.id
+                  }
+                  value={
+                    profile.id
+                  }
+                >
+                  {profile.name}
+                </option>
+              ),
+            )}
+          </select>
           <label className="shellControl">
             <span className="shellControlLabel">
               Zoom
@@ -3200,21 +3223,6 @@ useEffect(() => {
               ? "Standard Contrast"
               : "High Contrast"}
           </button>
-            {BUILT_IN_WORKSPACE_PROFILES.map(
-              (profile) => (
-                <option
-                  key={
-                    profile.id
-                  }
-                  value={
-                    profile.id
-                  }
-                >
-                  {profile.name}
-                </option>
-              ),
-            )}
-          </select>
 
           <button
             className="btn btn-subtle"
@@ -3295,6 +3303,7 @@ useEffect(() => {
       >
         <Workspace 
           active={active}
+          profileId={shellState.profileId}
           projectRoot={projectRoot}
           docsList={docsList}
           newDocName={newDocName}
@@ -4221,6 +4230,7 @@ function PhysicsPlaygroundPanel() {
 
 type WorkspaceProps = {
   active: AppId;
+  profileId: string;
   projectRoot: string;
   docsList: DocInfo[];
   newDocName: string;
@@ -4342,6 +4352,7 @@ type WorkspaceProps = {
 
 function Workspace({
   active,
+  profileId,
   projectRoot,
   docsList,
   newDocName,
@@ -4814,6 +4825,14 @@ function handleFrameSelectedModelObject() {
     );
   }
   switch (active) {
+    case "command-center":
+      return (
+        <CommandCenterWorkspace
+          profileId={
+            profileId
+          }
+        />
+      );
     case "code":
       return (
         <CodeWorkspace

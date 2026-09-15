@@ -1,4 +1,5 @@
 export type AppId =
+  | "command-center"
   | "code"
   | "game"
   | "movie"
