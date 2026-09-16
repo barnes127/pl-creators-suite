@@ -522,6 +522,16 @@ async function handleOpenProject() {
     );
 
     setProjectRoot(result.projectRoot);
+    await rpc(
+      "recent.add",
+      {
+        projectRoot:
+          result.projectRoot,
+
+        manifest:
+          result.manifest,
+      },
+    );
     setStatus(`Opened: ${result.projectRoot}`);
     await refreshRecents();
   } catch (e: any) {
@@ -545,6 +555,13 @@ async function handleImportProject() {
     });
 
     setProjectRoot(result.projectRoot);
+    await rpc(
+      "recent.add",
+      {
+        projectRoot:
+          result.projectRoot,
+      },
+    );
     setStatus(`Imported: ${result.projectRoot}`);
     await refreshRecents();
   } catch (e: any) {
@@ -2667,6 +2684,13 @@ useEffect(() => {
                       projectRoot: r.projectRoot,
                     });
                     setProjectRoot(result.projectRoot);
+                    await rpc(
+                      "recent.add",
+                      {
+                        projectRoot: result.projectRoot,
+                        manifest: result.manifest,
+                      },
+                    );
                     setStatus(`Opened: ${result.projectRoot}`);
                     await refreshRecents();
                   } catch (e: any) {
@@ -3557,6 +3581,18 @@ useEffect(() => {
                     baseDir: newBaseDir || undefined,
                   });
                   setProjectRoot(result.projectRoot);
+                  await rpc(
+                    "recent.add",
+                    {
+                      projectRoot:
+                        result.projectRoot,
+
+                      manifest: {
+                        name:
+                          newName,
+                      },
+                    },
+                  );
                   setStatus(`Created: ${result.projectRoot}`);
                   await refreshRecents();
                   setShowNew(false);
