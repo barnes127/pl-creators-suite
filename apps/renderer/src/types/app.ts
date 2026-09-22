@@ -61,6 +61,9 @@ export type PluginInfo = {
   enabled: boolean;
   type: string;
   description: string;
+  apiVersion?: string;
+  permissions?: string[];
+  contributes?: Record<string, unknown>;
 };
 
 

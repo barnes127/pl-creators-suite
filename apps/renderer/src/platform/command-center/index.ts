@@ -5,3 +5,5 @@ export * from "./registry";
 export * from "./layout";
 export * from "./storage";
 export * from "./firstPartyWidgets";
+export * from "./extensionWidgets";
+export * from "./compatibility";

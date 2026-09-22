@@ -217,3 +217,84 @@ export function setDashboardWidgetGroup(
     }),
   );
 }
+
+export function reorderDashboardWidget(
+  state:
+    DashboardProfileState,
+  instanceId:
+    string,
+  direction:
+    "up" |
+    "down",
+): DashboardProfileState {
+  const ordered =
+    [...state.widgets].sort(
+      (
+        left,
+        right,
+      ) =>
+        left.position.order -
+        right.position.order,
+    );
+
+  const index =
+    ordered.findIndex(
+      (
+        widget,
+      ) =>
+        widget.instanceId ===
+        instanceId,
+    );
+
+  if (
+    index ===
+    -1
+  ) {
+    return state;
+  }
+
+  const targetIndex =
+    direction ===
+    "up"
+      ? index - 1
+      : index + 1;
+
+  if (
+    targetIndex <
+      0 ||
+    targetIndex >=
+      ordered.length
+  ) {
+    return state;
+  }
+
+  const next =
+    [...ordered];
+
+  [
+    next[index],
+    next[targetIndex],
+  ] = [
+    next[targetIndex],
+    next[index],
+  ];
+
+  return {
+    ...state,
+
+    widgets:
+      next.map(
+        (
+          widget,
+          order,
+        ) => ({
+          ...widget,
+
+          position: {
+            ...widget.position,
+            order,
+          },
+        }),
+      ),
+  };
+}

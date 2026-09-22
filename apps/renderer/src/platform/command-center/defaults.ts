@@ -4,7 +4,7 @@ import type {
 
 
 export const DASHBOARD_SCHEMA_VERSION =
-  1;
+  2;
 
 
 export const DASHBOARD_WIDGET_CONTRACT_VERSION =

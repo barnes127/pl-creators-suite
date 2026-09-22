@@ -196,6 +196,8 @@ export function normalizeDashboardState(
 
   if (
     candidate.schemaVersion !==
+      1 &&
+    candidate.schemaVersion !==
     DASHBOARD_SCHEMA_VERSION
   ) {
     return fallback;
@@ -294,15 +296,26 @@ export function loadDashboardState(
       );
     }
 
+    const parsed =
+      JSON.parse(
+        raw,
+      );
 
-    return populateFirstPartyDashboardState(
+    const normalized =
       normalizeDashboardState(
         profileId,
-        JSON.parse(
-          raw,
-        ),
-      ),
-    );
+        parsed,
+      );
+
+    if (
+      parsed?.schemaVersion ===
+      1
+    ) {
+      return populateFirstPartyDashboardState(
+        normalized,
+      );
+    }
+    return normalized;
   } catch {
     return populateFirstPartyDashboardState(
       createDefaultDashboardState(

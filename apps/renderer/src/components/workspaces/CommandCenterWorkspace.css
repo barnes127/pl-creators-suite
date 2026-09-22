@@ -316,3 +316,162 @@
   overflow: hidden;
   text-overflow: ellipsis;
 }
+
+.commandCenterGroups {
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+}
+
+.commandCenterGrid {
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+}
+
+.commandCenterWidgetGroup {
+  min-width: 0;
+}
+
+.commandCenterWidgetGroupTitle {
+  margin: 0 0 10px;
+  font-size: 14px;
+}
+
+.dashboardWidgetControls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 8px;
+  padding: 10px 16px;
+  border-bottom: 1px solid rgba(127, 127, 127, 0.14);
+  background: rgba(127, 127, 127, 0.04);
+}
+
+.dashboardWidgetControlField {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 11px;
+}
+
+.dashboardWidgetControlField span {
+  opacity: 0.65;
+}
+
+.dashboardWidgetControlField input {
+  box-sizing: border-box;
+  width: 92px;
+  min-height: 30px;
+  border: 1px solid rgba(127, 127, 127, 0.22);
+  border-radius: 6px;
+  background: transparent;
+  color: inherit;
+  padding: 5px 7px;
+}
+
+.dashboardWidgetControlField:last-child input {
+  width: 140px;
+}
+
+.dashboardCustomizationPanel {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  margin-bottom: 20px;
+  padding: 16px;
+  border: 1px solid rgba(127, 127, 127, 0.2);
+  border-radius: 12px;
+  background: rgba(127, 127, 127, 0.04);
+}
+
+.dashboardCustomizationHeader > div,
+.dashboardCustomizationRow > div:first-child {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.dashboardCustomizationHeader span,
+.dashboardCustomizationRow span {
+  font-size: 11px;
+  opacity: 0.62;
+}
+
+.dashboardCustomizationSection {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.dashboardCustomizationRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 9px 10px;
+  border: 1px solid rgba(127, 127, 127, 0.14);
+  border-radius: 8px;
+}
+
+.dashboardCustomizationActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.dashboardCustomizationIssue {
+  padding: 8px 10px;
+  border: 1px dashed rgba(127, 127, 127, 0.25);
+  border-radius: 8px;
+  font-size: 12px;
+}
+
+.commandCenterEmptyActions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 18px;
+}
+
+@media (max-width: 800px) {
+  .commandCenterGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .commandCenterGrid .commandCenterWidget {
+    grid-column: 1 / -1 !important;
+  }
+
+  .dashboardCustomizationRow {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+}
+
+.commandCenterWidgetUnavailable {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 12px;
+  border: 1px solid currentColor;
+  border-radius: 8px;
+  opacity: 0.8;
+}
+
+.dashboardWidgetAvailabilityBadge {
+  align-self: flex-start;
+  padding: 3px 7px;
+  border: 1px solid currentColor;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  text-transform: capitalize;
+}
+
+.commandCenterWidget:focus-visible,
+.commandCenterWidgetMissing:focus-visible,
+.dashboardCustomizationPanel button:focus-visible,
+.dashboardWidgetControls button:focus-visible,
+.dashboardWidgetControls input:focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: 2px;
+}

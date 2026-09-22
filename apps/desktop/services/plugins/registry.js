@@ -23,6 +23,9 @@ function normalizePlugin(plugin) {
     enabled: Boolean(plugin?.enabled),
     type: String(plugin?.type || "unknown").trim(),
     description: String(plugin?.description || "").trim(),
+    apiVersion: String(plugin?.apiVersion || "").trim(),
+    permissions: Array.isArray(plugin?.permissions) ? plugin.permissions.map((permission) => String(permission || "").trim()).filter(Boolean) : [],
+    contributes: plugin?.contributes && typeof plugin.contributes === "object" && !Array.isArray(plugin.contributes) ? plugin.contributes : {},
   };
 }
 

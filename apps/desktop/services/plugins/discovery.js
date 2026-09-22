@@ -22,6 +22,8 @@ function pluginFromManifest(manifest, pluginPath) {
     description: manifest.description,
     apiVersion: manifest.apiVersion,
     entry: manifest.entry,
+    permissions: manifest.permissions,
+    contributes: manifest.contributes,
     pluginPath,
   };
 }
