@@ -8,12 +8,12 @@ This document defines the supported development and build baseline for the PL Cr
 
 | Component | Supported Version |
 |---|---:|
-| Node.js | 20.20.2 |
+| Node.js | 22.12.0 |
 | pnpm | 10.31.0 |
-| Electron | 40.0.0 |
-| electron-builder | 26.15.3 |
+| Electron | 41.10.3 |
+| electron-builder | 26.15.6 |
 | TypeScript | 5.9.3 |
-| Vite | 7.3.1 |
+| Vite | 7.3.6 |
 | React | 19.2.3 |
 | React DOM | 19.2.3 |
 | Three.js | 0.184.0 |
