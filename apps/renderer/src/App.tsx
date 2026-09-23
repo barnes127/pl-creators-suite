@@ -2710,8 +2710,9 @@ useEffect(() => {
 
       <CollapsiblePanel 
         title="Local AI Copilot"
-        defaultOpen={true}
+        defaultOpen={false}
         storageKey="pl.layout.panel.localAi"
+        className="sidebarToolPanel sidebarToolPanelCompact"
       >
 
         {localAiStatus ? (
@@ -2746,6 +2747,7 @@ useEffect(() => {
         title="Suite Status" 
         defaultOpen={false}
         storageKey="pl.layout.panel.systemStatus"
+        className="sidebarToolPanel sidebarToolPanelCompact"
       >
 
         {featureFlags ? (
@@ -2772,6 +2774,7 @@ useEffect(() => {
         title="Assets Registry"
         defaultOpen={false}
         storageKey="pl.layout.panel.assets"
+        className="sidebarToolPanel sidebarToolPanelScrollable"
       >
         {projectRoot ? (
           <div className="recentList utilityPanel">
@@ -2779,7 +2782,7 @@ useEffect(() => {
               <strong>Registry</strong>
               <span>Ready</span>
             </div>
-            <div className="recentItem utilityStatus Card">
+            <div className="recentItem utilityStatusCard">
               <strong>Assets</strong>
               <span>{assets.length}</span>
             </div>
@@ -2861,7 +2864,7 @@ useEffect(() => {
         ) : (
           <WarningState
             title="No project open"
-            message="Open a project to use a the asset registry."
+            message="Open a project to use the asset registry."
           />
         )}
       </CollapsiblePanel>
@@ -2870,6 +2873,7 @@ useEffect(() => {
         title="Workflows"
         defaultOpen={false}
         storageKey="pl.layout.panel.workflows"
+        className="sidebarToolPanel sidebarToolPanelWorkflows"
       >
         {projectRoot ? (
           <div className="recentList workflowPanel utilityPanel">
@@ -3095,6 +3099,7 @@ useEffect(() => {
         title="Extensions & Plugins" 
         defaultOpen={false}
         storageKey="pl.layout.plugins"
+        className="sidebarToolPanel sidebarToolPanelCompact"
       >
 
         {plugins.length === 0 ? (

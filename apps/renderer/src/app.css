@@ -3071,3 +3071,115 @@ select.input {
 .navShortcut {
   color: #fff;
 }
+
+/* -------------------------------------------------------------------------- */
+/* v1.3.1 UI cleanup — shell ergonomics                                       */
+/* -------------------------------------------------------------------------- */
+
+.sidebar {
+  align-content: start;
+}
+
+.sidebarToolPanel {
+  min-width: 0;
+  padding: 8px;
+  gap: 8px;
+}
+
+.sidebarToolPanel > .panelTitle {
+  min-height: 28px;
+}
+
+.sidebarToolPanel > div {
+  min-width: 0;
+}
+
+.sidebarToolPanelCompact > div {
+  max-height: 190px;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+.sidebarToolPanelScrollable > div {
+  max-height: min(34vh, 300px);
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+.sidebarToolPanelWorkflows > div {
+  max-height: min(42vh, 360px);
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+.sidebarToolPanel .recentItem,
+.sidebarToolPanel .listButton {
+  min-width: 0;
+}
+
+.sidebarToolPanel .recentItem span,
+.sidebarToolPanel .listButtonMeta {
+  overflow-wrap: anywhere;
+}
+
+.sidebarToolPanel .input,
+.sidebarToolPanel .btn {
+  max-width: 100%;
+}
+
+.sidebarToolPanel .btn {
+  white-space: normal;
+}
+
+.workflowPanel {
+  max-height: none;
+  padding-right: 4px;
+}
+
+.workflowPanel > .recentItem {
+  gap: 5px;
+}
+
+.workflowPanel .recentItem .recentItem {
+  padding: 8px;
+}
+
+.topbar {
+  justify-content: space-between;
+  align-items: flex-start;
+  flex-wrap: wrap;
+}
+
+.topbarLeft {
+  flex: 1 1 360px;
+}
+
+.topbarRight {
+  display: flex;
+  flex: 0 1 auto;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  align-items: center;
+}
+
+@media (max-width: 1180px) {
+  .topbar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .topbarLeft,
+  .topbarRight {
+    width: 100%;
+  }
+
+  .topbarRight {
+    justify-content: flex-start;
+  }
+}
+
+@media (max-width: 760px) {
+  .topbarRight .btn {
+    flex: 1 1 auto;
+  }
+}

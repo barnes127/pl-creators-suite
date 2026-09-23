@@ -4,6 +4,7 @@ type CollapsiblePanelProps = {
   title: string;
   defaultOpen?: boolean;
   storageKey?: string;
+  className?: string;
   children: ReactNode;
 };
 
@@ -24,6 +25,7 @@ export function CollapsiblePanel({
   title,
   defaultOpen = true,
   storageKey,
+  className = "",
   children,
 }: CollapsiblePanelProps) {
   const [open, setOpen] = useState(() => readStoredOpen(storageKey, defaultOpen));
@@ -39,7 +41,7 @@ export function CollapsiblePanel({
   }, [open, storageKey]);
 
   return (
-    <div className="panel">
+    <div className={`panel ${className}`}>
       <button
         className="panelTitle"
         type="button"

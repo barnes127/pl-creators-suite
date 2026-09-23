@@ -503,7 +503,13 @@ export function CommandCenterWorkspace({
   }
 
   return (
-    <section className="commandCenterWorkspace">
+    <section
+      className={`commandCenterWorkspace ${
+        customizing
+          ? "commandCenterWorkspaceCustomizing"
+          : ""
+      }`}
+    >
       <header className="commandCenterHeader">
         <div>
           <span className="commandCenterEyebrow">

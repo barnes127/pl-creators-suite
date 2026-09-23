@@ -475,3 +475,75 @@
   outline: 2px solid currentColor;
   outline-offset: 2px;
 }
+
+/* v1.3.1 cleanup — dashboard edit mode */
+
+.commandCenterWorkspaceCustomizing {
+  background:
+    linear-gradient(
+      180deg,
+      rgba(127, 127, 127, 0.035),
+      transparent 220px
+    );
+}
+
+.commandCenterWorkspaceCustomizing .commandCenterHeader {
+  margin-bottom: 14px;
+}
+
+.commandCenterWorkspaceCustomizing .dashboardCustomizationPanel {
+  border-style: solid;
+  border-width: 1px;
+  background: rgba(127, 127, 127, 0.07);
+}
+
+.commandCenterWorkspaceCustomizing .commandCenterWidget {
+  border-style: dashed;
+}
+
+.commandCenterWorkspaceCustomizing .dashboardWidgetControls {
+  background: rgba(127, 127, 127, 0.08);
+}
+
+.dashboardCustomizationWidgetList {
+  max-height: 250px;
+  overflow-y: auto;
+  padding-right: 4px;
+}
+
+.dashboardCustomizationWidgetList .dashboardCustomizationRow {
+  padding-block: 7px;
+}
+
+.commandCenterHeaderActions {
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+@media (max-width: 1100px) {
+  .commandCenterWorkspace {
+    padding: 18px;
+  }
+
+  .commandCenterHeader {
+    gap: 14px;
+  }
+
+  .commandCenterHeaderActions {
+    justify-content: flex-start;
+  }
+}
+
+@media (max-width: 700px) {
+  .commandCenterWorkspace {
+    padding: 12px;
+  }
+
+  .commandCenterHeader h1 {
+    font-size: 24px;
+  }
+
+  .commandCenterStatusRow {
+    gap: 6px;
+  }
+}

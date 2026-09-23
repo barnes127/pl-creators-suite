@@ -91,7 +91,7 @@ export function DashboardCustomizationPanel({
       </div>
 
 
-      <div className="dashboardCustomizationSection">
+      <div className="dashboardCustomizationSection dashboardCustomizationWidgetList">
         <strong>
           Dashboard widgets
         </strong>
