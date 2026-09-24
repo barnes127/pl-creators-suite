@@ -25,14 +25,29 @@ import type {
   WorkspaceProfileId,
 } from "./types";
 
+import {
+  migrateShellStateToCreatorProfiles,
+} from "../profiles";
 
 export function useShellState() {
   const [
     shellState,
     setShellStateValue,
   ] = useState<ShellWorkspaceState>(
-    () =>
-      loadShellState(),
+    () => {
+      const state =
+        loadShellState()
+      try {
+        migrateShellStateToCreatorProfiles(
+          state,
+        );
+      } catch {
+        // Legacy shell loading remains unstable
+        // even if profile
+      }
+
+      return state;
+    },
   );
 
 
