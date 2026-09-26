@@ -465,6 +465,12 @@ export function normalizeCreatorProfile(
         value.toolVisibility,
       ),
 
+    extensionStackMode:
+      value.extensionStackMode ===
+        "explicit"
+        ? "explicit"
+        : "inherit",
+
     extensionStack:
       normalizeStringArray(
         value.extensionStack,

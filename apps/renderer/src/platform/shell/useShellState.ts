@@ -26,8 +26,16 @@ import type {
 } from "./types";
 
 import {
+  applyCreatorProfileToShellState,
+  ensureCreatorProfileStore,
+  getActiveCreatorProfile,
   migrateShellStateToCreatorProfiles,
+  persistActiveCreatorProfileEnvironment,
 } from "../profiles";
+
+import type {
+  CreatorProfile,
+} from "../profiles"
 
 export function useShellState() {
   const [
@@ -38,9 +46,26 @@ export function useShellState() {
       const state =
         loadShellState()
       try {
-        migrateShellStateToCreatorProfiles(
-          state,
-        );
+        const migrated =
+          migrateShellStateToCreatorProfiles(
+            state,
+          );
+        const profiles =
+          ensureCreatorProfileStore(
+            migrated,
+          );
+        const activeProfile =
+          getActiveCreatorProfile(
+            profiles,
+          );
+        if (
+          activeProfile
+        ) {
+          return applyCreatorProfileToShellState(
+            state,
+            activeProfile,
+          );
+        }
       } catch {
         // Legacy shell loading remains unstable
         // even if profile
@@ -55,6 +80,9 @@ export function useShellState() {
     () => {
       try {
         saveShellState(
+          shellState,
+        );
+        persistActiveCreatorProfileEnvironment(
           shellState,
         );
       } catch {
@@ -104,6 +132,20 @@ export function useShellState() {
     );
   }
 
+  function applyProfile(
+    profile:
+      CreatorProfile,
+  ) {
+    setShellStateValue(
+      (
+        current,
+      ) =>
+        applyCreatorProfileToShellState(
+          current,
+          profile,
+        ),
+    );
+  }
 
   function setPanel(
     panel: ShellPanelId,
@@ -150,30 +192,31 @@ export function useShellState() {
     const reset =
       resetShellState();
 
+    const next = {
+      ...shellState,
+      layout:
+        structuredClone(
+          reset.layout,
+        ),
+    };
     setShellStateValue(
-      reset,
+      next,
     );
 
-    return reset;
+    return next;
   }
 
 
   return {
     shellState,
-
     setWorkspace,
-
     setProfile,
-
+    applyProfile,
     setPanel,
-
     togglePanel:
       toggleShellPanel,
-
     setZoom,
-
     setThemeMode,
-
     resetLayout,
   };
 }

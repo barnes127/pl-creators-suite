@@ -23,6 +23,10 @@ export type CreatorToolVisibility =
     >
   >;
 
+export type CreatorExtensionStackMode =
+  | "inherit"
+  | "explicit";
+
 export interface CreatorProfile {
   schemaVersion: typeof CREATOR_PROFILE_SCHEMA_VERSION;
   id: string;
@@ -34,6 +38,7 @@ export interface CreatorProfile {
   themeMode: ShellThemeMode;
   shortcutOverrides: CreatorShortcutOverrides;
   toolVisibility: CreatorToolVisibility;
+  extensionStackMode: CreatorExtensionStackMode;
   extensionStack: readonly string[];
   createdAt: string;
   updatedAt: string;

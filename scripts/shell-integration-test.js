@@ -154,9 +154,9 @@ check(
 
 check(
   app.includes(
-    "BUILT_IN_WORKSPACE_PROFILES",
+    "useCreatorProfile",
   ),
-  "App exposes built-in workspace profiles",
+  "App consumes creator profile state",
 );
 
 

@@ -5,6 +5,10 @@ import { Modal } from "./components/Modal";
 import { CollapsiblePanel } from "./components/CollapsiblePanel";
 import { Panel, WorkspaceHeader } from "./components/pl-ui";
 import {
+  applyCreatorShortcutOverrides,
+  useCreatorProfiles,
+} from "./platform/profiles";
+import {
   CommandCenterWorkspace,
   CodeWorkspace,
   DocsWorkspace,
@@ -22,7 +26,6 @@ import {
   ShellWorkspaceRegion,
   ShellBottomPanel,
   ShellStatusBar,
-  BUILT_IN_WORKSPACE_PROFILES,
   useShellState,
   EmptyState,
   LoadingState,
@@ -161,7 +164,8 @@ declare global {
 
 export default function App() {
 
-  const {shellState, setWorkspace, setProfile, setPanel,  setZoom, setThemeMode, resetLayout} = useShellState();
+  const {shellState, setWorkspace, applyProfile, setPanel,  setZoom, setThemeMode, resetLayout} = useShellState();
+  const {profiles, activeProfile, switchProfile} = useCreatorProfiles();
   const validWorkspaceIds = NAV_ITEMS.map((item) => item.id);
   const active: AppId = validWorkspaceIds.includes(shellState.activeWorkspace as AppId) ? (shellState.activeWorkspace as AppId) : "code";
 
@@ -497,8 +501,24 @@ export default function App() {
       ],
     );
 
+  const profiledShellShortcuts =
+    useMemo(
+      () =>
+        applyCreatorShortcutOverrides(
+          shellShortcuts,
+          activeProfile
+            ?.shortcutOverrides ??
+            {},
+        ),
+      [
+        shellShortcuts,
+        activeProfile
+          ?.shortcutOverrides,
+      ],
+    );
+
   useShellShortcuts(
-    shellShortcuts,
+    profiledShellShortcuts,
   );
 
 async function handleOpenProject() {
@@ -2616,21 +2636,6 @@ useEffect(() => {
                   setActive(
                     item.id,
                   );
-
-                  const profile =
-                    BUILT_IN_WORKSPACE_PROFILES.find(
-                      (candidate) =>
-                        candidate.workspace ===
-                        item.id,
-                    );
-
-                  if (
-                    profile
-                  ) {
-                    setProfile(
-                      profile.id,
-                    );
-                  }
                 }
               }
               type="button"
@@ -3135,6 +3140,7 @@ useEffect(() => {
           <select
             className="input"
             value={
+              activeProfile?.id ??
               shellState.profileId
             }
             onChange={
@@ -3142,32 +3148,22 @@ useEffect(() => {
                 event,
               ) => {
                 const profile =
-                  BUILT_IN_WORKSPACE_PROFILES.find(
-                    (candidate) =>
-                      candidate.id ===
-                      event.target.value,
+                  switchProfile(
+                    event.target.value,
+                    shellState,
                   );
-
                 if (!profile) {
                   return;
                 }
 
-                setProfile(
-                  profile.id,
+                applyProfile(
+                  profile,
                 );
-
-                if (
-                  profile.workspace
-                ) {
-                  setWorkspace(
-                    profile.workspace,
-                  );
-                }
               }
             }
-            aria-label="Workspace profile"
+            aria-label="Creator profile"
           >
-            {BUILT_IN_WORKSPACE_PROFILES.map(
+            {profiles.map(
               (profile) => (
                 <option
                   key={

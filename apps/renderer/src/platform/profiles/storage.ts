@@ -8,6 +8,20 @@ import {
 } from "./defaults";
 
 import {
+  ensureBuiltInCreatorProfiles,
+  getActiveCreatorProfile,
+} from "./builtIns";
+
+import {
+  applyCreatorProfileToShellState,
+  captureActiveProfileEnvironment,
+} from "./environment";
+
+import type {
+  CreatorProfile,
+} from "./types";
+
+import {
   CREATOR_PROFILE_SCHEMA_VERSION,
 } from "./types";
 
@@ -223,6 +237,155 @@ export function migrateShellStateToCreatorProfiles(
   return migrated;
 }
 
+export function ensureCreatorProfileStore(
+  state:
+    CreatorProfileStore,
+  storage:
+    ProfileStorageLike =
+      getBrowserStorage(),
+):
+  CreatorProfileStore {
+  const ensured =
+    ensureBuiltInCreatorProfiles(
+      state,
+    );
+
+  saveCreatorProfileStore(
+    ensured,
+    storage,
+  );
+
+  return ensured;
+}
+
+
+export function loadEnsuredCreatorProfileStore(
+  storage:
+    ProfileStorageLike =
+      getBrowserStorage(),
+):
+  CreatorProfileStore {
+  return ensureCreatorProfileStore(
+    loadCreatorProfileStore(
+      storage,
+    ),
+    storage,
+  );
+}
+
+
+export function persistActiveCreatorProfileEnvironment(
+  shellState:
+    ShellWorkspaceState,
+  storage:
+    ProfileStorageLike =
+      getBrowserStorage(),
+):
+  CreatorProfileStore {
+  const store =
+    loadEnsuredCreatorProfileStore(
+      storage,
+    );
+
+  const captured =
+    captureActiveProfileEnvironment(
+      store,
+      shellState,
+    );
+
+  saveCreatorProfileStore(
+    captured,
+    storage,
+  );
+
+  return captured;
+}
+
+
+export function activateCreatorProfile(
+  profileId:
+    string,
+  shellState:
+    ShellWorkspaceState,
+  storage:
+    ProfileStorageLike =
+      getBrowserStorage(),
+): {
+  store:
+    CreatorProfileStore;
+
+  profile:
+    CreatorProfile;
+
+  shellState:
+    ShellWorkspaceState;
+} | undefined {
+  const current =
+    persistActiveCreatorProfileEnvironment(
+      shellState,
+      storage,
+    );
+
+
+  const profile =
+    current.profiles.find(
+      (
+        candidate,
+      ) =>
+        candidate.id ===
+        profileId,
+    );
+
+
+  if (
+    !profile
+  ) {
+    return undefined;
+  }
+
+
+  const store:
+    CreatorProfileStore = {
+    ...current,
+
+    activeProfileId:
+      profile.id,
+  };
+
+
+  saveCreatorProfileStore(
+    store,
+    storage,
+  );
+
+
+  return {
+    store,
+
+    profile,
+
+    shellState:
+      applyCreatorProfileToShellState(
+        shellState,
+        profile,
+      ),
+  };
+}
+
+
+export function resolveActiveCreatorProfile(
+  storage:
+    ProfileStorageLike =
+      getBrowserStorage(),
+):
+  CreatorProfile |
+  undefined {
+  return getActiveCreatorProfile(
+    loadEnsuredCreatorProfileStore(
+      storage,
+    ),
+  );
+}
 
 export function resetCreatorProfileStore(
   storage:

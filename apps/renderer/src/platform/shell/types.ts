@@ -11,14 +11,7 @@ export type ShellPanelVisibility = Record<
 >;
 
 export type WorkspaceProfileId =
-  | "default"
-  | "code"
-  | "docs"
-  | "sheets"
-  | "modeling"
-  | "movie"
-  | "game"
-  | "custom";
+  string;
 
 export type ShellThemeMode =
   | "default"
