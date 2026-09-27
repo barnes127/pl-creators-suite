@@ -58,16 +58,10 @@ export function applyCreatorProfileToShellState(
 
     profileId:
       profile.id,
-
-    activeWorkspace:
-      profile.workspace,
-
     zoom:
       profile.zoom,
-
     themeMode:
       profile.themeMode,
-
     layout,
   };
 }
@@ -104,22 +98,15 @@ export function captureCreatorProfileEnvironment(
   return {
     ...profile,
 
-    workspace:
-      state.activeWorkspace,
-
     zoom:
       state.zoom,
-
     themeMode:
       state.themeMode,
-
     layout:
       structuredClone(
         state.layout,
       ),
-
     toolVisibility,
-
     updatedAt:
       now,
   };

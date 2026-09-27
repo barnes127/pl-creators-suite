@@ -224,40 +224,44 @@ test(
 
 
 test(
-  "profile environment applies to shell",
+  "profile environment applies without navigating workspace",
   () => {
     const profile =
       createBuiltInCreatorProfiles()
         .find(
-          (
-            candidate,
-          ) =>
-            candidate.name ===
-            "Modeling",
+          (candidate) =>
+            candidate.id ===
+            "modeling",
         );
 
     assert(
-      profile,
+      Boolean(
+        profile,
+      ),
     );
 
+    const startingShell =
+      structuredClone(
+        DEFAULT_WORKSPACE_STATE,
+      );
+
+    startingShell.activeWorkspace =
+      "command-center";
 
     const shell =
       applyCreatorProfileToShellState(
-        structuredClone(
-          DEFAULT_WORKSPACE_STATE,
-        ),
+        startingShell,
         profile,
       );
 
+    assertEqual(
+      shell.activeWorkspace,
+      "command-center",
+    );
 
     assertEqual(
       shell.profileId,
       profile.id,
-    );
-
-    assertEqual(
-      shell.activeWorkspace,
-      "modeler",
     );
 
     assertEqual(
@@ -280,7 +284,6 @@ test(
       structuredClone(
         DEFAULT_WORKSPACE_STATE,
       );
-
     shell.activeWorkspace =
       "docs";
 
@@ -303,7 +306,7 @@ test(
 
     assertEqual(
       captured.workspace,
-      "docs",
+      profile.workspace,
     );
 
     assertEqual(
