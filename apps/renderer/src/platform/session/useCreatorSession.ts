@@ -47,13 +47,16 @@ export function useCreatorSession() {
       initialStore,
     );
 
-  const restorableSessionRef =
-    useRef(
-      getActiveCreatorSession(
+  const restorableSession =
+    useMemo(
+      () =>
+        getActiveCreatorSession(
+          initialStore,
+        ),
+      [
         initialStore,
-      ),
+      ],
     );
-
 
   const persistStore =
     useCallback(
@@ -166,8 +169,7 @@ export function useCreatorSession() {
   return {
     sessionStore,
     activeSession,
-    restorableSession:
-      restorableSessionRef.current,
+    restorableSession,
     captureSession,
     markClean,
   };
