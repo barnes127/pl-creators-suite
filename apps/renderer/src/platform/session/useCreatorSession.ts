@@ -17,6 +17,21 @@ import {
   markCreatorSessionClean,
 } from "./lifecycle";
 
+import {
+  createCreatorSessionRestorePoint,
+  resolveCreatorSessionRestorePlan,
+  restoreCreatorSessionFromPoint,
+} from "./recovery";
+
+import {
+  loadCreatorSessionRecoveryStore,
+  saveCreatorSessionRecoveryStore,
+} from "./recoveryStorage";
+
+import type {
+  CreatorSessionRecoveryStore,
+} from "./recovery";
+
 import type {
   CreatorSessionCaptureInput,
 } from "./lifecycle";
@@ -34,6 +49,13 @@ export function useCreatorSession() {
       [],
     );
 
+  const initialRecoveryStore =
+    useMemo(
+      () =>
+        loadCreatorSessionRecoveryStore(),
+      [],
+    );
+
   const [
     sessionStore,
     setSessionStore,
@@ -47,16 +69,36 @@ export function useCreatorSession() {
       initialStore,
     );
 
-  const restorableSession =
+  const [
+    recoveryStore,
+    setRecoveryStore,
+  ] =
+    useState<CreatorSessionRecoveryStore>(
+      initialRecoveryStore,
+    );
+
+  const recoveryStoreRef =
+    useRef<CreatorSessionRecoveryStore>(
+      initialRecoveryStore,
+    );
+
+  const restorePlan =
     useMemo(
       () =>
-        getActiveCreatorSession(
-          initialStore,
+        resolveCreatorSessionRestorePlan(
+          getActiveCreatorSession(
+            initialStore,
+          ),
+          initialRecoveryStore,
         ),
       [
         initialStore,
+        initialRecoveryStore,
       ],
     );
+
+  const restorableSession =
+    restorePlan.session;
 
   const persistStore =
     useCallback(
@@ -78,6 +120,25 @@ export function useCreatorSession() {
       [],
     );
 
+  const persistRecoveryStore =
+    useCallback(
+      (
+        next:
+          CreatorSessionRecoveryStore,
+      ) => {
+        recoveryStoreRef.current =
+          next;
+
+        saveCreatorSessionRecoveryStore(
+          next,
+        );
+
+        setRecoveryStore(
+          next,
+        );
+      },
+      [],
+    );
 
   const captureSession =
     useCallback(
@@ -95,12 +156,26 @@ export function useCreatorSession() {
           next,
         );
 
-        return getActiveCreatorSession(
+        const active =
+          getActiveCreatorSession(
           next,
         );
+
+        if (active) {
+          const recovery =
+            createCreatorSessionRestorePoint(
+              recoveryStoreRef.current,
+              active,
+              {kind:"automatic"}
+            );
+
+          persistRecoveryStore(recovery.store);
+        }
+        return active;
       },
       [
         persistStore,
+        persistRecoveryStore,
       ],
     );
 
@@ -126,6 +201,54 @@ export function useCreatorSession() {
       ],
     );
 
+  const createManualRestorePoint =
+    useCallback(
+      (label: string) => {
+        const active =
+          getActiveCreatorSession(
+            storeRef.current,
+          );
+        if (!active) {
+          return undefined;
+        }
+        const result =
+          createCreatorSessionRestorePoint(
+            recoveryStoreRef.current,
+            active,
+            {
+              kind: "manual",
+              label,
+            },
+          );
+        persistRecoveryStore(
+          result.store,
+        );
+        return result.restorePoint;
+      },
+      [
+        persistRecoveryStore,
+      ],
+    );
+
+  const restoreFromRestorePoint =
+    useCallback(
+      (restorePointId: string) => {
+        const next =
+          restoreCreatorSessionFromPoint(
+            storeRef.current,
+            recoveryStoreRef.current,
+            restorePointId,
+          );
+        if (next === storeRef.current) {
+          return undefined;
+        }
+        persistStore(next);
+        return getActiveCreatorSession(next);
+      },
+      [
+        persistStore,
+      ],
+    );
 
   const activeSession =
     useMemo(
@@ -168,9 +291,13 @@ export function useCreatorSession() {
 
   return {
     sessionStore,
+    recoveryStore,
     activeSession,
     restorableSession,
+    restorePlan,
     captureSession,
+    createManualRestorePoint,
+    restoreFromRestorePoint,
     markClean,
   };
 }

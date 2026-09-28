@@ -4,3 +4,5 @@ export * from "./validation";
 export * from "./storage";
 export * from "./lifecycle";
 export * from "./useCreatorSession";
+export * from "./recovery";
+export * from "./recoveryStorage";

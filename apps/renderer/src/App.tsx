@@ -172,7 +172,7 @@ export default function App() {
 
   const {shellState, setWorkspace, applyProfile, setPanel,  setZoom, setThemeMode, resetLayout} = useShellState();
   const {profiles, activeProfile, switchProfile} = useCreatorProfiles();
-  const {restorableSession, captureSession} = useCreatorSession();
+  const {restorableSession, restorePlan, captureSession} = useCreatorSession();
   const sessionRestoreStartedRef = useRef(false);
   const sessionResourcesRestoredRef = useRef(false);
   const [sessionRestoreComplete, setSessionRestoreComplete] = useState(false,);
@@ -2740,7 +2740,11 @@ useEffect(
               manifest: result.manifest,
             },
           );
-          setStatus(`Restored session: ${result.projectRoot}`);
+          setStatus(
+            restorePlan.interrupted
+              ? `Recovered interrupted session: ${result.projectRoot}`
+              : `Restored session: ${result.projectRoot}`,
+          );
         }
       } catch (
         error:
@@ -2762,6 +2766,7 @@ useEffect(
   },
   [
     restorableSession,
+    restorePlan.interrupted,
     profiles,
     shellState,
     switchProfile,
