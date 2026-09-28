@@ -1,4 +1,4 @@
-import { useEffect,  useMemo, useState, useCallback } from "react";
+import { useEffect,  useMemo, useState, useCallback, useRef } from "react";
 import { rpc } from "./rpc";
 import "./app.css";
 import { Modal } from "./components/Modal";
@@ -8,6 +8,12 @@ import {
   applyCreatorShortcutOverrides,
   useCreatorProfiles,
 } from "./platform/profiles";
+import {
+  useCreatorSession,
+} from "./platform/session";
+import type {
+  CreatorSessionResourceRef,
+} from "./platform/session";
 import {
   CommandCenterWorkspace,
   CodeWorkspace,
@@ -166,6 +172,10 @@ export default function App() {
 
   const {shellState, setWorkspace, applyProfile, setPanel,  setZoom, setThemeMode, resetLayout} = useShellState();
   const {profiles, activeProfile, switchProfile} = useCreatorProfiles();
+  const {restorableSession, captureSession} = useCreatorSession();
+  const sessionRestoreStartedRef = useRef(false);
+  const sessionResourcesRestoredRef = useRef(false);
+  const [sessionRestoreComplete, setSessionRestoreComplete] = useState(false,);
   const validWorkspaceIds = NAV_ITEMS.map((item) => item.id);
   const active: AppId = validWorkspaceIds.includes(shellState.activeWorkspace as AppId) ? (shellState.activeWorkspace as AppId) : "code";
 
@@ -364,6 +374,100 @@ export default function App() {
     movieDirty ||
     modelDirty ||
     gameDirty;
+
+  const selectedSessionResources =
+    useMemo<
+      CreatorSessionResourceRef[]
+    >(
+      () => {
+        const resources:
+          CreatorSessionResourceRef[] =
+            [];
+        if (
+          activeDocName
+        ) {
+          resources.push({
+            kind:
+              "doc",
+            id:
+              activeDocName,
+          });
+        }
+        if (
+          activeCodeFileName
+        ) {
+          resources.push({
+            kind:
+              "code",
+            id:
+              activeCodeFileName,
+          });
+        }
+        if (
+          activeSheetName
+        ) {
+          resources.push({
+            kind:
+              "sheet",
+            id:
+              activeSheetName,
+          });
+        }
+
+        if (
+          activeMovieName
+        ) {
+          resources.push({
+            kind:
+              "movie",
+
+            id:
+              activeMovieName,
+          });
+        }
+        if (
+          activeModelName
+        ) {
+          resources.push({
+            kind:
+              "model",
+            id:
+              activeModelName,
+          });
+        }
+        if (
+          activeGameName
+        ) {
+          resources.push({
+            kind:
+              "game",
+            id:
+              activeGameName,
+          });
+        }
+        if (
+          activeWorkflowName
+        ) {
+          resources.push({
+            kind:
+              "workflow",
+            id:
+              activeWorkflowName,
+          });
+        }
+
+        return resources;
+      },
+      [
+        activeDocName,
+        activeCodeFileName,
+        activeSheetName,
+        activeMovieName,
+        activeModelName,
+        activeGameName,
+        activeWorkflowName,
+      ],
+    );
 
   const shellShortcuts =
     useMemo(
@@ -2513,6 +2617,207 @@ async function refreshRecents() {
     // ignore
   }
 }
+
+useEffect(
+  () => {
+    if (
+      !sessionRestoreComplete ||
+      !projectRoot ||
+      !restorableSession ||
+      sessionResourcesRestoredRef
+        .current
+    ) {
+      return;
+    }
+    const session = restorableSession;
+    sessionResourcesRestoredRef
+      .current =
+        true;
+    async function restoreSelectedResources() {
+      for (
+        const resource
+        of session
+          .selectedResources
+      ) {
+        switch (resource.kind) {
+          case "doc":
+            await handleOpenDoc(resource.id);
+            break;
+          case "code":
+            await handleOpenCodeFile(resource.id);
+            break;
+          case "sheet":
+            await handleOpenSheet(resource.id);
+            break;
+          case "movie":
+            await handleOpenMovie(resource.id);
+            break;
+          case "model":
+            await handleOpenModel(resource.id);
+            break;
+          case "game":
+            await handleOpenGame(resource.id);
+            break;
+          case "workflow":
+            await handleOpenWorkflow(resource.id);
+            break;
+        }
+      }
+    }
+    void restoreSelectedResources();
+  },
+  [
+    sessionRestoreComplete,
+    projectRoot,
+    restorableSession,
+  ],
+);
+
+useEffect(
+  () => {
+    if (
+      sessionRestoreStartedRef
+        .current
+    ) {
+      return;
+    }
+    sessionRestoreStartedRef
+      .current =
+        true;
+    async function restoreCreatorSession() {
+      if (!restorableSession) {
+        setSessionRestoreComplete(
+          true,
+        );
+        return;
+      }
+      try {
+        const profile =
+          profiles.find(
+            (candidate) => candidate.id ===
+              restorableSession.profileId,
+          );
+        if (profile) {
+          const switched =
+            switchProfile(
+              profile.id,
+              shellState,
+            );
+          if (switched) {
+            applyProfile(switched);
+          }
+        }
+        if (
+          validWorkspaceIds.includes(
+            restorableSession
+              .activeWorkspace as AppId,
+          )
+        ) {
+          setActive(
+            restorableSession
+              .activeWorkspace as AppId,
+          );
+        }
+        if (restorableSession.projectRoot) {
+          const result =
+            await rpc<{
+              projectRoot: string;
+              manifestPath: string;
+              manifest: any;
+            }>(
+              "project.open",
+              {
+                projectRoot:
+                  restorableSession
+                    .projectRoot,
+              },
+            );
+          setProjectRoot(result.projectRoot);
+          await rpc(
+            "recent.add",
+            {
+              projectRoot: result.projectRoot,
+              manifest: result.manifest,
+            },
+          );
+          setStatus(`Restored session: ${result.projectRoot}`);
+        }
+      } catch (
+        error:
+          any
+      ) {
+        setStatus(
+          `Session restore skipped: ${
+            error?.message ||
+            String(error)
+          }`,
+        );
+      } finally {
+        setSessionRestoreComplete(
+          true,
+        );
+      }
+    }
+    void restoreCreatorSession();
+  },
+  [
+    restorableSession,
+    profiles,
+    shellState,
+    switchProfile,
+    applyProfile,
+    setActive,
+    validWorkspaceIds,
+  ],
+);
+
+useEffect(
+  () => {
+    if (
+      !sessionRestoreComplete
+    ) {
+      return;
+    }
+
+    captureSession({
+      profileId:
+        activeProfile?.id ??
+        shellState.profileId,
+
+      projectRoot:
+        projectRoot ||
+        null,
+
+      activeWorkspace:
+        shellState.activeWorkspace,
+
+      layout:
+        shellState.layout,
+
+      openResources:
+        selectedSessionResources,
+
+      selectedResources:
+        selectedSessionResources,
+
+      taskRefs:
+        [],
+
+      terminalRefs:
+        [],
+    });
+  },
+  [
+    sessionRestoreComplete,
+    activeProfile?.id,
+    shellState.profileId,
+    shellState.activeWorkspace,
+    shellState.layout,
+    projectRoot,
+    selectedSessionResources,
+    captureSession,
+  ],
+);
 
 useEffect(() => {
   refreshRecents();
