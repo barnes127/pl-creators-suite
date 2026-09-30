@@ -9,7 +9,12 @@ import type {
 import {
   activateCreatorProfile,
   loadEnsuredCreatorProfileStore,
+  saveCreatorProfileStore,
 } from "./storage";
+
+import {
+  importCreatorProfileIntoStore,
+} from "./transfer";
 
 import type {
   CreatorProfile,
@@ -68,6 +73,19 @@ export function useCreatorProfiles() {
     return result.profile;
   }
 
+  function importProfile(
+    serialized: string,
+  ):
+    CreatorProfile {
+    const result =
+      importCreatorProfileIntoStore(
+        profileStore,
+        serialized,
+      );
+    saveCreatorProfileStore(result.store,);
+    setProfileStore(result.store);
+    return result.profile;
+  }
 
   function refreshProfiles() {
     const next =
@@ -83,14 +101,10 @@ export function useCreatorProfiles() {
 
   return {
     profileStore,
-
-    profiles:
-      profileStore.profiles,
-
+    profiles: profileStore.profiles,
     activeProfile,
-
     switchProfile,
-
+    importProfile,
     refreshProfiles,
   };
 }

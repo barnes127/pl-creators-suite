@@ -4,16 +4,9 @@ import "./app.css";
 import { Modal } from "./components/Modal";
 import { CollapsiblePanel } from "./components/CollapsiblePanel";
 import { Panel, WorkspaceHeader } from "./components/pl-ui";
-import {
-  applyCreatorShortcutOverrides,
-  useCreatorProfiles,
-} from "./platform/profiles";
-import {
-  useCreatorSession,
-} from "./platform/session";
-import type {
-  CreatorSessionResourceRef,
-} from "./platform/session";
+import {applyCreatorShortcutOverrides, useCreatorProfiles} from "./platform/profiles";
+import {useCreatorSession} from "./platform/session";
+import type {CreatorSessionResourceRef} from "./platform/session";
 import {
   CommandCenterWorkspace,
   CodeWorkspace,
@@ -148,16 +141,9 @@ import {
 } from "./engines";
 import { NAV_ITEMS } from "./config/navigation";
 import { RecoveryPanel } from "./components/recovery";
-
-import {
-  bindBuiltInSliceConsumers,
-  platformRuntime,
-} from "./platform/runtime";
-
-import type {
-  RecoveryUiStatus,
-} from "./components/recovery";
-
+import {CreatorContinuityPanel} from "./components/continuity";
+import {bindBuiltInSliceConsumers, platformRuntime} from "./platform/runtime";
+import type {RecoveryUiStatus} from "./components/recovery";
 
 declare global {
   interface Window {
@@ -171,14 +157,13 @@ declare global {
 export default function App() {
 
   const {shellState, setWorkspace, applyProfile, setPanel,  setZoom, setThemeMode, resetLayout} = useShellState();
-  const {profiles, activeProfile, switchProfile} = useCreatorProfiles();
-  const {restorableSession, restorePlan, captureSession} = useCreatorSession();
+  const {profiles, activeProfile, switchProfile, importProfile} = useCreatorProfiles();
+  const {recoveryStore, restorableSession, restorePlan, captureSession, createManualRestorePoint, restoreFromRestorePoint} = useCreatorSession();
   const sessionRestoreStartedRef = useRef(false);
   const sessionResourcesRestoredRef = useRef(false);
   const [sessionRestoreComplete, setSessionRestoreComplete] = useState(false,);
   const validWorkspaceIds = NAV_ITEMS.map((item) => item.id);
   const active: AppId = validWorkspaceIds.includes(shellState.activeWorkspace as AppId) ? (shellState.activeWorkspace as AppId) : "code";
-
   const setActive =
     useCallback(
       (
@@ -232,6 +217,9 @@ export default function App() {
 //  const activeItem = NAV_ITEMS.find((n) => n.id === active)!;
   const [projectRoot, setProjectRoot] = useState<string>("");
   const [showRecovery, setShowRecovery] = useState(false);
+  const [showContinuity, setShowContinuity] = useState(false);
+  const focusLayoutRef = useRef<typeof shellState.layout | null>(null);
+  const focusModeActive = !shellState.layout.visibility["primary-sidebar"] && !shellState.layout.visibility["inspector"] && !shellState.layout.visibility["bottom-panel"];
   const [recoveryStatus, setRecoveryStatus] = useState<RecoveryUiStatus | null>(null);
   const [recoveryBusy, setRecoveryBusy] = useState(false);
   const [recoveryError,setRecoveryError] = useState("");
@@ -343,30 +331,24 @@ export default function App() {
   const [activeModelName, setActiveModelName] = useState("");
   const [modelData, setModelData] = useState<ModelData | null>(null);
   const [modelDirty, setModelDirty] = useState(false);
-
   const [newModelObjectName, setNewModelObjectName] = useState("");
   const [newModelPrimitive, setNewModelPrimitive] = useState("cube");
-
   const [gamesList, setGamesList] = useState<GameInfo[]>([]);
   const [newGameName, setNewGameName] = useState("");
   const [activeGameName, setActiveGameName] = useState("");
   const [gameData, setGameData] = useState<GameData | null>(null);
   const [gameDirty, setGameDirty] = useState(false);
-
   const [newGameSceneName, setNewGameSceneName] = useState("");
   const [newGameEntityName, setNewGameEntityName] = useState("");
   const [newGameEntityType, setNewGameEntityType] = useState("object");
   const [newGameEntitySceneId, setNewGameEntitySceneId] = useState("");
-
   const [workflowsList, setWorkflowsList] = useState<WorkflowInfo[]>([]);
   const [newWorkflowName, setNewWorkflowName] = useState("");
   const [activeWorkflowName, setActiveWorkflowName] = useState("");
   const [activeWorkflow, setActiveWorkflow] = useState<WorkflowGraph | null>(null);
-  const [workflowRunResult, setWorkflowRunResult] =
-    useState<WorkflowRunResult | null>(null);
+  const [workflowRunResult, setWorkflowRunResult] = useState<WorkflowRunResult | null>(null);
   const [workflowBusy, setWorkflowBusy] = useState(false);
   const [workflowTemplateSearch, setWorkflowTemplateSearch] = useState("");
-
   const suiteHasUnsavedChanges =
     docDirty ||
     codeDirty ||
@@ -374,6 +356,38 @@ export default function App() {
     movieDirty ||
     modelDirty ||
     gameDirty;
+
+  function handleCreateSessionRestorePoint(
+    label: string,
+  ) {
+    const point = createManualRestorePoint(label);
+    if (point) {
+      setStatus(`Created session restore point: ${point.label}`);
+    }
+    return point;
+  }
+  function handleRestoreSessionPoint(
+    restorePointId: string,
+  ) {
+    if (suiteHasUnsavedChanges) {
+      setStatus("Save unsaved work before restoring session context.");
+      return;
+    }
+    const restored = restoreFromRestorePoint(restorePointId);
+    if (!restored) {
+      setStatus("Session restore point is unavailable.");
+      return;
+    }
+    setStatus("Restoring saved session context...");
+    window.location.reload();
+  }
+  function handleImportCreatorProfile(
+    serialized: string) {
+    const profile = importProfile(serialized);
+    applyProfile(profile);
+    setStatus(`Imported creator profile: ${profile.name}`);
+    return profile;
+  }
 
   const selectedSessionResources =
     useMemo<
@@ -2226,6 +2240,57 @@ function handleDeleteGameScene(sceneId: string) {
     hydrateWorkflowPack(pack, BUILT_IN_WORKFLOW_TEMPLATES)
   );
 
+function handleToggleFocusMode() {
+  if (focusModeActive) {
+    const previous = focusLayoutRef.current;
+    if (previous) {
+      setPanel(
+        "primary-sidebar",
+        previous.visibility["primary-sidebar"],
+      );
+      setPanel(
+        "inspector",
+        previous.visibility["inspector"],
+      );
+      setPanel(
+        "bottom-panel",
+        previous.visibility["bottom-panel"],
+      );
+    } else {
+      setPanel(
+        "primary-sidebar",
+        true,
+      );
+      setPanel(
+        "inspector",
+        true,
+      );
+      setPanel(
+        "bottom-panel",
+        true,
+      );
+    }
+    focusLayoutRef.current = null;
+    setStatus("Focus mode disabled.");
+    return;
+  }
+  focusLayoutRef.current =
+    structuredClone(shellState.layout);
+  setPanel(
+    "primary-sidebar",
+    false,
+  );
+  setPanel(
+    "inspector",
+    false,
+  );
+  setPanel(
+    "bottom-panel",
+    false,
+  );
+  setStatus("Focus mode enabled.");
+}
+
 async function refreshWorkflows(root = projectRoot) {
   try {
     if (!root) {
@@ -3565,14 +3630,30 @@ useEffect(() => {
             onClick={
               () => {
                 resetLayout();
-
-                setStatus(
-                  "Workspace layout reset",
-                );
+                setStatus("Workspace layout reset");
+                focusLayoutRef.current = null;
+                setStatus("Layout reset to default.");
               }
             }
           >
             Reset Layout
+          </button>
+          <button
+            className="btn btn-subtle"
+            type="button"
+            aria-pressed={focusModeActive}
+            onClick={handleToggleFocusMode}
+          >
+            {focusModeActive
+              ? "Exit Focus"
+              : "Focus"}
+          </button>
+          <button
+            className="btn btn-subtle"
+            type="button"
+            onClick={() => setShowContinuity(true)}
+          >
+            Continuity
           </button>
         </div>
         <div className="topbarRight">
@@ -4012,6 +4093,22 @@ useEffect(() => {
                   }
                 />
               </Modal>
+            )}
+            {showContinuity && (
+              <Modal
+                title="Creator Continuity"
+                onClose={() => setShowContinuity(false)}
+              >
+                <CreatorContinuityPanel
+                  activeProfile={activeProfile}
+                  recoveryStore={recoveryStore}
+                  restorePlan={restorePlan}
+                  canRestore={!suiteHasUnsavedChanges}
+                  onCreateRestorePoint={handleCreateSessionRestorePoint}
+                  onRestorePoint={handleRestoreSessionPoint}
+                  onImportProfile={handleImportCreatorProfile}
+               />
+             </Modal>
             )}
           </div>
 

@@ -4,6 +4,7 @@ import {
 
 import type {
   CreatorProfile,
+  CreatorProfileStore,
 } from "./types";
 
 import {
@@ -159,5 +160,43 @@ export function importCreatorProfile(
 
     updatedAt:
       now,
+  };
+}
+
+export interface ImportedCreatorProfileResult {
+  store: CreatorProfileStore;
+  profile: CreatorProfile;
+}
+
+export function importCreatorProfileIntoStore(
+  store: CreatorProfileStore,
+  serialized: string,
+  now = Date.now(),
+):
+  ImportedCreatorProfileResult {
+  const candidate = importCreatorProfile(serialized);
+  const idExists =
+    store.profiles.some(
+      (profile) =>
+        profile.id ===
+        candidate.id,
+    );
+  const profile =
+    idExists
+      ? importCreatorProfile(
+          serialized,
+          `${candidate.id}-imported-${now}`,
+        )
+      : candidate;
+  return {
+    profile,
+    store: {
+      ...store,
+      activeProfileId: profile.id,
+      profiles: [
+        ...store.profiles,
+        profile,
+      ],
+    },
   };
 }

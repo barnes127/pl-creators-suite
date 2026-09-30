@@ -1,0 +1,59 @@
+.creatorContinuity {
+  display: grid;
+  gap: 18px;
+}
+
+.creatorContinuitySection {
+  display: grid;
+  gap: 12px;
+}
+
+.creatorContinuitySection h3 {
+  margin: 0;
+}
+
+.creatorContinuityStatus {
+  display: grid;
+  gap: 4px;
+}
+
+.creatorContinuityHint {
+  margin: 0;
+  opacity: 0.78;
+}
+
+.creatorContinuityActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+}
+
+.creatorContinuityList {
+  display: grid;
+  gap: 8px;
+}
+
+.creatorContinuityWarning {
+  padding: 8px 10px;
+  border: 1px solid currentColor;
+  border-radius: 6px;
+}
+
+.creatorContinuityMessage {
+  padding-top: 8px;
+  border-top: 1px solid currentColor;
+}
+
+.creatorContinuityImport {
+  position: relative;
+  overflow: hidden;
+}
+
+.creatorContinuityImport input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+  pointer-events: none;
+}
