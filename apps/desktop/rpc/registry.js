@@ -1,45 +1,24 @@
 const path = require("path");
-
 const projects = require("../services/projects");
-
 const dialogs = require("../services/dialogs");
-
 const plugins = require("../services/plugins/registry");
-
 const pluginManifest = require("../services/plugins/manifest");
-
 const pluginDiscovery = require("../services/plugins/discovery");
-
 const entitlements = require("../services/entitlements");
-
 const localAi = require("../services/ai/local");
-
 const appMetadata = require("../services/app/metadata");
-
 const assets = require("../services/assets");
-
 const docs = require("../services/docs");
-
 const code = require("../services/code");
-
 const sheets = require("../services/sheets");
-
 const movies = require("../services/movies");
-
 const models = require("../services/models");
-
 const games = require("../services/games");
-
 const workflows = require("../services/workflows");
-
 const recovery = require("../services/project-platform/recovery");
-
 const {desktopRuntime} = require("../services/runtime");
-
 const {createOperationalMethods} = require("../services/operations");
-
 const operationalMethods = createOperationalMethods( desktopRuntime );
-
 function createRpcMethods({
   logsExport,
   recentList,
@@ -52,83 +31,61 @@ function createRpcMethods({
         cancelRequest(
           params?.requestId,
         ),
-
     "tasks.start":
       async (params) =>
         operationalMethods
           .startTask(params),
-
     "tasks.get":
       async (params) =>
         operationalMethods
           .getTask(params),
-
     "tasks.list":
       async () =>
         operationalMethods
           .listTasks(),
-
     "tasks.cancel":
       async (params) =>
         operationalMethods
           .cancelTask(params),
-
     "diagnostics.query":
       async (params) =>
         operationalMethods
           .queryDiagnostics(
             params,
           ),
-
     "diagnostics.health":
       async () =>
         operationalMethods
           .diagnosticsHealth(),
-
+    "health.snapshot":
+      async () =>
+        operationalMethods
+          .healthSnapshot(),
     "diagnostics.resources":
       async (params) =>
         operationalMethods
           .captureResource(params),
-
-    "project.create":
-      projects.projectCreate,
-
-    "project.open":
-      projects.projectOpen,
-
-    "project.export":
-      projects.projectExport,
-
-    "project.import":
-      projects.projectImport,
-
-    "logs.export":
-      logsExport,
-
-    "recent.list":
-      recentList,
-
-    "recent.add":
-      recentAdd,
-
+    "project.create": projects.projectCreate,
+    "project.open": projects.projectOpen,
+    "project.export": projects.projectExport,
+    "project.import": projects.projectImport,
+    "logs.export": logsExport,
+    "recent.list": recentList,
+    "recent.add": recentAdd,
     "assets.import":
       async (params) =>
         assets.importAsset(params),
-
     "assets.register":
       async (params) =>
         assets.registerAsset(params),
-
     "assets.ensure":
       async (params) =>
         assets.ensureAssetStorage(
           params?.projectRoot,
         ),
-
     "assets.list":
       async (params) =>
         assets.listAssets(params),
-
     "assets.detectType":
       async (params) => ({
         type:
@@ -136,21 +93,18 @@ function createRpcMethods({
             params?.filePath,
           ),
       }),
-
     "app.metadata":
       async () => ({
         metadata:
           await appMetadata
             .getAppMetadata(),
       }),
-
     "ai.local.status":
       async () => ({
         status:
           await localAi
             .getLocalAiStatus(),
       }),
-
     "ai.local.chat":
       async (params, context) =>
         localAi.chat(params, context),

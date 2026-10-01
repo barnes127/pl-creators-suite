@@ -4,6 +4,7 @@ function createOperationalMethods(
   const {
     taskManager,
     diagnostics,
+    health,
     captureResources,
   } = runtime;
 
@@ -77,6 +78,13 @@ function createOperationalMethods(
       return {
         health:
           await diagnostics.health(),
+      };
+    },
+
+    async healthSnapshot() {
+      return {
+        health:
+          await health.snapshot(),
       };
     },
 

@@ -173,6 +173,32 @@ async function main() {
     );
 
     await check(
+      "unified health snapshot is available",
+      async () => {
+        const result =
+          await operations
+            .healthSnapshot();
+        assert.ok(
+          result.health,
+        );
+        assert.equal(
+          result.health
+            .summary
+            .collectorCount,
+          1,
+        );
+        assert.ok(
+          result.health.sources
+            .some(
+              (source) =>
+                source.id ===
+                "diagnostics",
+            ),
+        );
+      },
+    );
+
+    await check(
       "diagnostics query returns persisted task history",
       async () => {
         const result =

@@ -7,6 +7,11 @@ const {
 } = require("./diagnostics");
 
 const {
+  HealthService,
+  createDiagnosticsHealthCollector,
+} = require("./health");
+
+const {
   createTaskDiagnosticsBridge,
 } = require(
   "./diagnostics/tasks",
@@ -42,6 +47,14 @@ function createDesktopRuntime(
         options.maxDiagnosticRecords ??
         1000,
     });
+
+  const health =
+    new HealthService();
+  health.registerCollector(
+    createDiagnosticsHealthCollector(
+      diagnostics,
+    ),
+  );
 
   const taskBridge =
     createTaskDiagnosticsBridge(
@@ -98,6 +111,7 @@ function createDesktopRuntime(
 
   return {
     diagnostics,
+    health,
     taskManager,
     rpcBridge,
     initialize,

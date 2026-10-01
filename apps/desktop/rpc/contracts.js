@@ -765,6 +765,18 @@ const METHOD_CONTRACTS = {
       ],
     },
 
+    "health.snapshot": {
+      validate:
+        noParams,
+
+      mutates: false,
+      retryable: true,
+
+      trust: [
+        TRUST.NONE,
+      ],
+    },
+
     "diagnostics.resources": {
       validate:
         diagnosticsResourceParams,
