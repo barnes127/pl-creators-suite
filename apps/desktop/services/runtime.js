@@ -1,31 +1,10 @@
 const os = require("os");
 const path = require("path");
-
-const {
-  DiagnosticsService,
-  getProcessResourceSnapshot,
-} = require("./diagnostics");
-
-const {
-  HealthService,
-  createDiagnosticsHealthCollector,
-} = require("./health");
-
-const {
-  createTaskDiagnosticsBridge,
-} = require(
-  "./diagnostics/tasks",
-);
-
-const {
-  createRpcDiagnosticsSink,
-} = require(
-  "./diagnostics/rpc",
-);
-
-const {
-  createDesktopTaskManager,
-} = require("./tasks");
+const {DiagnosticsService, getProcessResourceSnapshot} = require("./diagnostics");
+const {HealthService, createDiagnosticsHealthCollector, createSystemHealthCollector} = require("./health");
+const {createTaskDiagnosticsBridge} = require("./diagnostics/tasks");
+const {createRpcDiagnosticsSink} = require("./diagnostics/rpc");
+const {createDesktopTaskManager} = require("./tasks");
 
 function createDesktopRuntime(
   options = {},
@@ -66,6 +45,12 @@ function createDesktopRuntime(
       onTaskChanged:
         taskBridge.onTaskChanged,
     });
+
+  health.registerCollector(
+    createSystemHealthCollector({
+      taskManager,
+    }),
+  );
 
   const rpcBridge =
     createRpcDiagnosticsSink(

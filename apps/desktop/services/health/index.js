@@ -1,9 +1,15 @@
-const {
-  HealthService,
-  normalizeSource,
-  normalizeFinding,
-} = require("./service");
+const {HealthService, normalizeSource, normalizeFinding} = require("./service");
 const {createDiagnosticsHealthCollector} = require("./diagnostics");
+const {
+  createSystemHealthCollector,
+  getCpuSummary,
+  getMemorySummary,
+  getDiskSummary,
+  getQueueSummary,
+  getWorkerSummary,
+  getGpuSummary,
+  getCacheSummary,
+} = require("./system");
 const {
   HEALTH_SEVERITIES,
   HEALTH_STATUSES,
@@ -20,6 +26,14 @@ module.exports = {
   normalizeSource,
   normalizeFinding,
   createDiagnosticsHealthCollector,
+  createSystemHealthCollector,
+  getCpuSummary,
+  getMemorySummary,
+  getDiskSummary,
+  getQueueSummary,
+  getWorkerSummary,
+  getGpuSummary,
+  getCacheSummary,
   HEALTH_SEVERITIES,
   HEALTH_STATUSES,
   HEALTH_CATEGORIES,

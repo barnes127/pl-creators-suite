@@ -185,7 +185,7 @@ async function main() {
           result.health
             .summary
             .collectorCount,
-          1,
+          2,
         );
         assert.ok(
           result.health.sources
@@ -194,6 +194,14 @@ async function main() {
                 source.id ===
                 "diagnostics",
             ),
+        );
+        assert.ok(
+          result.health.sources
+            .some(
+               (source) =>
+                 source.id ===
+                 "system",
+             ),
         );
       },
     );
