@@ -1,8 +1,4 @@
-const {
-  RpcInvalidParamsError,
-} = require("./errors");
-
-
+const {RpcInvalidParamsError} = require("./errors");
 const TRUST = Object.freeze({
   NONE: "none",
   FILESYSTEM: "filesystem",
@@ -189,6 +185,18 @@ function optionalBoolean(
   }
 }
 
+function healthSnapshotParams(
+  params,
+) {
+  requireObject(params);
+
+  optionalString(
+    params,
+    "projectRoot",
+  );
+
+  return params;
+}
 
 function projectRootParams(
   params,
@@ -767,7 +775,7 @@ const METHOD_CONTRACTS = {
 
     "health.snapshot": {
       validate:
-        noParams,
+        healthSnapshotParams,
 
       mutates: false,
       retryable: true,

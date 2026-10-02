@@ -58,9 +58,9 @@ function createRpcMethods({
         operationalMethods
           .diagnosticsHealth(),
     "health.snapshot":
-      async () =>
+      async (params) =>
         operationalMethods
-          .healthSnapshot(),
+          .healthSnapshot(params),
     "diagnostics.resources":
       async (params) =>
         operationalMethods

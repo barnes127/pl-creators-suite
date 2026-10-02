@@ -20,6 +20,10 @@ const {
   isHealthCategory,
   getHighestHealthSeverity,
 } = require("./types");
+const {createPluginHealthCollector} = require("./plugins");
+const {createLocalAiHealthCollector} = require("./ai");
+const {createRecoveryHealthCollector, createIndexHealthCollector} = require("./project");
+const {createSyncHealthCollector, createEngineHealthCollector} = require("./platform");
 
 module.exports = {
   HealthService,
@@ -42,4 +46,10 @@ module.exports = {
   isHealthStatus,
   isHealthCategory,
   getHighestHealthSeverity,
+  createPluginHealthCollector,
+  createLocalAiHealthCollector,
+  createRecoveryHealthCollector,
+  createIndexHealthCollector,
+  createSyncHealthCollector,
+  createEngineHealthCollector,
 };

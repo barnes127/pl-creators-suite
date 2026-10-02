@@ -88,6 +88,7 @@
     "test:desktop-diagnostics": "node scripts/desktop-diagnostics-service-test.js",
     "test:command-center-health-foundation": "node scripts/command-center-health-foundation-test.js",
     "test:command-center-system-telemetry": "node scripts/command-center-system-telemetry-test.js",
+    "test:command-center-service-health": "node scripts/command-center-service-health-test.js",
     "test:desktop-operations": "node scripts/desktop-operational-rpc-test.js",
     "test:platform-core-apis": "rm -rf .tmp-core-api-test && tsc --target ES2022 --module commonjs --moduleResolution node --esModuleInterop --skipLibCheck --outDir .tmp-core-api-test scripts/platform-core-api-behavior-test.ts && node .tmp-core-api-test/scripts/platform-core-api-behavior-test.js && rm -rf .tmp-core-api-test",
     "test:desktop-file-api": "node scripts/desktop-file-api-test.js",

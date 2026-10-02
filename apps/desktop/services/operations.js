@@ -81,10 +81,12 @@ function createOperationalMethods(
       };
     },
 
-    async healthSnapshot() {
+    async healthSnapshot( params ={} ) {
       return {
         health:
-          await health.snapshot(),
+          await health.snapshot({
+            projectRoot: String(params.projectRoot || "").trim(),
+          })
       };
     },
 
