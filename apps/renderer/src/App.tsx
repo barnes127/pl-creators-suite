@@ -23,8 +23,9 @@ import {
   ShellMain,
   ShellTopBar,
   ShellWorkspaceRegion,
-  ShellBottomPanel,
   ShellStatusBar,
+  ShellContextRail,
+  ShellBottomPanel,
   useShellState,
   EmptyState,
   LoadingState,
@@ -144,6 +145,8 @@ import { RecoveryPanel } from "./components/recovery";
 import {CreatorContinuityPanel} from "./components/continuity";
 import {bindBuiltInSliceConsumers, platformRuntime} from "./platform/runtime";
 import type {RecoveryUiStatus} from "./components/recovery";
+import {HealthContextRail} from "./components/health";
+import {useHealthSnapshot} from "./platform/health";
 
 declare global {
   interface Window {
@@ -152,10 +155,7 @@ declare global {
     };
   }
 }
-
-
 export default function App() {
-
   const {shellState, setWorkspace, applyProfile, setPanel,  setZoom, setThemeMode, resetLayout} = useShellState();
   const {profiles, activeProfile, switchProfile, importProfile} = useCreatorProfiles();
   const {recoveryStore, restorableSession, restorePlan, captureSession, createManualRestorePoint, restoreFromRestorePoint} = useCreatorSession();
@@ -216,6 +216,8 @@ export default function App() {
 
 //  const activeItem = NAV_ITEMS.find((n) => n.id === active)!;
   const [projectRoot, setProjectRoot] = useState<string>("");
+  const {snapshot: healthSnapshot, loading: healthLoading, error: healthError, refresh: refreshHealth} = useHealthSnapshot(projectRoot);
+  const healthRailOpen = shellState.layout.visibility.inspector;
   const [showRecovery, setShowRecovery] = useState(false);
   const [showContinuity, setShowContinuity] = useState(false);
   const focusLayoutRef = useRef<typeof shellState.layout | null>(null);
@@ -3655,6 +3657,26 @@ useEffect(() => {
           >
             Continuity
           </button>
+          <button
+            className="btn btn-subtle"
+            type="button"
+            aria-pressed={healthRailOpen}
+            onClick={
+              () =>
+                setPanel(
+                  "inspector",
+                  !healthRailOpen,
+                )
+            }
+          >
+            Health
+            {healthSnapshot &&
+              healthSnapshot
+                .summary
+                .findingCount >
+                0 &&
+              ` (${healthSnapshot.summary.findingCount})`}
+          </button>
         </div>
         <div className="topbarRight">
           <button className="btn btn-primary" type="button" onClick={handleNewProject}>
@@ -3826,7 +3848,23 @@ useEffect(() => {
         />
       </WorkspaceErrorBoundary>
       </ShellWorkspaceRegion>
-
+      {healthRailOpen && (
+        <ShellContextRail
+          width={
+            shellState
+              .layout
+              .inspectorWidth
+          }
+        >
+          <HealthContextRail
+            snapshot={healthSnapshot}
+            loading={healthLoading}
+            error={healthError}
+            onRefresh={() => {void refreshHealth()}}
+            onClose={() => setPanel("inspector", false)}
+          />
+        </ShellContextRail>
+      )}
       <ShellBottomPanel className={`copilotDrawer ${copilotDrawerOpen ? "open" : "closed"}`}>
         <div className="copilotDrawerHeader">
           <button
@@ -3930,12 +3968,11 @@ useEffect(() => {
             : "PL Creators Suite"
         }
         saveState={{
-          dirty:
-            suiteHasUnsavedChanges,
-
-          saving:
-            false,
+          dirty: suiteHasUnsavedChanges,
+          saving: false,
         }}
+        healthSeverity={healthSnapshot ?.overallSeverity}
+        healthFindingCount={healthSnapshot ?.summary .findingCount}
       />
 
       {showNew && (

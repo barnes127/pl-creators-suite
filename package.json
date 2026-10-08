@@ -115,6 +115,7 @@
     "test:command-center-session-lifecycle": "rm -rf .tmp-command-center-session-lifecycle-test && tsc --target ES2022 --module commonjs --moduleResolution node --esModuleInterop --skipLibCheck --outDir .tmp-command-center-session-lifecycle-test scripts/command-center-session-lifecycle-test.ts && node .tmp-command-center-session-lifecycle-test/scripts/command-center-session-lifecycle-test.js && rm -rf .tmp-command-center-session-lifecycle-test",
     "test:command-center-session-recovery": "rm -rf .tmp-command-center-session-recovery-test && tsc --target ES2022 --module commonjs --moduleResolution node --esModuleInterop --skipLibCheck --outDir .tmp-command-center-session-recovery-test scripts/command-center-session-recovery-test.ts && node .tmp-command-center-session-recovery-test/scripts/command-center-session-recovery-test.js && rm -rf .tmp-command-center-session-recovery-test",
     "test:command-center-v132-closeout": "node scripts/command-center-v132-closeout-test.js",
+    "test:command-center-health-ui": "node scripts/command-center-health-ui-test.js",
     "performance:baseline": "node scripts/performance-baseline.js",
     "rpc:inventory": "node scripts/rpc-inventory.js",
     "dev": "pnpm -r dev",

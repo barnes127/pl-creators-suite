@@ -1,26 +1,9 @@
-import {
-  useEffect,
-  useState,
-} from "react";
-
-import type {
-  TaskRecord,
-} from "@pl/platform";
-
-import {
-  rpc,
-} from "../../rpc";
-
-import {
-  platformRuntime,
-} from "../../platform/runtime";
-
-import type {
-  AppMetadata,
-  LocalAiStatus,
-  PluginInfo,
-} from "../../types/app";
-
+import {useEffect, useState} from "react";
+import type {TaskRecord} from "@pl/platform";
+import {rpc} from "../../rpc";
+import {platformRuntime} from "../../platform/runtime";
+import type {AppMetadata} from "../../types/app";
+import {useHealthSnapshot} from "../../platform/health";
 
 type RecentProject = {
   projectRoot:
@@ -31,21 +14,6 @@ type RecentProject = {
 
   lastOpenedAt:
     string;
-};
-
-
-type DiagnosticsHealth = {
-  jobCount:
-    number;
-
-  activeJobs:
-    number;
-
-  failedJobs:
-    number;
-
-  interruptedJobs:
-    number;
 };
 
 
@@ -726,239 +694,46 @@ function LearningWidget() {
   );
 }
 
-
 function ProjectHealthWidget({
   projectRoot,
 }: {
   projectRoot:
     string;
 }) {
-  const [
-    health,
-    setHealth,
-  ] =
-    useState<
-      DiagnosticsHealth |
-      null
-    >(
-      null,
-    );
-
-  const [
-    localAi,
-    setLocalAi,
-  ] =
-    useState<
-      LocalAiStatus |
-      null
-    >(
-      null,
-    );
-
-  const [
-    plugins,
-    setPlugins,
-  ] =
-    useState<
-      PluginInfo[]
-    >(
-      [],
-    );
-
-  const [
-    error,
-    setError,
-  ] =
-    useState(
-      "",
-    );
-
-
-  useEffect(
-    () => {
-      let cancelled =
-        false;
-
-      Promise.all(
-        [
-          rpc<{
-            health:
-              DiagnosticsHealth;
-          }>(
-            "diagnostics.health",
-          ),
-
-          rpc<{
-            status:
-              LocalAiStatus;
-          }>(
-            "ai.local.status",
-          ),
-
-          rpc<{
-            plugins:
-              PluginInfo[];
-          }>(
-            "plugins.list",
-          ),
-        ],
-      )
-        .then(
-          (
-            [
-              healthResult,
-              aiResult,
-              pluginResult,
-            ],
-          ) => {
-            if (
-              cancelled
-            ) {
-              return;
-            }
-
-            setHealth(
-              healthResult.health,
-            );
-
-            setLocalAi(
-              aiResult.status,
-            );
-
-            setPlugins(
-              pluginResult.plugins ??
-              [],
-            );
-
-            setError(
-              "",
-            );
-          },
-        )
-        .catch(
-          (
-            caught,
-          ) => {
-            if (
-              cancelled
-            ) {
-              return;
-            }
-
-            setError(
-              caught instanceof
-                Error
-                ? caught.message
-                : String(
-                    caught,
-                  ),
-            );
-          },
-        );
-
-      return () => {
-        cancelled =
-          true;
-      };
-    },
-    [],
-  );
-
-
-  if (
-    error
-  ) {
-    return (
-      <WidgetError
-        message={`Health information unavailable: ${error}`}
-      />
-    );
+  const {snapshot, loading, error} = useHealthSnapshot(projectRoot);
+  if (loading && !snapshot) {
+    return (<WidgetLoading message="Checking suite health..."/>);
   }
-
-  if (
-    !health ||
-    !localAi
-  ) {
-    return (
-      <WidgetLoading
-        message="Checking suite health..."
-      />
-    );
+  if (error && !snapshot) {
+    return (<WidgetError message={`Health information unavailable: ${error}`}/>);
   }
-
-  const enabledPlugins =
-    plugins.filter(
-      (
-        plugin,
-      ) =>
-        plugin.enabled,
-    ).length;
-
+  if (!snapshot) {
+    return null;
+  }
   return (
     <div className="commandCenterWidgetMetrics">
       <div>
-        <span>
-          Project
-        </span>
-
+        <span>Overall</span>
         <strong>
-          {projectRoot
-            ? "Open"
-            : "None"}
+          {snapshot.overallSeverity}
         </strong>
       </div>
-
       <div>
-        <span>
-          Active tasks
-        </span>
-
+        <span>Services</span>
         <strong>
-          {health.activeJobs}
+          {snapshot.summary.sourceCount}
         </strong>
       </div>
-
       <div>
-        <span>
-          Failed tasks
-        </span>
-
+        <span>Findings</span>
         <strong>
-          {health.failedJobs}
+          {snapshot.summary.findingCount}
         </strong>
       </div>
-
       <div>
-        <span>
-          Interrupted
-        </span>
-
+        <span>Project</span>
         <strong>
-          {health.interruptedJobs}
-        </strong>
-      </div>
-
-      <div>
-        <span>
-          Local AI
-        </span>
-
-        <strong>
-          {localAi.available
-            ? "Available"
-            : "Unavailable"}
-        </strong>
-      </div>
-
-      <div>
-        <span>
-          Plugins
-        </span>
-
-        <strong>
-          {enabledPlugins}
-          /
-          {plugins.length}
+          {projectRoot ? "Open" : "None"}
         </strong>
       </div>
     </div>

@@ -100,7 +100,13 @@ html, body, #root {
   min-height: 0;
   overflow: hidden;
   display: grid;
-  grid-template-rows: auto 1fr auto;
+  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-rows:
+    auto
+    minmax(0, 1fr)
+    auto
+    auto
+    auto;
   min-width: 0;
 }
 
@@ -264,6 +270,8 @@ html, body, #root {
 .copilotDrawer {
   border-top: 1px solid #262626;
   background: #111;
+  grid-column: 1 / -1;
+  grid-row: 3
 }
 
 .copilotDrawerHeader {
@@ -315,6 +323,8 @@ html, body, #root {
 .physicsDrawer {
   border-top: 1px solid #262626;
   background: #0b0b0d;
+  grid-column: 1 / -1;
+  grid-row: 4;
 }
 
 .physicsDrawerHeader {
@@ -1643,12 +1653,16 @@ body {
     rgba(10, 15, 22, 0.94);
   border-bottom: 1px solid var(--pl-border);
   box-shadow: 0 1px 0 rgba(255, 255, 255, 0.025);
+  grid-column: 1 / -1;
+  grid-row: 1;
 }
 
 .statusbar {
   background: rgba(7, 10, 15, 0.96);
   border-top: 1px solid var(--pl-border);
   color: var(--pl-text-muted);
+  grid-column: 1 / -1;
+  grid-row: 5;
 }
 
 /* Brand/nav polish */
@@ -1799,6 +1813,8 @@ body {
   background:
     radial-gradient(circle at top right, rgba(94, 231, 255, 0.035), transparent 32%),
     radial-gradient(circle at bottom left, rgba(167, 139, 250, 0.025), transparent 30%);
+    grid-column: 1;
+    grid-row: 2;
 }
 
 .workspaceHeader {
@@ -1952,6 +1968,15 @@ textarea:focus,
   background: rgba(255, 255, 255, 0.025);
 }
 
+.contextRail {
+  grid-column: 2;
+  grid-row: 2;
+  min-width: 260px;
+  max-width: 720px;
+  min-height: 0;
+  overflow: hidden;
+  border-left: 1px solid #232327;
+}
 /* Drawers / advanced tools */
 
 .copilotDrawer,
