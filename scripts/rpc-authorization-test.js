@@ -158,6 +158,57 @@ test(
   },
 );
 
+test(
+  "diagnostics.export requires filesystem write permission",
+  () => {
+    const authorizer =
+      createRpcAuthorizer({
+        allowedPermissions: [
+          PERMISSION.FILESYSTEM_READ,
+        ],
+      });
+
+    assert.throws(
+      () =>
+        authorizer.authorize(
+          "diagnostics.export",
+          getMethodContract(
+            "diagnostics.export",
+          ),
+        ),
+      RpcPermissionError,
+    );
+  },
+);
+
+test(
+  "diagnostics.export allowed with filesystem write permission",
+  () => {
+    const authorizer =
+      createRpcAuthorizer({
+        allowedPermissions: [
+          PERMISSION.FILESYSTEM_WRITE,
+        ],
+      });
+
+    const result = authorizer.authorize(
+      "diagnostics.export",
+      getMethodContract(
+        "diagnostics.export",
+      ),
+    );
+
+    assert.strictEqual(
+      result.allowed,
+      true,
+    );
+
+    assert.deepStrictEqual(
+      result.requiredPermissions,
+      [PERMISSION.FILESYSTEM_WRITE],
+    );
+  },
+);
 
 test(
   "local AI requires AI and local-network permissions",

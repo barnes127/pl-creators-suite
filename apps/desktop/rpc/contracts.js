@@ -98,21 +98,40 @@ function taskStartParams(params) {
   return params;
 }
 
+function diagnosticsExportParams(params) {
+  requireObject(params);
+  optionalString(
+    params,
+    "projectRoot",
+  );
+  optionalString(
+    params,
+    "outPath",
+  );
+  if (
+    params.outPath !== undefined &&
+    !params.outPath.trim()
+  ) {
+    invalid(
+      "outPath cannot be empty.",
+      { field: "outPath" },
+    );
+  }
+  return params;
+}
+
 function diagnosticsQueryParams(
   params,
 ) {
   requireObject(params);
-
   requireString(
     params,
     "collection",
   );
-
   optionalObject(
     params,
     "filter",
   );
-
   return params;
 }
 
@@ -773,16 +792,18 @@ const METHOD_CONTRACTS = {
       ],
     },
 
-    "health.snapshot": {
-      validate:
-        healthSnapshotParams,
+    "diagnostics.export": {
+      validate: diagnosticsExportParams,
+      mutates: true,
+      retryable: false,
+      trust: [TRUST.FILESYSTEM],
+    },
 
+    "health.snapshot": {
+      validate: healthSnapshotParams,
       mutates: false,
       retryable: true,
-
-      trust: [
-        TRUST.NONE,
-      ],
+      trust: [TRUST.NONE],
     },
 
     "diagnostics.resources": {

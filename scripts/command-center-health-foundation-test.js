@@ -462,6 +462,61 @@ async function main() {
         broken.severity,
         "unavailable",
       );
+      const healthy =
+        snapshot.sources.find(
+          (source) =>
+            source.id === "healthy",
+        );
+      assert.ok(
+        healthy,
+        "Healthy collector should still be present",
+      );
+
+      assert.equal(
+        healthy.status,
+        "healthy",
+      );
+
+      assert.equal(
+        healthy.severity,
+        "healthy",
+      );
+
+      const failureFinding =
+        snapshot.findings.find(
+          (finding) =>
+            finding.sourceId === "broken",
+        );
+
+      assert.ok(
+        failureFinding,
+        "Failed collector should produce a finding",
+      );
+
+      assert.equal(
+        failureFinding.status,
+        "unavailable",
+      );
+
+      assert.equal(
+        failureFinding.severity,
+        "unavailable",
+      );
+
+      assert.equal(
+        snapshot.summary.findingCount,
+        1,
+      );
+
+      assert.equal(
+        snapshot.summary.sourceCount,
+        2,
+      );
+
+      assert.equal(
+        snapshot.overallSeverity,
+        "unavailable",
+      );
     },
   );
 
@@ -630,6 +685,72 @@ async function main() {
     },
   );
 
+  await check(
+    "failed collector exports without leaking error details",
+    async () => {
+      const {
+        buildDiagnosticPackage,
+      } = require(
+        "../apps/desktop/services/diagnostics/export",
+      );
+
+      const secret =
+        "PRIVATE_TEST_SECRET_987654";
+
+      const service =
+        new HealthService();
+
+      service.registerCollector({
+        id: "failure-fixture",
+        category: "system",
+
+        async collect() {
+          throw new Error(
+            `Collector error: ${secret}`,
+          );
+        },
+      });
+
+      const snapshot =
+        await service.snapshot();
+
+      const diagnosticPackage =
+        buildDiagnosticPackage({
+          projectOpen: false,
+          health: snapshot,
+          diagnostics: {},
+        });
+
+      const serialized =
+        JSON.stringify(
+          diagnosticPackage,
+        );
+
+      assert.equal(
+        diagnosticPackage.health
+          .sources[0].status,
+        "unavailable",
+      );
+
+      assert.equal(
+        diagnosticPackage.health
+          .findings[0].severity,
+        "unavailable",
+      );
+
+      assert.equal(
+        serialized.includes(secret),
+        false,
+      );
+
+      assert.equal(
+        serialized.includes(
+          "Collector error:",
+        ),
+        false,
+      );
+    },
+  );
 
   console.log(
     `\nHealth foundation test complete: ${passed} passed, ${failed} failed.\n`,

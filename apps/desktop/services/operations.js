@@ -1,3 +1,4 @@
+const {buildDiagnosticPackage, writeDiagnosticPackage} = require("./diagnostics");
 function createOperationalMethods(
   runtime,
 ) {
@@ -7,36 +8,22 @@ function createOperationalMethods(
     health,
     captureResources,
   } = runtime;
-
   return {
     startTask(params = {}) {
-      const definition =
-        params.definition;
-
+      const definition = params.definition;
       if (
         !definition ||
         typeof definition !== "object" ||
         Array.isArray(definition)
       ) {
-        throw new Error(
-          "Task definition is required",
-        );
+        throw new Error("Task definition is required");
       }
-
-      const submitted =
-        taskManager.submit(
-          definition,
-        );
-
+      const submitted = taskManager.submit(definition);
       return {
-        taskId:
-          submitted.taskId,
-
-        task:
-          submitted.task,
+        taskId: submitted.taskId,
+        task: submitted.task,
       };
     },
-
     getTask(params = {}) {
       return {
         task:
@@ -45,14 +32,9 @@ function createOperationalMethods(
           ) ?? null,
       };
     },
-
     listTasks() {
-      return {
-        tasks:
-          taskManager.list(),
-      };
+      return {tasks: taskManager.list(),};
     },
-
     cancelTask(params = {}) {
       return {
         task:
@@ -61,7 +43,6 @@ function createOperationalMethods(
           ) ?? null,
       };
     },
-
     async queryDiagnostics(
       params = {},
     ) {
@@ -73,14 +54,12 @@ function createOperationalMethods(
           ),
       };
     },
-
     async diagnosticsHealth() {
       return {
         health:
           await diagnostics.health(),
       };
     },
-
     async healthSnapshot( params ={} ) {
       return {
         health:
@@ -89,7 +68,32 @@ function createOperationalMethods(
           })
       };
     },
-
+    async exportDiagnostics(params = {}) {
+      const projectRoot =
+        String(params.projectRoot || "").trim();
+      const [snapshot, records] =
+        await Promise.all([
+          health.snapshot({projectRoot}),
+          diagnostics.exportRecords(),
+        ]);
+      const diagnosticPackage =
+        buildDiagnosticPackage({
+          projectOpen: Boolean(projectRoot),
+          health: snapshot,
+          diagnostics: records,
+        });
+      const result =
+        await writeDiagnosticPackage(
+          diagnosticPackage,
+          params.outPath,
+        );
+      return {
+        exported: true,
+        path: result.path,
+        schemaVersion: result.schemaVersion,
+        bytes: result.bytes,
+      };
+    },
     async captureResource(
       params = {},
     ) {

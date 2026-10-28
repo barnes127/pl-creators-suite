@@ -413,14 +413,19 @@
       "targetMilestone": "v1.2",
       "source": "Shared Creator Platform Foundations / Tasks Workers Diagnostics",
       "implementation": [
+        "apps/desktop/services/diagnostics/export.js",
         "apps/desktop/services/diagnostics",
         "apps/desktop/services/operations.js"
       ],
       "validation": [
         "scripts/desktop-diagnostics-service-test.js",
-        "scripts/desktop-operational-rpc-test.js"
+        "scripts/desktop-operational-rpc-test.js",
+        "scripts/command-center-health-foundation-test.js",
+        "scripts/command-center-diagnostic-export-test.js",
+        "scripts/command-center-v133-closeout-test.js",
+        "docs/releases/v1.3.3-validation.md"
       ],
-      "notes":  "The v1.2 shared diagnostics contract provides persisted logs, problems, crashes, resource records, job records, filtering, health summaries, interrupted-job recovery state, and operational RPC access. The user-facing Operational Health Center is v1.3 work.",
+      "notes":  "The v1.2 shared diagnostics foundation provides persisted logs, problems, crashes, resource records, job records, filtering, health summaries, interrupted-job recovery state, and operational RPC access. v1.3.3 extends this foundation with aggregated suite-health visibility, the Health Center, and user-initiated privacy-minimized local JSON diagnostic exports. Diagnostic export remains separate from the legacy logs.export operation. Detailed export validation and known limitations are recorded in docs/releases/v1.3.3-validation.md.",
       "blockedBy": [
         "PL-CORE-RPC-001"
       ],
@@ -608,13 +613,18 @@
       "source": "v1.2 — Shared Creator Platform required outcomes",
       "implementation": [
         "apps/desktop/services/diagnostics",
-        "apps/desktop/services/operations.js"
+        "apps/desktop/services/operations.js",
+        "apps/desktop/services/health"
       ],
       "validation": [
         "scripts/desktop-diagnostics-service-test.js",
-        "scripts/desktop-operational-rpc-test.js"
+        "scripts/desktop-operational-rpc-test.js",
+        "scripts/command-center-system-telemetry-test.js",
+        "scripts/command-center-service-health-test.js",
+        "scripts/command-center-health-ui-test.js",
+        "docs/releases/v1.3.3-validation.md"
       ],
-      "notes": "The v1.2 scope provides locally persisted operational diagnostics, task/job history, resource snapshots, health summaries, and query access. No automatic external diagnostic transmission exists. Any future cloud telemetry remains opt-in and belongs to later provider/cloud milestones.",
+      "notes": "The local telemetry foundation provides persisted operational diagnostics, resource snapshots, task/job history, and health summaries without requiring a cloud account. v1.3.3 adds real local system telemetry, suite service-health collectors, and unified Health Center visibility. Diagnostic packages are created locally only after explicit user initiation; no automatic external diagnostic transmission is introduced. GPU, worker, and cache reporting remain limited by available providers. Future cloud telemetry remains opt-in.",
       "blockedBy": [
         "PL-CORE-DIAG-001",
         "PL-CORE-PERMISSION-001"

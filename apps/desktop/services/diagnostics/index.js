@@ -1,12 +1,5 @@
-const {
-  DiagnosticsService,
-  matchesFilter,
-} = require("./service");
-
-const {
-  getProcessResourceSnapshot,
-} = require("./resources");
-
+const {DiagnosticsService, matchesFilter} = require("./service");
+const {getProcessResourceSnapshot} = require("./resources");
 const {
   createLogRecord,
   createProblemRecord,
@@ -14,12 +7,8 @@ const {
   createResourceRecord,
   createJobRecord,
 } = require("./records");
-
-const {
-  DIAGNOSTIC_LEVELS,
-  PROBLEM_SEVERITIES,
-  JOB_TERMINAL_STATUSES,
-} = require("./types");
+const {DIAGNOSTIC_LEVELS, PROBLEM_SEVERITIES, JOB_TERMINAL_STATUSES} = require("./types");
+const {buildDiagnosticPackage, writeDiagnosticPackage} = require("./export");
 
 module.exports = {
   DiagnosticsService,
@@ -33,4 +22,6 @@ module.exports = {
   DIAGNOSTIC_LEVELS,
   PROBLEM_SEVERITIES,
   JOB_TERMINAL_STATUSES,
+  buildDiagnosticPackage,
+  writeDiagnosticPackage,
 };

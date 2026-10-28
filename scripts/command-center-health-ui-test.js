@@ -170,6 +170,40 @@ check(
   "health context rail provides refresh and close controls",
 );
 
+check(
+  healthRail.includes(
+    "onExport",
+  ),
+  "Health Center exposes export callback",
+);
+
+check(
+  healthRail.includes(
+    "exporting",
+  ),
+  "Health Center exposes export busy state",
+);
+
+check(
+  healthRail.includes(
+    "Export Diagnostics",
+  ),
+  "Health Center renders diagnostic export button",
+);
+
+check(
+  healthRail.includes(
+    "disabled={exporting}",
+  ),
+  "Health Center disables export button while exporting",
+);
+
+check(
+  healthRail.includes(
+    "exportMessage",
+  ),
+  "Health Center displays diagnostic export result",
+);
 
 check(
   shellComponents.includes(
@@ -221,6 +255,57 @@ check(
   "App mounts the Health Center inside the shell",
 );
 
+check(
+  app.includes(
+    '"diagnostics.export"',
+  ),
+  "App invokes diagnostic export RPC",
+);
+
+check(
+  app.includes(
+    "handleExportDiagnostics",
+  ),
+  "App defines diagnostic export handler",
+);
+
+check(
+  app.includes(
+    "setExportingDiagnostics(true)",
+  ) &&
+  app.includes(
+    "setExportingDiagnostics(false)",
+  ),
+  "App manages diagnostic export lifecycle",
+);
+
+check(
+  app.includes(
+    "setDiagnosticExportMessage",
+  ),
+  "App manages export success and failure messages",
+);
+
+check(
+  app.includes(
+    "onExport={",
+  ),
+  "App connects Health Center export callback",
+);
+
+check(
+  app.includes(
+    "exporting={",
+  ),
+  "App passes export busy state",
+);
+
+check(
+  app.includes(
+    "exportMessage={",
+  ),
+  "App passes export result message",
+);
 
 check(
   app.includes(

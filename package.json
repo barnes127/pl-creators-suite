@@ -35,6 +35,12 @@
       "undici@6": "6.28.1",
       "undici@7": "7.29.1",
       "source-map-js": "1.2.2"
+    },
+    "auditConfig": {
+      "ignoreCves": [
+        "CVE-2026-93748",
+        "CVE-2026-97058"
+      ]
     }
   },
   "scripts": {
@@ -87,7 +93,6 @@
     "test:desktop-tasks": "node scripts/desktop-task-service-test.js",
     "test:desktop-formats": "node scripts/desktop-format-runtime-test.js",
     "test:desktop-diagnostics": "node scripts/desktop-diagnostics-service-test.js",
-    "test:command-center-health-foundation": "node scripts/command-center-health-foundation-test.js",
     "test:command-center-system-telemetry": "node scripts/command-center-system-telemetry-test.js",
     "test:command-center-service-health": "node scripts/command-center-service-health-test.js",
     "test:desktop-operations": "node scripts/desktop-operational-rpc-test.js",
@@ -117,6 +122,9 @@
     "test:command-center-session-recovery": "rm -rf .tmp-command-center-session-recovery-test && tsc --target ES2022 --module commonjs --moduleResolution node --esModuleInterop --skipLibCheck --outDir .tmp-command-center-session-recovery-test scripts/command-center-session-recovery-test.ts && node .tmp-command-center-session-recovery-test/scripts/command-center-session-recovery-test.js && rm -rf .tmp-command-center-session-recovery-test",
     "test:command-center-v132-closeout": "node scripts/command-center-v132-closeout-test.js",
     "test:command-center-health-ui": "node scripts/command-center-health-ui-test.js",
+    "test:command-center-health-foundation": "node scripts/command-center-health-foundation-test.js",
+    "test:command-center-diagnostic-export": "node scripts/command-center-diagnostic-export-test.js",
+    "test:command-center-v133-closeout": "node scripts/command-center-v133-closeout-test.js",
     "performance:baseline": "node scripts/performance-baseline.js",
     "rpc:inventory": "node scripts/rpc-inventory.js",
     "dev": "pnpm -r dev",

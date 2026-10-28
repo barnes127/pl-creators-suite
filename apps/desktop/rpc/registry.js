@@ -57,6 +57,10 @@ function createRpcMethods({
       async () =>
         operationalMethods
           .diagnosticsHealth(),
+    "diagnostics.export":
+      async (params) =>
+        operationalMethods
+          .exportDiagnostics(params),
     "health.snapshot":
       async (params) =>
         operationalMethods
@@ -435,106 +439,85 @@ function createRpcMethods({
       });
     }
 
-
 const METHOD_POLICIES =
   Object.freeze({
     "app.metadata": {
       timeoutMs: 5000,
     },
-
     "ai.local.status": {
       timeoutMs: 5000,
     },
-
     "ai.local.chat": {
       timeoutMs: 125000,
     },
-
     "entitlements.flags": {
       timeoutMs: 5000,
     },
-
     "plugins.list": {
       timeoutMs: 5000,
     },
-
     "recent.list": {
       timeoutMs: 5000,
     },
-
     "assets.list": {
       timeoutMs: 10000,
     },
-
     "docs.list": {
       timeoutMs: 10000,
     },
-
     "code.list": {
       timeoutMs: 10000,
     },
-
     "sheets.list": {
       timeoutMs: 10000,
     },
-
     "movies.list": {
       timeoutMs: 10000,
     },
-
     "models.list": {
       timeoutMs: 10000,
     },
-
     "games.list": {
       timeoutMs: 10000,
     },
-
     "workflows.list": {
       timeoutMs: 10000,
     },
-
     "recovery.status": {
       timeoutMs:
         10000,
     },
-
     "recovery.snapshots": {
       timeoutMs:
         10000,
     },
-
     "recovery.restore": {
       timeoutMs:
         120000,
     },
-
     "tasks.start": {
       timeoutMs: 10000,
     },
-
     "tasks.get": {
       timeoutMs: 5000,
     },
-
     "tasks.list": {
       timeoutMs: 5000,
     },
-
     "tasks.cancel": {
       timeoutMs: 5000,
     },
-
     "diagnostics.query": {
       timeoutMs: 10000,
     },
-
     "diagnostics.health": {
       timeoutMs: 5000,
     },
-
     "diagnostics.resources": {
       timeoutMs: 5000,
+    },
+    "diagnostics.export": {
+      timeoutMs: 30000,
     },
   });
 

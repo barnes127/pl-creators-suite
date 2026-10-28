@@ -217,6 +217,40 @@ export default function App() {
 //  const activeItem = NAV_ITEMS.find((n) => n.id === active)!;
   const [projectRoot, setProjectRoot] = useState<string>("");
   const {snapshot: healthSnapshot, loading: healthLoading, error: healthError, refresh: refreshHealth} = useHealthSnapshot(projectRoot);
+  const [exportingDiagnostics, setExportingDiagnostics] = useState(false);
+  const [diagnosticExportMessage, setDiagnosticExportMessage] = useState("");
+  const handleExportDiagnostics =
+    async () => {
+      if (exportingDiagnostics) {
+        return;
+      }
+      setExportingDiagnostics(true);
+      setDiagnosticExportMessage("");
+      try {
+        const result = await rpc<{
+          exported: boolean;
+          path: string;
+          schemaVersion: number;
+          bytes: number;
+        }>(
+          "diagnostics.export",
+          {
+            projectRoot: projectRoot || undefined,
+          },
+        );
+        setDiagnosticExportMessage(
+          `Diagnostics exported: ${result.path}`,
+        );
+      } catch (error) {
+        setDiagnosticExportMessage(
+          error instanceof Error
+            ? `Export failed: ${error.message}`
+            : "Diagnostic export failed.",
+        );
+      } finally {
+        setExportingDiagnostics(false);
+      }
+    };
   const healthRailOpen = shellState.layout.visibility.inspector;
   const [showRecovery, setShowRecovery] = useState(false);
   const [showContinuity, setShowContinuity] = useState(false);
@@ -3859,6 +3893,9 @@ useEffect(() => {
           <HealthContextRail
             snapshot={healthSnapshot}
             loading={healthLoading}
+            onExport={() => {void handleExportDiagnostics()}}
+            exporting={exportingDiagnostics}
+            exportMessage={diagnosticExportMessage}
             error={healthError}
             onRefresh={() => {void refreshHealth()}}
             onClose={() => setPanel("inspector", false)}

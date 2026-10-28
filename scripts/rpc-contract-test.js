@@ -441,13 +441,13 @@ async function main() {
   );
 
   await test(
-    "all active contract entries total 72",
+    "all active contract entries total 73",
     () => {
       assert.equal(
         Object.keys(
           METHOD_CONTRACTS,
         ).length,
-        72,
+        73,
       );
     },
   );
@@ -509,6 +509,82 @@ async function main() {
     },
   );
 
+  await test(
+    "diagnostics.export accepts empty parames",
+    () => {
+      const params = validateMethodParams(
+        "diagnostics.export",
+        {},
+      );
+    },
+  );
+
+  await test(
+    "diagnostics.export accepts original paths",
+    () => {
+      const params = validateMethodParams(
+        "diagnostics.export",
+        {
+          projectRoot: "/tmp/project",
+          outPath: "/tmp/diagnostics.json",
+        },
+      );
+      assert.strictEqual(
+        params.projectRoot,
+        "/tmp/project",
+      );
+      assert.strictEqual(
+        params.outPath,
+        "/tmp/diagnostics.json",
+      );
+    },
+  );
+
+  await test(
+    "diagnostics.export rejects invalid params",
+    () => {
+      const invalidParams = [
+        null,
+        [],
+        "invalid",
+        123,
+        { projectRoot: 42 },
+        { outPath: false },
+        { outPath: "" },
+        { outPath: "   " },
+      ];
+      for (const params of invalidParams) {
+        assert.throws(
+          () =>
+            validateMethodParams(
+              "diagnostics.export",
+              params,
+            ),
+        );
+      }
+    },
+  );
+
+  await test(
+    "diagnostics.export declares filesystem mutation",
+    () => {
+      const contract = getMethodContract("diagnostics.export");
+      assert.ok(contract);
+      assert.strictEqual(
+        contract.mutates,
+        true,
+      );
+      assert.strictEqual(
+        contract.retryable,
+        false,
+      );
+      assert.ok(contract.trust.includes("filesystem"));
+      assert.deepStrictEqual(
+        derivePermissions(contract),
+        ["filesystem.write"],
+      );
+    },
+  );
 
   await test(
     "AI chat requires prompt",

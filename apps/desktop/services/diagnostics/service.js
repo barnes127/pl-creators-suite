@@ -195,6 +195,25 @@ class DiagnosticsService {
     );
   }
 
+  async exportRecords() {
+    const collections = [
+      "logs",
+      "problems",
+      "crashes",
+      "resources",
+      "jobs",
+    ];
+    const records = {};
+    for (const collection of collections) {
+      records[collection] =
+        await this.query(
+          collection,
+          {limit: 250},
+        );
+    }
+    return records;
+  }
+
   async markInterruptedJobs() {
     const jobs =
       await readDiagnosticRecords(

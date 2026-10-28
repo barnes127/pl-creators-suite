@@ -1,66 +1,48 @@
-import type {
-  HealthSeverity,
-  HealthSnapshot,
-} from "@pl/platform";
-
+import type {HealthSeverity, HealthSnapshot} from "@pl/platform";
 import "./HealthContextRail.css";
 
-
 export interface HealthContextRailProps {
-  snapshot:
-    HealthSnapshot |
-    null;
-
-  loading:
-    boolean;
-
-  error:
-    string;
-
-  onRefresh:
-    () => void;
-
-  onClose:
-    () => void;
+  snapshot: HealthSnapshot | null;
+  loading: boolean;
+  error: string;
+  onRefresh: () => void;
+  onClose: () => void;
+  onExport: () => void;
+  exporting: boolean;
+  exportMessage: string;
 }
 
-
 function severityLabel(
-  severity:
-    HealthSeverity,
+  severity: HealthSeverity,
 ) {
   switch (
     severity
   ) {
     case "healthy":
       return "Healthy";
-
     case "info":
       return "Info";
-
     case "warning":
       return "Warning";
-
     case "error":
       return "Error";
-
     case "critical":
       return "Critical";
-
     case "unavailable":
       return "Unavailable";
-
     default:
       return "Unknown";
   }
 }
-
 
 export function HealthContextRail({
   snapshot,
   loading,
   error,
   onRefresh,
+  onExport,
+  exporting,
+  exportMessage,
   onClose,
 }: HealthContextRailProps) {
   return (
@@ -70,22 +52,16 @@ export function HealthContextRail({
           <span className="healthContextEyebrow">
             Operations
           </span>
-
           <strong>
             Health Center
           </strong>
         </div>
-
         <div className="healthContextHeaderActions">
           <button
             className="btn btn-subtle"
             type="button"
-            onClick={
-              onRefresh
-            }
-            disabled={
-              loading
-            }
+            onClick={onRefresh}
+            disabled={loading}
           >
             {loading
               ? "Checking..."
@@ -95,16 +71,39 @@ export function HealthContextRail({
           <button
             className="btn btn-subtle"
             type="button"
-            onClick={
-              onClose
-            }
+            onClick={onExport}
+            disabled={exporting}
+            aria-busy={exporting}
+          >
+            {exporting
+              ? "Exporting..."
+              : "Export Diagnostics"}
+          </button>
+
+          <button
+            className="btn btn-subtle"
+            type="button"
+            onClick={onClose}
             aria-label="Close health center"
           >
             ×
           </button>
         </div>
       </div>
-
+      {exportMessage && (
+        <div
+          className="healthContextSection"
+          role="status"
+        >
+          <span
+            style={{
+              overflowWrap: "anywhere",
+            }}
+          >
+            {exportMessage}
+          </span>
+        </div>
+      )}
       {error && (
         <div
           className="healthContextError"
@@ -113,13 +112,11 @@ export function HealthContextRail({
           <strong>
             Health unavailable
           </strong>
-
           <span>
             {error}
           </span>
         </div>
       )}
-
       {!error &&
         !snapshot &&
         loading && (
@@ -127,23 +124,17 @@ export function HealthContextRail({
             Checking suite health...
           </div>
         )}
-
       {snapshot && (
         <>
           <div
             className="healthContextSummary"
-            data-severity={
-              snapshot.overallSeverity
-            }
+            data-severity={snapshot.overallSeverity}
           >
             <span>
               Overall
             </span>
-
             <strong>
-              {severityLabel(
-                snapshot.overallSeverity,
-              )}
+              {severityLabel(snapshot.overallSeverity)}
             </strong>
 
             <span>
@@ -162,34 +153,25 @@ export function HealthContextRail({
               <strong className="healthContextSectionTitle">
                 Needs attention
               </strong>
-
               {snapshot.findings.map(
                 (
                   finding,
                 ) => (
                   <div
                     className="healthFindingCard"
-                    data-severity={
-                      finding.severity
-                    }
-                    key={
-                      finding.id
-                    }
+                    data-severity={finding.severity}
+                    key={finding.id}
                   >
                     <div className="healthFindingHeader">
                       <strong>
-                        {
-                          finding.title
-                        }
+                        {finding.title}
                       </strong>
-
                       <span>
                         {severityLabel(
                           finding.severity,
                         )}
                       </span>
                     </div>
-
                     {finding.summary && (
                       <p>
                         {
