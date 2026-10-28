@@ -33,3 +33,21 @@ Routine implementation decisions that remain fully within the approved plan, arc
 - Make only in-scope repairs after test failures; otherwise halt and report the issue.
 - Report exactly what was run, results, changed files, objective coverage, risks, unresolved work, and manual boot-test steps.
 - Stop after the current batch is ready for human acceptance. Human developer reviews diffs, artifacts, and app behavior, then controls integration and closeout.
+
+### Roadmap authority and proposal separation
+
+The Official V1 Master Blueprint is the primary source of truth for product scope, milestones, and required capabilities. Supporting blueprints and repository architecture documents must be interpreted consistently with it.
+
+Codex must distinguish:
+
+1. Requirements explicitly defined by the authoritative roadmap.
+2. Verified facts about the current implementation.
+3. Engineering proposals, optimizations, or potential deviations.
+
+All implementation reviews and architectural inventories must contain a dedicated **Roadmap Compliance, Deviations, and Engineering Proposals** section.
+
+No proposal or deviation becomes an approved requirement through inclusion in an agent-generated document.
+
+When a proposal conflicts with the master blueprint or modifies an approved architecture, Codex must halt affected work and request explicit human approval. Accepted material architectural changes must be reflected in the appropriate authoritative documentation.
+
+The human developer retains final authority over roadmap changes, architecture, implementation acceptance, and integration.
