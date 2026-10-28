@@ -55,3 +55,58 @@ The notification center's action metadata is not an execution authority. Future 
 6. **Notifications and UI:** Defer event fanout, notification generation/grouping/search, live updates, output navigation, task/milestone widgets, and user controls to the approved later batches. Pause and retry require handler-specific support and cannot be inferred from current types.
 
 Batch 1 changes only this document. It does not change source code, persisted formats, shared contracts, RPC, dependencies, tests, or behavior. Agentic AI, cloud execution, marketplace integration, and unrelated UI work are outside this batch.
+
+## Roadmap Compliance, Deviations, and Engineering Proposals
+
+### Source-of-truth hierarchy
+
+1. **Primary authority:** PL Creators Suite Official V1 Master Blueprint.
+2. **Supporting authority:** Integrated Systems Architecture Companion and other explicitly referenced official blueprints, provided they do not contradict the master blueprint.
+3. **Implementation evidence:** Current repository, accepted architectural decisions, capability registry, and validated release records.
+4. **Engineering proposals:** Codex recommendations, alternative approaches, and optimization suggestions. These are non-authoritative until explicitly accepted by the human developer.
+
+The proposed batch breakdown controls development sequencing only where it remains consistent with the official roadmap.
+
+### A. Confirmed Roadmap Requirements
+
+Record the relevant official requirement, exact source section, and whether the current batch addresses or defers it.
+
+### B. Existing Implementation Findings
+
+Record verified current behavior, source-file evidence, and known limitations. Observed behavior must not be represented as an approved architectural requirement merely because it already exists.
+
+### C. Potential Deviations — Approval Required
+
+For each potential deviation, document:
+
+- **ID:** DEV-v1.3.4-001
+- **Original requirement:** Exact blueprint reference
+- **Proposed change:** What would differ
+- **Reason:** Why the change is being proposed
+- **Affected interfaces/files:** Exact scope
+- **Compatibility/security impact:** Identified consequences
+- **Alternatives:** Including an approach that preserves the roadmap
+- **Recommendation:** Codex's recommendation, clearly labeled
+- **Decision:** PENDING / APPROVED / REJECTED
+- **Approval reference:** Human decision and date
+
+**No proposed deviation may be implemented while its decision remains PENDING.**
+
+### D. Optional Improvements — Not Roadmap Deviations
+
+Record enhancements that do not conflict with the roadmap but exceed the approved batch scope.
+
+These remain proposals and must not be automatically added to the implementation.
+
+### E. Human Architecture Decisions
+
+Record explicitly accepted decisions and identify whether they amend the implementation plan or require a formal update to an authoritative blueprint.
+
+### F. Compliance Conclusion
+
+- Roadmap alignment: ALIGNED / PARTIALLY ALIGNED / CONFLICT IDENTIFIED
+- Confirmed deviations: NONE / LIST
+- Unapproved deviations: NONE / LIST
+- Batch scope compliance: PASS / FAIL / PENDING REVIEW
+- Human acceptance: PENDING / ACCEPTED / REJECTED
+
