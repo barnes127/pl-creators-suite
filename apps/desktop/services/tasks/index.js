@@ -54,14 +54,17 @@ function createDesktopTaskManager(options = {}) {
   return manager;
 }
 
-const desktopTaskManager =
-  createDesktopTaskManager();
-
 module.exports = {
   TaskManager,
   TaskHandlerNotFoundError,
   normalizeProgress,
   createDesktopTaskManager,
-  desktopTaskManager,
   createTaskApiAdapter,
 };
+
+Object.defineProperty(module.exports, "desktopTaskManager", {
+  enumerable: true,
+  get() {
+    return require("../runtime").desktopRuntime.taskManager;
+  },
+});
