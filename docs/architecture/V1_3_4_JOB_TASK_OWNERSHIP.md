@@ -1,10 +1,10 @@
 # v1.3.4 Batch 1 — Job and task ownership inventory
 
-This document records the interfaces and behavior present at the start of v1.3.4. It is an inventory for Batch 1, not a new runtime contract or an implementation of a unified queue. The original v1.3.3 code baseline is `c785cfecb46c05f52378408c81cb9834943405a0`; the supervised-development harness starting HEAD is `2642413e09c6a782cec2aa7dbaa77f24ceee9852`.
+This document records the verified Batch 1 foundation and the interfaces present at the start of v1.3.4. It does not implement a unified queue. The original v1.3.3 code baseline is `c785cfecb46c05f52378408c81cb9834943405a0`; the implementation starting HEAD is `21df300316919fb1fbc42f3bc6aa5baa29619ada`.
 
 ## Authority and scope
 
-The *Official V1 Master Blueprint*, under **v1.3 — Creator Command Center**, **Wave 1.3.4 — Jobs, queues, tasks, and notifications**, calls for a common queue model across build, render, simulation, conversion, import/export, indexing, update, workflow, and cloud jobs. It also calls for operational controls where supported, linked task and milestone widgets, and an actionable notification center. The local `references/v1.3.4.pdf`, page 1, sequences **Batch 1 — Inventory and contracts** ahead of queue execution, notifications/events, Command Center UI, and validation/closeout. This document implements only that inventory step. No universal execution capability can be inferred from the roadmap list.
+The *Official V1 Master Blueprint*, under **v1.3 — Creator Command Center**, **Wave 1.3.4 — Jobs, queues, tasks, and notifications**, calls for a common queue model across build, render, simulation, conversion, import/export, indexing, update, workflow, and cloud jobs. It also calls for operational controls where supported, linked task and milestone widgets, and an actionable notification center. The local `references/v1.3.4.pdf`, page 1, sequences **Batch 1 — Inventory and contracts** ahead of queue execution, notifications/events, Command Center UI, and validation/closeout. Batch 1 adds local ownership and an internal read projection to that inventory step. No universal execution capability can be inferred from the roadmap list.
 
 The *Integrated Systems Architecture Companion* sections **1. Purpose, Authority, and Scope**, **3. Canonical Platform Architecture**, **4. System Invariants**, **10. Execution Fabric and Heterogeneous Compute**, and **15. Workflow, Automation, and Agentic Execution** describe shared service boundaries, observable execution, failure containment, and a conceptual execution fabric. The companion expressly does not change milestone scope. The ODT and DOCX are reflowable; their section headings were verified, but stable printed page numbers were not established by this read-only inspection. See `references/PL_Creators_Suite_Official_V1_Master_Blueprint_LIBRE_SAFE.odt`, `references/PL_Creators_Suite_Integrated_Systems_Architecture_Companion.docx`, and `references/v1.3.4.pdf`.
 
@@ -16,7 +16,8 @@ Repository constraints are recorded in `docs/architecture/ARCHITECTURE_GUARDRAIL
 | --- | --- | --- |
 | Platform tasks: `packages/platform/src/tasks/types.ts`, `state.ts`, `api.ts`, `workers.ts` | `TaskDefinition`, `TaskRecord`, `TaskService`, transition helpers, `TaskApi.start/cancel/get/list`, `TASK_API_SERVICE_ID = core.task`, and worker descriptors/request/result types. `apps/desktop/services/tasks/api.js` adapts a desktop manager to the task service shape. | These are shared contracts, not an executable scheduler, worker registry, or persistence layer. A task has priority, progress, warnings, failure, resources, timestamps, input, result, and metadata fields. Presence of a field does not prove every handler supplies it. |
 | Desktop execution: `apps/desktop/services/tasks/manager.js`, `index.js`, `formats.js`, `indexing.js` | `TaskManager.registerHandler`, `submit`, `start`, `cancel`, `get`, `list`, and `wait`; handlers `project.index`, `format.preview`, `format.import`, `format.export`. `apps/desktop/services/operations.js` uses the runtime manager for task RPC. | The manager's map owns live task state for its own instance, in memory only. `submit` records `queued` and schedules immediate promise-based execution; no priority ordering, concurrency limit, pause, retry, or shared worker assignment is verified. Format handlers delegate to the desktop format runtime. Indexing translates the abort signal into the indexing cancellation token. |
-| Legacy indexing facade: `apps/desktop/services/project-platform/indexing/jobs.js` | `ProjectIndexJobManager.start/cancel/get/list` delegates to a task manager and maps `completed` to legacy `complete`. | Its default is the separate exported `desktopTaskManager` singleton from `apps/desktop/services/tasks/index.js`. `apps/desktop/services/runtime.js` constructs a different manager for operational RPC and diagnostics. Therefore an indexing job started through the default legacy facade is not automatically in runtime `tasks.list`, its health queue counts, or its diagnostic bridge. Caller-specific injection could change this; do not claim all indexing is absent from runtime without tracing that caller. |
+| Legacy indexing facade: `apps/desktop/services/project-platform/indexing/jobs.js` | `ProjectIndexJobManager.start/cancel/get/list` delegates to a task manager and maps `completed` to legacy `complete`. | The default resolves the lazy `desktopTaskManager` export at construction, which returns `desktopRuntime.taskManager`. Default indexing jobs therefore share the runtime live map, task RPC, health counts, and diagnostic bridge. An injected manager or `createDesktopTaskManager()` remains independently owned and may lack that bridge. Identity is process-local, not across runtimes or processes. |
+| Internal overview: `apps/desktop/services/tasks/overview.js`, `runtime.js` | `runtime.listUnifiedTaskStates()` asynchronously merges that runtime manager’s `list()` with its diagnostics service’s `getLatestJobs()`. | Summaries are allowlisted, deduplicated by local ID, and prefer live records. Historical-only rows are read-only. Successful empty history reports `historyAvailable: true`; read failure reports `false` and retains live summaries. This is internal, not an RPC method or durable execution state. |
 | Diagnostic job history: `apps/desktop/services/diagnostics/tasks.js`, `records.js`, `service.js`, `storage.js`, `types.js` | Runtime passes `onTaskChanged` to a serialized asynchronous bridge calling `diagnostics.job(task)`. `DiagnosticsService.job/query/getLatestJobs/markInterruptedJobs/prune/health` operate on diagnostic records. | Append-only `jobs.jsonl` under the diagnostics root (`~/.plcs/diagnostics` by default in `runtime.js`), except explicit `prune` rewrites the file. Each change appends a snapshot; `getLatestJobs` keeps the last record per task ID. `maxRecords` is used by explicit `prune`; automatic pruning on `job` was not found. The bridge logs persistence failures rather than failing the task. |
 | Health telemetry: `apps/desktop/services/health/system.js` | `getQueueSummary` counts statuses from the runtime manager's `list`; `getWorkerSummary` reports unavailable. | The queue summary is observational accounting of one in-memory manager, not scheduler capacity, placement, or durable queue depth. The worker summary says no shared worker runtime registry is active. |
 | RPC operations: `apps/desktop/services/operations.js`, `apps/desktop/rpc/contracts.js`, `registry.js`, `authorization.js` | `tasks.start/get/list/cancel` call `startTask/getTask/listTasks/cancelTask`. `diagnostics.query` reads named diagnostic collections and filters. Contracts validate task IDs and required start fields. The authorizer derives permissions from contract trust metadata before handlers run. | `tasks.start` returns the initial task snapshot and ID; it does not wait for completion. Task RPC reads current memory only. `diagnostics.query` is a separate history read. Start/cancel are mutating, non-retryable RPC methods; get/list are read methods. `tasks.start` declares filesystem and shell trust; `tasks.cancel` declares none. `rpc.cancel` cancels an RPC request and is distinct from `tasks.cancel` of a background task. |
@@ -35,7 +36,7 @@ The live `TaskRecord` and durable diagnostic job record are not identical. `crea
 | Handler failure | A non-cancellation error sets `failed`, failure fields, and finish time; the task promise rejects. | The task manager retains the live failed record until process exit. Its diagnostic snapshots may remain as history. |
 | Cancellation before start | If supported, `cancel` sets `cancelled`, aborts the signal, and notifies. The scheduled runner sees the aborted signal and does not invoke the handler. | This is a task cancellation, not a rollback guarantee. |
 | Cancellation while running | `cancel` sets `cancelling` and aborts the signal. Handler resolution or a cancellation-classified error then sets `cancelled`. A task with `supportsCancellation: false` is returned unchanged. | Cancellation is cooperative; a handler must observe its signal or otherwise finish. An aborted signal also causes the catch path to classify a later error as cancellation. |
-| Process end and startup | Live tasks are not restored. `createDesktopRuntime.initialize` asks diagnostics to append an `interrupted` record for the latest stored state of each ID that was `queued`, `running`, or `cancelling`, with `TASK_INTERRUPTED` failure and finish time. | `interrupted` is a durable historical conclusion, not a resurrected live task or automatic retry. Stored jobs from a separate manager without the runtime diagnostic bridge may have no such history. |
+| Process end and startup | Live tasks are not restored. `createDesktopRuntime.initialize` asks diagnostics to append an `interrupted` record for the latest stored state of each ID that was `queued`, `running`, or `cancelling`, with `TASK_INTERRUPTED` failure and finish time. | `interrupted` is a durable historical conclusion, not a resurrected live task or automatic retry. Jobs from an injected or independently created manager without the runtime diagnostic bridge may have no such history. |
 
 The diagnostic bridge serializes its writes with a promise chain, but `onTaskChanged` does not await persistence. A process exit or a failed write can leave the last durable state behind the last in-memory state. `markInterruptedJobs` operates on the latest record it can read. The service's `query("jobs")` returns individual append records; callers that need one latest state per ID must deliberately use or reproduce `getLatestJobs` semantics. Retention and corrupted-record handling must be considered before any history reader is presented as complete.
 
@@ -43,70 +44,49 @@ The diagnostic bridge serializes its writes with a promise chain, but `onTaskCha
 
 Task RPC and diagnostic RPC are distinct interfaces. `tasks.list/get` return task snapshots with `input`, `result`, and `metadata`; `diagnostics.query` can expose raw stored job metadata. The diagnostic job builder omits input and result, and `apps/desktop/services/diagnostics/export.js` reduces exported jobs to status and timestamps. These are different privacy surfaces. Any later unified view must define exactly which fields a renderer may read or display; it must not copy task input, results, paths, credentials, or arbitrary metadata into notifications or exports by default. The current RPC validation and permission rules must remain intact unless separately approved.
 
-The notification center's action metadata is not an execution authority. Future actionable notices must use existing command and RPC permission boundaries. The platform event bus is typed but is not a durable task ledger; future event delivery must tolerate late listeners and restart, with task state read from its owner. A future Command Center presentation can reconcile live task IDs with latest diagnostic job IDs without creating another task manager, but the exact merge and privacy policy remains unapproved.
+The notification center's action metadata is not an execution authority. Future actionable notices must use existing command and RPC permission boundaries. The platform event bus is typed but is not a durable task ledger; future event delivery must tolerate late listeners and restart, with task state read from its owner. The internal overview now reconciles live task IDs with latest diagnostic job IDs without another manager. It projects only ID, kind, title, status, finite progress percent, timestamps, failure code, warning count, and source. It omits input, result, metadata, paths, credentials, progress text, raw errors, and warning or failure details. It does not authorize presentation, execution, or cancellation of historical-only rows.
 
 ## Decisions reserved for Batch 2 and later approval
 
-1. **Live owner and coverage:** Decide whether legacy `ProjectIndexJobManager` callers should receive the runtime manager, or whether another approved bridge is needed. Trace all callers and preserve the legacy `complete` status adapter. Do not add a parallel scheduler.
-2. **Unified read identity:** Define which service combines live tasks and latest durable jobs, how IDs are matched, how newer live state takes precedence, and how stale or corrupt history is represented. Decide whether an existing RPC interface is sufficient. Any new or changed RPC method or shared contract requires explicit deviation approval under the Batch 1 record.
-3. **Execution and queue semantics:** Establish supported job kinds, handler ownership, concurrency, priority, actual queue depth, cancellation, and worker availability from implemented runtimes. Do not claim worker placement or queue position from health counters or worker type declarations.
-4. **Recovery and retention:** Decide whether interrupted history is view-only, retryable, or recoverable for each handler; specify retention, error handling, and compatibility for existing `jobs.jsonl` before changing persistence.
-5. **Privacy and access:** Decide the minimal display fields for task lists, durable history, events, and notices. Keep filesystem, shell, project, and diagnostic access behind existing trust and permission boundaries.
-6. **Notifications and UI:** Defer event fanout, notification generation/grouping/search, live updates, output navigation, task/milestone widgets, and user controls to the approved later batches. Pause and retry require handler-specific support and cannot be inferred from current types.
+1. **Execution and queue semantics:** Establish supported job kinds, handler ownership, concurrency, priority, actual queue depth, cancellation, and worker availability from implemented runtimes. Health counts do not establish scheduling or worker placement.
+2. **Recovery and retention:** Decide whether interrupted history is retryable or recoverable per handler; specify retention and compatibility before changing `jobs.jsonl`. Batch 1 history is read-only, even when a diagnostic failure record says retryable.
+3. **Privacy and access:** Decide how a future UI may access the internal overview without weakening current RPC trust, permissions, or diagnostic privacy boundaries. A new RPC method requires separate approval.
+4. **Notifications and UI:** Defer event fanout, notification generation, Command Center UI, and task/milestone controls. Pause and retry require handler-specific support.
 
-Batch 1 changes only this document. It does not change source code, persisted formats, shared contracts, RPC, dependencies, tests, or behavior. Agentic AI, cloud execution, marketplace integration, and unrelated UI work are outside this batch.
+Batch 1 changes the seven originally approved files plus the separately approved indexing contract test. It adds no dependencies, persistence, scheduler, public RPC, UI, or notification behavior. The default exported manager identity changes as expressly approved. Agentic AI, cloud execution, marketplace integration, and unrelated UI work remain outside this batch.
 
 ## Roadmap Compliance, Deviations, and Engineering Proposals
 
-### Source-of-truth hierarchy
-
-1. **Primary authority:** PL Creators Suite Official V1 Master Blueprint.
-2. **Supporting authority:** Integrated Systems Architecture Companion and other explicitly referenced official blueprints, provided they do not contradict the master blueprint.
-3. **Implementation evidence:** Current repository, accepted architectural decisions, capability registry, and validated release records.
-4. **Engineering proposals:** Codex recommendations, alternative approaches, and optimization suggestions. These are non-authoritative until explicitly accepted by the human developer.
-
-The proposed batch breakdown controls development sequencing only where it remains consistent with the official roadmap.
-
 ### A. Confirmed Roadmap Requirements
 
-Record the relevant official requirement, exact source section, and whether the current batch addresses or defers it.
+The Official V1 Master Blueprint, v1.3 Creator Command Center, Wave 1.3.4, calls for a common queue model across job types, supported operational controls, linked tasks and milestones, and actionable notifications. The wave plan in `references/v1.3.4.pdf`, page 1, places inventory and contracts in Batch 1. Queue execution, notifications, UI, and closeout remain later batches.
 
-### B. Existing Implementation Findings
+### B. Verified Implementation Findings
 
-Record verified current behavior, source-file evidence, and known limitations. Observed behavior must not be represented as an approved architectural requirement merely because it already exists.
+`desktopRuntime.taskManager` is the process-local live owner for the default indexing facade, exported default manager, operational task RPC, health collector, and diagnostic bridge. Explicitly created or injected managers remain isolated. `ProjectIndexJobManager` retains legacy `complete` mapping and its existing cancellation behavior; queued jobs cancelled through either the facade or canonical manager share the same task ID and end as `cancelled`. Importing the modules in tasks-first, indexing-first, or runtime-first order did not write to an isolated default diagnostics directory.
+
+`listUnifiedTaskStates()` returns allowlisted summaries from live and latest diagnostic records, with live precedence on ID collision. Unknown statuses and malformed rows are skipped. Interrupted records are historical-only; a failed history read returns live summaries with `historyAvailable: false`. This method does not change task RPC or diagnostic storage. Evidence: `scripts/project-indexing-service-test.js`, `scripts/desktop-operational-rpc-test.js`, and the approved validation commands in the implementation report.
+
+The human-approved bounded test amendment replaced a pre-existing literal `.tmp` source assertion in `scripts/project-indexing-contract-test.js` with an isolated behavior test. It observes a written temporary index before rename, reads the valid final index, checks that no temporary file remains, and cleans up its fixture. The storage implementation is unchanged. The rename interception is confined to the standalone test process and restored in `finally`. In Node 22.12.0 and Node 20.20.2, `require("fs/promises")` returned the same object on repeated calls and its `rename` property was writable and configurable. The contract check passed 28/28 under both versions, so the reliability review made no further contract-test change.
+
+The indexing service test no longer uses a fixed 25 ms delay before deleting its isolated HOME. It records the terminal states of the default-runtime tasks and waits until those exact states are readable from the isolated diagnostic ledger. A five-second bound is a failure guard, not a cleanup delay: if diagnostic completion cannot be verified, the test fails and retains the HOME for inspection rather than racing a detached write. Cleanup is awaited and cleanup errors fail the test. The service check passed 17/17 under both Node 22.12.0 and Node 20.20.2, and neither run left its isolated HOME. Node 20.20.2 remains outside the repository's pinned Node 22.12.0 engine and produced the expected package-manager warning; no behavioral difference was observed in these two indexing checks.
 
 ### C. Potential Deviations — Approval Required
 
-For each potential deviation, document:
-
-- **ID:** DEV-v1.3.4-001
-- **Original requirement:** Exact blueprint reference
-- **Proposed change:** What would differ
-- **Reason:** Why the change is being proposed
-- **Affected interfaces/files:** Exact scope
-- **Compatibility/security impact:** Identified consequences
-- **Alternatives:** Including an approach that preserves the roadmap
-- **Recommendation:** Codex's recommendation, clearly labeled
-- **Decision:** PENDING / APPROVED / REJECTED
-- **Approval reference:** Human decision and date
-
-**No proposed deviation may be implemented while its decision remains PENDING.**
+None identified or implemented. Any future change to RPC, persistence, scheduling, service boundaries, or security needs a separately updated batch record and human approval.
 
 ### D. Optional Improvements — Not Roadmap Deviations
 
-Record enhancements that do not conflict with the roadmap but exceed the approved batch scope.
-
-These remain proposals and must not be automatically added to the implementation.
+Future batches may define an authorized read path for the overview and a user-facing history policy. These are proposals, not Batch 1 requirements or approvals.
 
 ### E. Human Architecture Decisions
 
-Record explicitly accepted decisions and identify whether they amend the implementation plan or require a formal update to an authoritative blueprint.
+The human approved the revised seven-file Batch 1 plan, including the lazy exported default-manager identity and the internal runtime overview method, then approved a bounded eighth-file contract-test repair. The current batch record names the additional file and validation commands. This local ownership decision does not claim a universal execution fabric.
 
 ### F. Compliance Conclusion
 
-- Roadmap alignment: ALIGNED / PARTIALLY ALIGNED / CONFLICT IDENTIFIED
-- Confirmed deviations: NONE / LIST
-- Unapproved deviations: NONE / LIST
-- Batch scope compliance: PASS / FAIL / PENDING REVIEW
-- Human acceptance: PENDING / ACCEPTED / REJECTED
-
+- Roadmap alignment: ALIGNED for Batch 1 foundation; later wave capabilities deferred.
+- Confirmed deviations: NONE.
+- Unapproved deviations: NONE implemented.
+- Batch scope compliance: PENDING final human review.
+- Human acceptance: PENDING.

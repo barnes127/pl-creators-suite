@@ -3,6 +3,19 @@ const fs =
 
 const path =
   require("path");
+const os =
+  require("os");
+const assert =
+  require("assert");
+const fsPromises =
+  require("fs/promises");
+const {
+  getIndexPath,
+  readProjectIndex,
+  writeProjectIndex,
+} = require(
+  "../apps/desktop/services/project-platform/indexing/storage",
+);
 
 
 const root =
@@ -161,14 +174,6 @@ check(
 
 check(
   storage.includes(
-    ".tmp",
-  ),
-  "index persistence uses atomic temp writes",
-);
-
-
-check(
-  storage.includes(
     "fs.rename",
   ),
   "index persistence atomically replaces file",
@@ -298,16 +303,56 @@ check(
 );
 
 
-console.log(
-  `\nProject indexing contract test complete: ${passed} passed, ${failed} failed.`,
-);
-
-
-if (
-  failed >
-  0
-) {
-  process.exit(
-    1,
+async function verifyTemporaryWriteAndRename() {
+  const projectRoot = await fsPromises.mkdtemp(
+    path.join(os.tmpdir(), "pl-index-contract-"),
   );
+  const originalRename = fsPromises.rename;
+  const finalPath = getIndexPath(projectRoot);
+  const generatedAt = "2026-01-01T00:00:00.000Z";
+  let renameObserved = false;
+
+  try {
+    fsPromises.rename = async (source, destination) => {
+      assert.equal(destination, finalPath);
+      assert.match(source, /\.tmp$/);
+      const temporaryIndex = JSON.parse(
+        await fsPromises.readFile(source, "utf8"),
+      );
+      assert.equal(temporaryIndex.generatedAt, generatedAt);
+      assert.deepEqual(temporaryIndex.files, {});
+      renameObserved = true;
+      return originalRename(source, destination);
+    };
+
+    await writeProjectIndex(projectRoot, {
+      generatedAt,
+      files: {},
+    });
+
+    assert.equal(renameObserved, true);
+    const finalIndex = await readProjectIndex(projectRoot);
+    assert.equal(finalIndex.generatedAt, generatedAt);
+    assert.deepEqual(finalIndex.files, {});
+    const files = await fsPromises.readdir(path.dirname(finalPath));
+    assert.deepEqual(files, [path.basename(finalPath)]);
+  } finally {
+    fsPromises.rename = originalRename;
+    await fsPromises.rm(projectRoot, {recursive: true, force: true});
+  }
 }
+
+verifyTemporaryWriteAndRename()
+  .then(() => {
+    check(true, "index persistence writes and renames a valid final index");
+  })
+  .catch((error) => {
+    console.error(error);
+    check(false, "index persistence writes and renames a valid final index");
+  })
+  .finally(() => {
+    console.log(
+      `\nProject indexing contract test complete: ${passed} passed, ${failed} failed.`,
+    );
+    if (failed > 0) process.exitCode = 1;
+  });

@@ -3,12 +3,20 @@ const assert =
 
 const fs =
   require("fs/promises");
+const fsSync = require("fs");
 
 const os =
   require("os");
 
 const path =
   require("path");
+const {spawnSync} = require("child_process");
+
+const testHome = fsSync.mkdtempSync(path.join(os.tmpdir(), "pl-index-home-"));
+process.env.HOME = testHome;
+
+const desktopTasks = require("../apps/desktop/services/tasks");
+const {desktopRuntime} = require("../apps/desktop/services/runtime");
 
 const {
   indexProject,
@@ -33,6 +41,9 @@ let passed =
 
 let failed =
   0;
+
+const expectedDiagnosticStates =
+  new Map();
 
 
 async function check(
@@ -60,6 +71,74 @@ async function check(
 
     console.error(
       error,
+    );
+  }
+}
+
+
+async function waitForExpectedDiagnostics() {
+  const timeoutAt =
+    Date.now() +
+    5000;
+
+  while (
+    true
+  ) {
+    try {
+      const latestJobs =
+        await desktopRuntime
+          .diagnostics
+          .getLatestJobs();
+
+      const latestById =
+        new Map(
+          latestJobs.map(
+            (job) => [
+              job.id,
+              job.status,
+            ],
+          ),
+        );
+
+      const complete =
+        Array.from(
+          expectedDiagnosticStates,
+        ).every(
+          ([id, status]) =>
+            latestById.get(id) ===
+            status,
+        );
+
+      if (
+        complete
+      ) {
+        return;
+      }
+    } catch (
+      error
+    ) {
+      if (
+        error?.code !==
+        "CORRUPT_DIAGNOSTICS_RECORD"
+      ) {
+        throw error;
+      }
+    }
+
+    if (
+      Date.now() >=
+      timeoutAt
+    ) {
+      throw new Error(
+        "Timed out waiting for isolated task diagnostics to finish.",
+      );
+    }
+
+    await new Promise(
+      (resolve) =>
+        setImmediate(
+          resolve,
+        ),
     );
   }
 }
@@ -497,7 +576,8 @@ async function main() {
       "index job manager tracks successful job",
       async () => {
         const manager =
-          new ProjectIndexJobManager();
+          new ProjectIndexJobManager(desktopTasks.createDesktopTaskManager());
+        const updates = [];
 
 
         const {
@@ -506,6 +586,9 @@ async function main() {
         } =
           manager.start({
             projectRoot,
+            onProgress(update) {
+              updates.push(update);
+            },
           });
 
 
@@ -522,9 +605,129 @@ async function main() {
           job.status,
           "complete",
         );
+        assert.equal(updates.at(-1).phase, "complete");
+        assert.equal(updates.at(-1).relativePath, null);
       },
     );
+
+    await check("default indexing manager shares runtime ownership", async () => {
+      const facade = new ProjectIndexJobManager();
+      assert.strictEqual(desktopTasks.desktopTaskManager, desktopRuntime.taskManager);
+      assert.strictEqual(facade.taskManager, desktopRuntime.taskManager);
+      const isolated = desktopTasks.createDesktopTaskManager();
+      assert.notStrictEqual(isolated, desktopRuntime.taskManager);
+      assert.notStrictEqual(new ProjectIndexJobManager(isolated).taskManager,
+        desktopRuntime.taskManager);
+    });
+
+    await check("legacy and canonical cancellation target the same queued jobs", async () => {
+      const facade = new ProjectIndexJobManager();
+      const first = facade.start({projectRoot});
+      expectedDiagnosticStates.set(first.jobId, "queued");
+      const firstCancelled = facade.cancel(first.jobId);
+      const firstState = desktopRuntime.taskManager.get(first.jobId);
+      expectedDiagnosticStates.set(first.jobId, firstState.status);
+      await first.promise;
+      assert.strictEqual(firstCancelled, true);
+      assert.equal(firstState.status, "cancelled");
+      assert.equal(facade.get(first.jobId).status, "cancelled");
+      assert.strictEqual(facade.cancel(first.jobId), false);
+
+      const second = facade.start({projectRoot});
+      expectedDiagnosticStates.set(second.jobId, "queued");
+      const secondCancellation = desktopRuntime.taskManager.cancel(second.jobId);
+      const secondState = desktopRuntime.taskManager.get(second.jobId);
+      expectedDiagnosticStates.set(second.jobId, secondState.status);
+      await second.promise;
+      assert.equal(secondCancellation.status, "cancelled");
+      assert.equal(secondState.status, "cancelled");
+      assert.equal(facade.get(second.jobId).status, "cancelled");
+      assert.ok(facade.list().some((job) => job.id === second.jobId));
+    });
+
+    await check("CommonJS import orders have stable ownership and no diagnostic writes", async () => {
+      const home = path.join(tempRoot, "isolated-home");
+      await fs.mkdir(home);
+      const modules = [
+        "./apps/desktop/services/tasks",
+        "./apps/desktop/services/project-platform/indexing/jobs",
+        "./apps/desktop/services/runtime",
+      ];
+      for (const order of [[0, 1, 2], [1, 2, 0], [2, 0, 1]]) {
+        const script = `
+          const paths = ${JSON.stringify(modules)};
+          ${JSON.stringify(order)}.forEach((index) => require(paths[index]));
+          const tasks = require(paths[0]);
+          const {ProjectIndexJobManager} = require(paths[1]);
+          const {desktopRuntime} = require(paths[2]);
+          if (tasks.desktopTaskManager !== desktopRuntime.taskManager ||
+              new ProjectIndexJobManager().taskManager !== desktopRuntime.taskManager ||
+              tasks.desktopTaskManager !== tasks.desktopTaskManager) process.exit(2);
+        `;
+        const result = spawnSync(process.execPath, ["-e", script], {
+          cwd: path.join(__dirname, ".."),
+          env: {...process.env, HOME: home},
+          encoding: "utf8",
+        });
+        assert.equal(result.status, 0, result.stderr);
+        await assert.rejects(fs.stat(path.join(home, ".plcs", "diagnostics")),
+          {code: "ENOENT"});
+      }
+    });
   } finally {
+    let diagnosticsComplete =
+      false;
+
+    try {
+      await waitForExpectedDiagnostics();
+      diagnosticsComplete =
+        true;
+    } catch (
+      error
+    ) {
+      failed +=
+        1;
+
+      console.error(
+        "FAIL    isolated diagnostics completed before HOME cleanup",
+      );
+      console.error(
+        error,
+      );
+      console.error(
+        `Retained isolated HOME for review: ${testHome}`,
+      );
+    }
+
+    if (
+      diagnosticsComplete
+    ) {
+      try {
+        await fs.rm(
+          testHome,
+          {
+            recursive:
+              true,
+
+            force:
+              true,
+          },
+        );
+      } catch (
+        error
+      ) {
+        failed +=
+          1;
+
+        console.error(
+          "FAIL    isolated test HOME cleanup",
+        );
+        console.error(
+          error,
+        );
+      }
+    }
+
     await fs.rm(
       tempRoot,
       {

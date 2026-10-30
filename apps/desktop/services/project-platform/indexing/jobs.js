@@ -1,4 +1,4 @@
-const { desktopTaskManager } = require("../../tasks");
+const desktopTasks = require("../../tasks");
 
 
 function toLegacyIndexStatus(status) {
@@ -19,8 +19,10 @@ function toLegacyIndexProgress(progress = {}) {
 }
 
 class ProjectIndexJobManager {
-  constructor(taskManager = desktopTaskManager) {
-    this.taskManager = taskManager;
+  constructor(taskManager) {
+    this.taskManager = taskManager === undefined
+      ? desktopTasks.desktopTaskManager
+      : taskManager;
     this.jobIds = new Set();
   }
 

@@ -1,168 +1,105 @@
-Current batch — v1.3.4 Batch 1 (read-only planning draft)
-- Version: v1.3
+## Current batch — v1.3.4 Batch 1: Inventory and Unified Contracts
+## Identification and status
+- Version: v1.3 — Creator Command Center
 - Wave: v1.3.4 — Unified Jobs, Queues, Tasks & Notifications
-- Batch: 1 — Inventory and Contracts
-- Baseline commit (full SHA): c785cfecb46c05f52378408c81cb9834943405a0
+- Batch: 1 — Inventory and Contracts (inventory completed; source-level contract foundation pending)
+- Original accepted v1.3.3 baseline SHA: c785cfecb46c05f52378408c81cb9834943405a0
 - Agent branch: agent/v1.3.4-b1
 - Agent worktree: ~/dev/pl-cs-v134-b1
-- Main checkout: ~/dev/pl-creators-suite
-- Status: DRAFT — READ-ONLY PLANNING ONLY; IMPLEMENTATION NOT AUTHORIZED
-- Original v1.3.3 code baseline: c785cfecb46c05f52378408c81cb9834943405a0
-- Batch 1 planning/implementation starting HEAD: 2642413e09c6a782cec2aa7dbaa77f24ceee9852
+- Normal checkout: ~/dev/pl-creators-suite
+- Last human-reported agent HEAD: 21df300 (verify full SHA with git rev-parse HEAD immediately before execution)
+- Status: REVISED IMPLEMENTATION PLAN REVIEWED — AWAITING EXPLICIT HUMAN AUTHORIZATION
+- Earlier documentation-only authorization is superseded only when the human expressly approves this revised record. No automatic approval is implied by this template.
 
-Authoritative source references
-- Version roadmap:
-  references/PL_Creators_Suite_Official_V1_Master_Blueprint_LIBRE_SAFE.odt;
-  official v1.3 roadmap; exact subsection/page to be confirmed during read-only inspection.
-- Wave outline:
-  Same master blueprint, v1.3.4 — Unified Jobs, Queues, Tasks & Notifications;
-  agent must quote/identify the precise section and distinguish authoritative requirements from proposals.
-- Local wave/batch planning reference:
-  references/v1.3.4.pdf;
-  Batch 1 — Inventory and Contracts. This is a planning reference; check against the master blueprint before interpreting it as an approved change specification.
-- Integrated architecture:
-  references/PL_Creators_Suite_Integrated_Systems_Architecture_Companion.docx;
-  identify exact relevant section/page for task management, service boundaries, lifecycle, events, and cross-slice integration during preflight.
-- Repository architecture rules:
-  docs/architecture/ARCHITECTURE_GUARDRAILS.md,
-  docs/architecture/TRUST_BOUNDARIES.md,
-  docs/architecture/FAILURE_ISOLATION.md,
-  docs/architecture/PLATFORM_API_BOUNDARIES_V1_2_6.md,
-  docs/architecture/PLATFORM_API_REFERENCE_V1_2_6.md.
-- Existing code/contract sources:
-  packages/platform/src/tasks/,
-  packages/platform/src/notifications/,
-  packages/platform/src/events/,
-  apps/desktop/services/tasks/,
-  apps/desktop/services/diagnostics/,
-  apps/desktop/services/operations.js,
-  apps/desktop/services/runtime.js,
-  apps/desktop/rpc/contracts.js,
-  apps/desktop/rpc/registry.js,
-  docs/capabilities/registry/.
-- Supporting, NOT scope-expanding:
-  references/PL Creators Suite Copilot + Agentic Task System Reference.docx;
-  future compatibility only. Do not implement agent orchestration, approvals, or autonomy here.
-- UI reference:
-  references/PL_Creators_Suite_Official_V1_UI_Design_Evolution_Blueprint.docx;
-  consult only for relevant compatibility, not Batch 4 UI implementation.
-- Preceding accepted evidence:
-  docs/releases/v1.3.3-validation.md;
-  accepted baseline SHA above. Respect its documented limitations.
-- Conflict rule: Original approved master roadmap and existing architecture outrank ad hoc batch suggestions. If references conflict or a cited section is inaccessible, report the precise issue and STOP the affected proposal; do not invent requirements.
+## Source authority and references
+1. Primary authority: references/PL_Creators_Suite_Official_V1_Master_Blueprint_LIBRE_SAFE.odt — v1.3 Creator Command Center, Wave 1.3.4: Jobs, Queues, Tasks & Notifications. Requirements: common queue model and controls where supported, coordinated tasks/milestones and notifications. Never promote suggested implementation details into master-blueprint requirements.
+2. Approved architecture companion: references/PL_Creators_Suite_Integrated_Systems_Architecture_Companion.docx — §§3–4, 10, 15: shared boundaries, explicit trust, failure containment, extensible execution fabric. It supports but does not supersede the master blueprint.
+3. Wave planning reference: references/v1.3.4.pdf, page 1 — Batch 1 Inventory and Contracts; later batches handle queue execution, events/notifications, UI and closeout.
+4. Existing implementation inventory: docs/architecture/V1_3_4_JOB_TASK_OWNERSHIP.md — observed behavior and deferred decisions. This is not a replacement for approved roadmap architecture.
+5. Repository guardrails: docs/architecture/ARCHITECTURE_GUARDRAILS.md, TRUST_BOUNDARIES.md, FAILURE_ISOLATION.md, PLATFORM_API_BOUNDARIES_V1_2_6.md, PLATFORM_API_REFERENCE_V1_2_6.md.
+6. Accepted prior release evidence: docs/releases/v1.3.3-validation.md.
+7. Relevant code for read-only inspection: packages/platform/src/tasks/, packages/platform/src/notifications/, packages/platform/src/events/, apps/desktop/services/tasks/, apps/desktop/services/diagnostics/, apps/desktop/services/project-platform/indexing/, apps/desktop/services/runtime.js, apps/desktop/services/operations.js, apps/desktop/rpc/contracts.js, apps/desktop/rpc/registry.js.
+8. Future compatibility only: the approved Copilot/Agentic Task System and UI evolution references, where present. Do not implement future agent, cloud, or UI features.
 
-Existing baseline inventory — verify locally before proposing changes
-- Platform tasks:
-  packages/platform/src/tasks/types.ts defines task kinds,
-  queued/running/cancelling/cancelled/completed/failed/interrupted  statuses, priorities, progress, warning/failure, resources, definition, record and service interface.
-  state.ts defines allowed transitions.
-  workers.ts defines worker descriptors/capabilities/request/result
-  types. api.ts exports TaskApi and TASK_API_SERVICE_ID (core.task).
-- Desktop execution:
-  apps/desktop/services/tasks/manager.js contains a task manager with handler registration, submission, progress/warning/resource callbacks, cancellation and task snapshot/list/get.
-  api.js adapts it to the platform-style task service.
-  Additional formats.js and indexing.js handlers exist; inspect actual integration, not just filenames.
-- Persisted diagnostic jobs:
-  apps/desktop/services/diagnostics/tasks.js bridges task changes into diagnostics.job(task),and
-  apps/desktop/services/runtime.js wires this to TaskManager.
-  Inspect records.js, service.js, storage.js for persistence/retention/recovery and whether diagnostic job records are identical to task records (do not assume).
-- Notifications:
-  packages/platform/src/notifications/types.ts
-  defines notification severity/category/action/record/filter contracts; center.ts provides in-memory NotificationCenter push/get/list/dismiss/remove/clear. Persistence, desktop wiring, event delivery and visible UI are NOT verified by presence of this class.
-- Operations/RPC:
-  apps/desktop/services/operations.js
-  exposes startTask, getTask, listTasks, cancelTask, queryDiagnostics, etc.; apps/desktop/rpc/contracts.js and registry.js provide tasks.start/get/list/cancel and diagnostics method contracts/registration. Examine authorization, cancellation and errors before proposing additions.
-- Events/queue/worker runtime:
-  inspect packages/platform/src/events/, queue accounting in apps/desktop/services/health/system.js, and all callers. Do not assume a standalone queue scheduler, worker registry, queue persistence, task notification fanout or unified UI already exists.
+If any referenced blueprint is absent or unreadable in the agent environment, or a material conflict arises, halt affected work and report it. Do not invent missing requirements.
 
-Batch Objective
-Inspect and reconcile the existing shared task, desktop task, queue/worker, persisted diagnostic-job, notification, event, operational and RPC interfaces. Produce an evidence-backed ownership map, lifecycle/state mapping, compatibility/gap analysis and a minimally scoped proposed foundational contract plan for v1.3.4. The current authorization permits documentation and read-only planning only. Implementation of any proposed contract change requires separate human plan approval.
+## Original objective and Batch 1 deliverable
+Review existing task, queue, job, and notification APIs; define and implement the minimum unified state and ownership foundation. Preserve the existing desktop task and diagnostic systems. The documentation inventory is complete; the remaining scope is the seven-file source-level implementation below.
 
-## Expected Behavior
-- Existing task submission/execution/cancellation and diagnostic job persistence continue to work unchanged during planning.
-- Agent identifies the source of truth for live task state versus durable job history, and distinguishes both from future queue and notification presentation.
-- Agent identifies how supported task states and transitions map to observed backend behavior (including cancelled, failed, interrupted, and reboot/recovery cases); does not silently redefine statuses.
-- Agent proposes how an eventual unified view could read/reconcile existing data without creating another conflicting task manager or inventing queue/worker values.
-- Agent reports concrete interface gaps, affected consumers, compatibility and privacy consequences, and separates Batch 1 foundational changes from later lifecycle, notifications, UI and closeout batches.
+## Approved design direction (subject to authorization gate below)
+- desktopRuntime.taskManager is the canonical process-local owner for live tasks submitted through that desktop runtime; it is not the universal owner of future LAN/cloud/agent/worker execution.
+- Preserve existing TaskStatus values and transition semantics, including cooperative cancellation; do not add scheduling semantics to the current brief queued state.
+- Existing task.id links live and diagnostic snapshots only within the local runtime/diagnostic scope, with no global-uniqueness claim.
+- Diagnostic jobs.jsonl snapshots are historical evidence, not executable tasks; historical-only records must be read-only.
+- A privacy-allowlisted internal overview reconciles records by local ID, prefers live records, and degrades to live-only visibility if history reads fail.
+- Existing public TaskApi, RPC method names/response shapes, RPC trust/authorization, notification/event contracts, diagnostics storage format and lifecycle remain unchanged.
 
-## Acceptance Criteria
-For the read-only planning pass (current gate):
-1. Confirm baseline SHA, branch, worktree and absence of unauthorized implementation changes; report discrepancies.
-2. Provide a table of existing APIs and files: purpose, key exported methods/types, callers, ownership, storage/lifecycle, verified vs absent/not verified.
-3. Identify exact master blueprint and companion document headings/pages for the relevant requirements; cite paths and explain any conflicts.
-4. Provide a task-status transition comparison between platform contracts and desktop runtime; cover completion, failure, cancellation and interruption.
-5. Describe queue/worker and notification runtime reality based on source inspection; no fabricated functionality.
-6. Present a small, ordered list of proposed Batch 1 file edits, including why each is necessary, its compatibility impact, and associated tests. Any shared/public contract alteration must be flagged DEVIATION APPROVAL REQUIRED.
-7. List specific files not to change; explicitly defer Batch 2–5 behavior, agentic AI, new dependencies, cloud, marketplace and unrelated UI.
-8. Report which documented test commands exist and whether Beta Bot is actually launchable. Mark every unexecuted test NOT RUN rather than PASS.
-9. Stop and request human review. No file edits, dependency install, Git write, commit, merge or push.
-For later implementation acceptance (NOT YET AUTHORIZED): approved changes must demonstrably satisfy the human-approved plan, relevant regression checks, manual boot review, and diff inspection without unapproved deviations. Set specific new behavioral criteria after the read-only plan identifies the actual changes.
+## EXACT source-file modification allowlist — seven files
+1. apps/desktop/services/tasks/index.js — make exported desktopTaskManager a lazy reference to desktopRuntime.taskManager, without fallback manager creation; preserve createDesktopTaskManager() for isolated instances. This is an expressly proposed exported-instance behavior change.
+2. apps/desktop/services/project-platform/indexing/jobs.js — resolve the default manager at constructor time, preserve optional injected manager and legacy completed → complete mapping and start/get/list/cancel shapes.
+3. apps/desktop/services/tasks/overview.js (new) — implement internal summary projection merging live manager .list() with diagnostics .getLatestJobs(); return { tasks, historyAvailable }. Dedupe by local ID, live wins. Successful empty history is historyAvailable: true; history read failure is false, with live summaries still returned. Skip malformed records and unsupported statuses. Summaries may contain only id, kind, title, status, finite numeric progress percent, timestamps, failureCode, warning count, and source (live or history). Do not expose raw inputs, results, metadata, paths, credentials, progress message/currentItem, raw errors, or detailed failure/warning payloads. Historical-only summaries confer no cancellation/execution authority.
+4. apps/desktop/services/runtime.js — add internal listUnifiedTaskStates() using that runtime's manager and diagnostics instance. Preserve other runtime members, initialization, interruption handling, and diagnostic bridge. This is an expressly proposed internal service-interface addition.
+5. scripts/project-indexing-service-test.js — inject isolated manager for fixture execution; test default manager identity, factory isolation, legacy status/cancellation and both facade/canonical cancellation behavior. Test alternate CommonJS import orders in subprocesses with isolated HOME and verify imports do not write to the default diagnostics directory.
+6. scripts/desktop-operational-rpc-test.js — add temporary-diagnostics-root tests for live/history ID collision, history-only state, interrupted history, successful empty history, malformed/unknown status handling, safe allowlist, failure fallback and unchanged existing operational RPC results.
+7. docs/architecture/V1_3_4_JOB_TASK_OWNERSHIP.md — update observed implementation and its evidence, explaining process-local identity and ownership, read-only history, limitations, compatibility, privacy and future proposals. Maintain a dedicated Roadmap Compliance, Deviations, and Engineering Proposals section distinguishing official requirements, verified facts, approved decisions and unapproved ideas.
 
-## Approved implementation scope
-Proposed scope for human approval:
-- Create one architecture inventory:
-  docs/architecture/V1_3_4_JOB_TASK_OWNERSHIP.md
-- Document existing platform task and worker contracts.
-- Document desktop task manager ownership and handler registration.
-- Document the separate legacy indexing task manager.
-- Document diagnostic job persistence, deduplication,
-  interruption handling, and retention behavior.
-- Document existing notification and event interfaces.
-- Document task lifecycle behavior and existing RPC boundaries.
-- Identify unresolved decisions requiring approval in Batch 2.
-No executable source-code changes are authorized by this scope.
-Proposed touched-file whitelist:
-- docs/architecture/V1_3_4_JOB_TASK_OWNERSHIP.md
-- Approved plan:
-  Codex v1.3.4 Batch 1 read-only proposal.
-- Approved implementation:
-  Documentation-only architecture inventory.
-- Authorized output:
-  docs/architecture/V1_3_4_JOB_TASK_OWNERSHIP.md
-- Approval restrictions:
-  No existing source-file modifications.
-  No runtime behavior changes.
-  No commits, merges, or pushes.
+Clarification: The seven-file allowlist does not authorize modification of dev-harness/current-batch.md by Codex. The human updates this worksheet before implementation; agents may read it but not rewrite scope or authorization. For any legitimate need to modify an eighth file, stop and request approval.
 
-## Forbidden scope / frozen contracts
-- No runtime behavior changes.
-- No dependency changes.
-- No modifications to existing shared task, worker,
-  notification, event, or service contracts.
-- No modifications to desktop task execution or persistence.
-- No modifications to RPC contracts, registry, or authorization.
-- No modifications to renderer components or Command Center UI.
-- No changes to project recovery behavior.
-- No implementation of Batch 2–5 functionality.
-- No commit, merge, push, or deployment by Codex.
-Any required deviation must halt affected work and
-receive explicit human approval.
+## Approved scope amendment — contract test
 
-## Review and validation plan
-Commands verified as existing npm/pnpm scripts in  the repository package.json; execution status: NOT RUN for this batch.
-- Static/types: pnpm test:platform-types; pnpm capabilities:validate; pnpm build:renderer; git diff --check.
-- Task and platform contracts: pnpm test:platform-task-formats; pnpm test:platform-orchestration-apis; pnpm test:platform-core-apis; pnpm test:desktop-tasks; pnpm test:desktop-task-api.
-- Diagnostics and operations: pnpm test:desktop-diagnostics; pnpm test:desktop-operations; pnpm test:command-center-system-telemetry; pnpm test:command-center-service-health.
-- Events/RPC: pnpm test:platform-events; pnpm test:rpc; pnpm test:rpc-authorization; pnpm test:rpc-execution; pnpm test:rpc-backend.
-- Baseline smoke where appropriate: pnpm test:command-center-health-ui and pnpm test:command-center-v133-closeout.
-- Beta Bot: NOT CONFIGURED / launch command and approved UI scenarios NOT VERIFIED. Do not improvise a runner or claim automated UI evidence.
-- Human manual boot AFTER approval and implementation: run verified local Electron launch (cd apps/desktop && pnpm dev), check project restore, task visibility/operations, Health Center/status bar and diagnostic export for regressions. Keep worktree and main-user-data environments isolated; avoid destructive tests on real projects.
-- Privacy/security: verify no task input/results/secrets are emitted through new diagnostic/notification paths, no permission bypass in RPC, no undocumented storage, and no file output beyond approved fixtures. Mark anything not tested explicitly.
+- Additional authorized file:
+  scripts/project-indexing-contract-test.js
+- Reason:
+  Existing test falsely requires a literal ".tmp" string,
+  although storage constructs the suffix dynamically.
+- Authorized work:
+  Replace the brittle assertion with behavior-based
+  temporary-write and rename validation.
+- Forbidden:
+  Changes to storage.js, persistence semantics,
+  dependencies, or unrelated tests.
+- Approval:
+  Human-approved test-only scope amendment.
 
-## Definition of done
-- [ ] Human-approved implementation plan recorded with exact file whitelist and acceptance tests
-- [ ] Approved behavior implemented within scope (NOT AUTHORIZED YET)
-- [ ] Exact commands/results reported, including skipped or blocked
-- [ ] Beta Bot evidence supplied if verified/runnable; otherwise NOT CONFIGURED
-- [ ] No unapproved deviations
-- [ ] Human diff review and boot test passed
-- [ ] Human explicitly accepted batch and authorized integration
+## Strict exclusions and mandatory deviation gate
+- No new scheduler, worker placement, concurrency limits, priority enforcement, pause/retry, event fanout, notification UI, Command Center UI, cloud/LAN/agent execution, unrelated refactors or dependency changes.
+- No public/shared type change, new RPC method or response shape, altered trust/permissions, changed persisted schema, migrations, new service singleton, or unapproved user-data writes.
+- No commit, push, merge, deploy, or transition into Batch 2 by Codex.
+- If import-cycle resolution, existing consumers, security requirements or test findings require a change outside the exact plan, HALT affected work. Report evidence, affected files/contracts, alternatives/tradeoffs and recommendation; await explicit human approval and an amended batch record. Do not silently substitute another implementation.
+- Keep test data and diagnostic storage isolated from real ~/.plcs user state.
+Verification and acceptance criteria
+- Default indexing facade, exported default manager, operational RPC, health collector and diagnostic bridge refer to the same process-local live manager; independently created managers remain isolated.
+- Module loading works tasks-first, indexing-first, runtime-first, without circular initialization faults or unintended filesystem writes. Lazy alias is stable and synchronous.
+- Legacy indexing start/get/list/cancel, progress mapping, complete status and cooperative cancellation remain compatible; cancellation via legacy facade and canonical manager targets the same live job.
+- Overview uses only allowed summary fields and valid statuses; live wins duplicate ID; historical records remain read-only; no invented execution/retry/recovery state.
+- Successful empty history returns historyAvailable: true. Failed diagnostics read returns false, retains live tasks, and does not leak raw errors.
+- Existing platform lifecycle, RPC contracts/permissions and diagnostics persistence remain unchanged.
+- No unexpected files modified. Human reviews actual diff and final local boot/GUI test before acceptance.
 
-## Authorization
-- Read-only analysis: ALLOWED
-- Proposed plan approved by human: YES
-- Implementation authorized by human: YES
-- Integration authorized by human: NO
+## Approved test commands (run from agent worktree, after dependency/environment checks)
+- pnpm test:project-indexing-service
+- pnpm test:project-indexing-contract
+- pnpm test:desktop-tasks
+- pnpm test:desktop-task-api
+- pnpm test:desktop-diagnostics
+- pnpm test:desktop-operations
+- pnpm test:platform-task-formats
+- pnpm test:platform-types
+- pnpm test:rpc
+- pnpm test:rpc-authorization
+- git diff --check (also check untracked new file explicitly before staging; check staged diff once staged)
+For every check record PASS / FAIL / BLOCKED / NOT RUN with exact command and evidence. The prior Codex session reported a Node 20.20.2 environment against a Node 22.12.0 requirement; record/resolve environment mismatch before relying on results. Do not silently install or switch tooling without existing approved procedures.
 
-Codex read-only preflight request
-Follow root AGENTS.md and dev-harness/prompts.md Prompt A. Use only the above-authorized sources and inspect exact path/heading references first. If the agent worktree has an incorrect SHA, inaccessible references, a contradictory architecture requirement, or a necessary public-contract change, report it and stop the affected work. Return the proposed ordered plan, exact touched-file list, tests and deviations for human approval. Do not edit any files or Git state.
+Beta Bot: NOT CONFIGURED — no verified command or approved scenario. Do not invent runner results.
+
+Human validation: Review status and complete diff, test actual local Electron boot and relevant workflows using isolated fixtures, inspect security/privacy effects, and accept/reject the batch. Runtime and UI tests are not satisfied by agent claims alone.
+
+## Approval gate — human-owned, never self-authorized by Codex
+- Read-only planning: ALLOWED
+- Revised seven-file plan reviewed: YES
+- The exported default-manager behavior change (tasks/index.js) has human approval: YES
+- The internal listUnifiedTaskStates() addition (runtime.js) has human approval: YES
+- Implementation of this exact seven-file batch: YES
+- Integration into main: NO
+- Batch 2 start: NO
+Codex must confirm the three implementation approvals are YES in the current on-disk worksheet before beginning any write. An instruction prompt alone does not override an unapproved worksheet. After authorized implementation, stop and present the diff/test evidence for final human acceptance.

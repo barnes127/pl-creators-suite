@@ -15,6 +15,7 @@ const {
 const {createTaskDiagnosticsBridge} = require("./diagnostics/tasks");
 const {createRpcDiagnosticsSink} = require("./diagnostics/rpc");
 const {createDesktopTaskManager} = require("./tasks");
+const {listUnifiedTaskStates: createTaskOverview} = require("./tasks/overview");
 const localAi = require("./ai/local");
 const recovery = require("./project-platform/recovery");
 const indexing = require("./project-platform/indexing");
@@ -125,6 +126,10 @@ function createDesktopRuntime(options = {}) {
     );
   }
 
+  function listUnifiedTaskStates() {
+    return createTaskOverview(taskManager, diagnostics);
+  }
+
   return {
     diagnostics,
     health,
@@ -132,6 +137,7 @@ function createDesktopRuntime(options = {}) {
     rpcBridge,
     initialize,
     captureResources,
+    listUnifiedTaskStates,
   };
 }
 

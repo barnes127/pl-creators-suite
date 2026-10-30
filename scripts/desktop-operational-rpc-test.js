@@ -300,6 +300,93 @@ async function main() {
         );
       },
     );
+
+    await check("overview merges live and read-only history with live precedence", async () => {
+      const liveId = "overview-live-collision";
+      const started = runtime.taskManager.submit({
+        id: liveId,
+        handlerId: "test.operation",
+        kind: "calculation",
+        title: "Live fixture",
+        input: {value: 5, credential: "secret-input"},
+        metadata: {path: "/secret/project"},
+      });
+      await started.promise;
+      await runtime.diagnostics.job({
+        id: liveId, kind: "other", title: "Stale history", status: "failed",
+        failure: {code: "OLD", message: "secret-error"},
+      });
+      await runtime.diagnostics.job({
+        id: "history-only", kind: "indexing", title: "Historical fixture",
+        status: "completed", progress: {percent: 75, message: "secret-progress",
+          currentItem: "/secret/item"},
+        warnings: [{code: "SECRET", message: "secret-warning"}],
+        metadata: {credential: "secret-metadata"},
+        failure: {code: "SAFE_CODE", message: "secret-failure"},
+      });
+      const overview = await runtime.listUnifiedTaskStates();
+      assert.equal(overview.historyAvailable, true);
+      const live = overview.tasks.find((task) => task.id === liveId);
+      assert.equal(live.source, "live");
+      assert.equal(live.status, "completed");
+      const historical = overview.tasks.find((task) => task.id === "history-only");
+      assert.deepEqual(historical, {
+        id: "history-only", kind: "indexing", title: "Historical fixture",
+        status: "completed", source: "history", progressPercent: 75,
+        failureCode: "SAFE_CODE", warningCount: 1,
+      });
+      assert.equal(runtime.taskManager.get("history-only"), null);
+      assert.equal(operations.cancelTask({taskId: "history-only"}).task, null);
+      assert.ok(!JSON.stringify(overview).includes("secret-"));
+      assert.ok(!JSON.stringify(overview).includes("/secret/"));
+    });
+
+    await check("overview includes interrupted history and skips invalid records", async () => {
+      await runtime.diagnostics.job({
+        id: "overview-interrupted", kind: "other", title: "Interrupted",
+        status: "interrupted", failure: {code: "TASK_INTERRUPTED", message: "private"},
+      });
+      await runtime.diagnostics.append("jobs", {
+        id: "unknown-status", status: "retrying", title: "Invalid",
+      });
+      await runtime.diagnostics.append("jobs", {
+        id: "bad-progress", status: "failed", title: "Bad percent",
+        progress: {percent: Infinity},
+      });
+      await runtime.diagnostics.append("jobs", {status: "completed"});
+      const overview = await runtime.listUnifiedTaskStates();
+      assert.equal(overview.tasks.find((task) => task.id === "overview-interrupted")
+        .failureCode, "TASK_INTERRUPTED");
+      assert.ok(!overview.tasks.some((task) => task.id === "unknown-status"));
+      assert.ok(!overview.tasks.find((task) => task.id === "bad-progress")
+        .hasOwnProperty("progressPercent"));
+      assert.ok(!overview.tasks.some((task) => !task.id));
+    });
+
+    await check("overview reports empty history as available", async () => {
+      const emptyRuntime = createDesktopRuntime({
+        diagnosticsRoot: path.join(rootDir, "empty"),
+      });
+      assert.deepEqual(await emptyRuntime.listUnifiedTaskStates(), {
+        tasks: [], historyAvailable: true,
+      });
+    });
+
+    await check("overview retains live tasks when history read fails", async () => {
+      const original = runtime.diagnostics.getLatestJobs;
+      runtime.diagnostics.getLatestJobs = async () => {
+        throw new Error("secret-diagnostics-path");
+      };
+      try {
+        const overview = await runtime.listUnifiedTaskStates();
+        assert.equal(overview.historyAvailable, false);
+        assert.ok(overview.tasks.some((task) => task.id === "overview-live-collision"));
+        assert.ok(overview.tasks.every((task) => task.source === "live"));
+        assert.ok(!JSON.stringify(overview).includes("secret-diagnostics-path"));
+      } finally {
+        runtime.diagnostics.getLatestJobs = original;
+      }
+    });
   } finally {
     await fs.rm(
       rootDir,
