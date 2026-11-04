@@ -416,13 +416,10 @@ function startRpcServer({
         });
 
        if (
-         typeof METHODS[
-           request.method
-         ] !== "function"
+         !Object.hasOwn(METHODS, request.method) ||
+         typeof METHODS[request.method] !== "function"
        ) {
-         throw new RpcMethodNotFoundError(
-           request.method,
-         );
+         throw new RpcMethodNotFoundError(request.method);
        }
 
         const execution =
