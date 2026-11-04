@@ -7,6 +7,13 @@ class TaskHandlerNotFoundError extends Error {
   }
 }
 
+const TASK_PRIORITY_ORDER = Object.freeze({
+  critical: 0,
+  high: 1,
+  normal: 2,
+  low: 3,
+});
+
 function nowIso() {
   return new Date().toISOString();
 }
@@ -90,6 +97,34 @@ function isCancellationError(error, signal) {
   );
 }
 
+function normalizeTaskPriority(priority) {
+  const value = priority ?? "normal";
+
+  if (!Object.hasOwn(TASK_PRIORITY_ORDER, value)) {
+    throw new Error(
+      `Invalid task priority: ${value}`,
+    );
+  }
+
+  return value;
+}
+
+function createDeferred() {
+  let resolve;
+  let reject;
+
+  const promise = new Promise((yes, no) => {
+    resolve = yes;
+    reject = no;
+  });
+
+  return {
+    promise,
+    resolve,
+    reject,
+  };
+}
+
 class TaskManager {
   constructor(options = {}) {
     this.handlers = new Map();
@@ -99,12 +134,58 @@ class TaskManager {
       typeof options.onTaskChanged === "function"
         ? options.onTaskChanged
         : () => {};
+
+    const limit =
+      options.maxConcurrentTasks ?? 2;
+
+    if (
+      !Number.isSafeInteger(limit) ||
+      limit < 1
+    ) {
+      throw new RangeError(
+        "maxConcurrentTasks must be a positive safe integer",
+      );
+    }
+
+    this.maxConcurrentTasks = limit;
+    this.activeCount = 0;
+    this.pending = [];
+    this.drainScheduled = false;
   }
 
   notifyTaskChanged(task) {
-    this.onTaskChanged(
-      createTaskSnapshot(task),
-    );
+    try {
+      this.onTaskChanged(
+        createTaskSnapshot(task),
+      );
+    } catch (error) {
+      console.error(
+        "Task change observer failed",
+        error,
+      );
+    }
+  }
+
+  notifyTaskCallback(
+    callback,
+    value,
+    task,
+  ) {
+    if (typeof callback !== "function") {
+      return;
+    }
+
+    try {
+      callback(
+        value,
+        createTaskSnapshot(task),
+      );
+    } catch (error) {
+      console.error(
+        "Task reporting observer failed",
+        error,
+      );
+    }
   }
 
   registerHandler(handlerId, handler) {
@@ -133,6 +214,79 @@ class TaskManager {
     return this.handlers.has(handlerId);
   }
 
+  scheduleDrain() {
+    if (this.drainScheduled) {
+      return;
+    }
+
+    this.drainScheduled = true;
+
+    queueMicrotask(() => {
+      this.drainScheduled = false;
+      this.drainQueue();
+    });
+  }
+
+  selectNextPending() {
+    if (this.pending.length === 0) {
+      return null;
+    }
+
+    let bestIndex = 0;
+
+    for (
+      let index = 1;
+      index < this.pending.length;
+      index += 1
+    ) {
+      const candidate =
+        this.pending[index];
+
+      const selected =
+        this.pending[bestIndex];
+
+      if (
+        TASK_PRIORITY_ORDER[
+          candidate.priority
+        ] <
+        TASK_PRIORITY_ORDER[
+          selected.priority
+        ]
+      ) {
+        bestIndex = index;
+      }
+    }
+
+    const [selected] =
+      this.pending.splice(
+        bestIndex,
+        1,
+      );
+
+    return selected;
+  }
+
+  drainQueue() {
+    while (
+      this.activeCount <
+        this.maxConcurrentTasks &&
+      this.pending.length > 0
+    ) {
+      const task =
+        this.selectNextPending();
+
+      if (
+        !task ||
+        task.status !== "queued"
+      ) {
+        continue;
+      }
+
+      this.activeCount += 1;
+      void this.executeQueuedTask(task);
+    }
+  }
+
   submit(definition = {}, options = {}) {
     this.sequence += 1;
 
@@ -150,9 +304,7 @@ class TaskManager {
       "",
     ).trim();
 
-    const handler = this.handlers.get(handlerId);
-
-    if (!handler) {
+    if (!this.handlers.has(handlerId)) {
       throw new TaskHandlerNotFoundError(handlerId);
     }
 
@@ -164,7 +316,9 @@ class TaskManager {
       kind: definition.kind ?? "other",
       title: definition.title ?? handlerId,
       description: definition.description,
-      priority: definition.priority ?? "normal",
+      priority: normalizeTaskPriority(
+        definition.priority,
+      ),
       status: "queued",
       input: definition.input,
       result: undefined,
@@ -179,127 +333,164 @@ class TaskManager {
       supportsCancellation:
         definition.supportsCancellation !== false,
       controller,
+      callbacks: options,
+      deferred: createDeferred(),
       promise: null,
     };
 
+    task.promise = task.deferred.promise;
+
+    // Keep the original promise rejecting for submit()/wait(),
+    // while ensuring fire-and-forget callers do not create a
+    // process-level unhandled rejection.
+    void task.promise.catch(() => {});
+
     this.tasks.set(taskId, task);
-
     this.notifyTaskChanged(task);
-
-    task.promise = Promise.resolve()
-      .then(async () => {
-        if (controller.signal.aborted) {
-          task.status = "cancelled";
-          task.finishedAt = nowIso();
-          return undefined;
-        }
-
-        task.status = "running";
-        task.startedAt = nowIso();
-        this.notifyTaskChanged(task);
-
-        const context = {
-          signal: controller.signal,
-
-          reportProgress: (progress) => {
-            task.progress = normalizeProgress({
-              ...task.progress,
-              ...progress,
-            });
-
-            this.notifyTaskChanged(task);
-
-            options.onProgress?.(
-              { ...task.progress },
-              createTaskSnapshot(task),
-            );
-          },
-
-          reportWarning: (warning) => {
-            task.warnings.push({
-              ...warning,
-            });
-
-            this.notifyTaskChanged(task);
-
-            options.onWarning?.(
-              { ...warning },
-              createTaskSnapshot(task),
-            );
-          },
-
-          reportResourceUsage: (usage) => {
-            task.resourceUsage = {
-              ...task.resourceUsage,
-              ...usage,
-            };
-
-            this.notifyTaskChanged(task);
-
-            options.onResourceUsage?.(
-              { ...task.resourceUsage },
-              createTaskSnapshot(task),
-            );
-          },
-        };
-
-        try {
-          const result = await handler(
-            task.input,
-            context,
-          );
-
-          if (controller.signal.aborted) {
-            task.status = "cancelled";
-            task.finishedAt = nowIso();
-            return undefined;
-          }
-
-          task.result = result;
-          task.status = "completed";
-          task.finishedAt = nowIso();
-          this.notifyTaskChanged(task);
-
-          return result;
-        } catch (error) {
-          if (
-            isCancellationError(
-              error,
-              controller.signal,
-            )
-          ) {
-            task.status = "cancelled";
-          } else {
-            task.status = "failed";
-
-            task.failure = {
-              code: error?.code || "TASK_FAILED",
-              message:
-                error?.message ||
-                "Task execution failed",
-              details: error?.details,
-              retryable:
-                error?.retryable === true,
-            };
-          }
-
-          task.finishedAt = nowIso();
-
-          this.notifyTaskChanged(task);
-
-          if (task.status === "cancelled") {
-            return undefined;
-          }
-
-          throw error;
-        }
-      });
+    this.pending.push(task);
+    this.scheduleDrain();
 
     return {
       taskId,
       task: createTaskSnapshot(task),
       promise: task.promise,
     };
+  }
+
+  async executeQueuedTask(task) {
+    try {
+      if (task.controller.signal.aborted) {
+        task.status = "cancelled";
+        task.finishedAt ??= nowIso();
+        this.notifyTaskChanged(task);
+        task.deferred.resolve(undefined);
+        return;
+      }
+
+      task.status = "running";
+      task.startedAt = nowIso();
+      this.notifyTaskChanged(task);
+
+      const canReport = () =>
+        task.status === "running" ||
+        task.status === "cancelling";
+
+      const context = {
+        signal: task.controller.signal,
+
+        reportProgress: (progress) => {
+          if (!canReport()) {
+            return;
+          }
+
+          task.progress = normalizeProgress({
+            ...task.progress,
+            ...progress,
+          });
+
+          this.notifyTaskChanged(task);
+          this.notifyTaskCallback(
+            task.callbacks?.onProgress,
+            { ...task.progress },
+            task,
+          );
+        },
+
+        reportWarning: (warning) => {
+          if (!canReport()) {
+            return;
+          }
+
+          task.warnings.push({
+            ...warning,
+          });
+
+          this.notifyTaskChanged(task);
+          this.notifyTaskCallback(
+            task.callbacks?.onWarning,
+            { ...warning },
+            task,
+          );
+        },
+
+        reportResourceUsage: (usage) => {
+          if (!canReport()) {
+            return;
+          }
+
+          task.resourceUsage = {
+            ...task.resourceUsage,
+            ...usage,
+          };
+
+          this.notifyTaskChanged(task);
+          this.notifyTaskCallback(
+            task.callbacks?.onResourceUsage,
+            { ...task.resourceUsage },
+            task,
+          );
+        },
+      };
+
+      const handler =
+        this.handlers.get(task.handlerId);
+
+      if (!handler) {
+        throw new TaskHandlerNotFoundError(
+          task.handlerId,
+        );
+      }
+
+      const result = await handler(
+        task.input,
+        context,
+      );
+
+      if (task.controller.signal.aborted) {
+        task.status = "cancelled";
+        task.finishedAt = nowIso();
+        this.notifyTaskChanged(task);
+        task.deferred.resolve(undefined);
+        return;
+      }
+
+      task.result = result;
+      task.status = "completed";
+      task.finishedAt = nowIso();
+      this.notifyTaskChanged(task);
+      task.deferred.resolve(result);
+    } catch (error) {
+      if (
+        isCancellationError(
+          error,
+          task.controller.signal,
+        )
+      ) {
+        task.status = "cancelled";
+        task.deferred.resolve(undefined);
+      } else {
+        task.status = "failed";
+        task.failure = {
+          code:
+            error?.code ||
+            "TASK_FAILED",
+          message:
+            error?.message ||
+            "Task execution failed",
+          details: error?.details,
+          retryable:
+            error?.retryable === true,
+        };
+        task.deferred.reject(error);
+      }
+
+      task.finishedAt = nowIso();
+      this.notifyTaskChanged(task);
+    } finally {
+      task.callbacks = undefined;
+      this.activeCount -= 1;
+      this.scheduleDrain();
+    }
   }
 
   async start(definition) {
@@ -328,14 +519,25 @@ class TaskManager {
     }
 
     if (task.status === "queued") {
+      this.pending = this.pending.filter(
+        (entry) => entry.id !== task.id,
+      );
+      task.controller.abort();
       task.status = "cancelled";
       task.finishedAt = nowIso();
-    } else {
-      task.status = "cancelling";
+      task.callbacks = undefined;
+      this.notifyTaskChanged(task);
+      task.deferred.resolve(undefined);
+      this.scheduleDrain();
+      return createTaskSnapshot(task);
     }
 
-    task.controller.abort();
+    if (task.status === "cancelling") {
+      return createTaskSnapshot(task);
+    }
 
+    task.status = "cancelling";
+    task.controller.abort();
     this.notifyTaskChanged(task);
 
     return createTaskSnapshot(task);

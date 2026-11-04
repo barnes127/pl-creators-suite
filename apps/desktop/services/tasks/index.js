@@ -24,6 +24,8 @@ function createDesktopTaskManager(options = {}) {
   const manager = new TaskManager({
     onTaskChanged:
       options.onTaskChanged,
+    maxConcurrentTasks:
+      options.maxConcurrentTasks,
   });
 
   manager.registerHandler(

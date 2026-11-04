@@ -52,6 +52,8 @@ function createDesktopRuntime(options = {}) {
     createDesktopTaskManager({
       onTaskChanged:
         taskBridge.onTaskChanged,
+      maxConcurrentTasks:
+        options.maxConcurrentTasks,
     });
   health.registerCollector(
     createSystemHealthCollector({
