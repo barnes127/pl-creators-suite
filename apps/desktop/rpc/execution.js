@@ -115,14 +115,13 @@ function createRpcExecutionManager({
 
 
   async function invokeOnce({
+    fn,
     method,
     params,
     contract,
     policy,
     context,
   }) {
-    const fn = methods[method];
-
     if (context.signal.aborted) {
       throw new RpcCancelledError(
         `RPC method "${method}" was cancelled`,
@@ -188,28 +187,21 @@ function createRpcExecutionManager({
     rawParams,
     correlationId,
   }) {
-    const fn =
-      methods[method];
-
     if (
-      typeof fn !== "function"
+      typeof method !== "string" ||
+      !Object.hasOwn(methods, method)
     ) {
       return null;
     }
 
-    const contract =
-      getMethodContract(
-        method,
-      );
+    const fn = methods[method];
+    if (typeof fn !== "function") {
+      return null;
+    }
 
-    if (
-      typeof authorize ===
-      "function"
-    ) {
-      authorize(
-        method,
-        contract,
-      );
+    const contract = getMethodContract(method);
+    if (!contract) {
+      return null;
     }
 
     const params =
@@ -324,6 +316,7 @@ function createRpcExecutionManager({
 
           const result =
             await invokeOnce({
+              fn,
               method,
               params,
               contract,

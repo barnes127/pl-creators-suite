@@ -1254,15 +1254,15 @@ Object.freeze(
   METHOD_CONTRACTS,
 );
 
-function getMethodContract(
-  method,
-) {
-  return (
-    METHOD_CONTRACTS[method] ||
-    null
-  );
+function getMethodContract(method) {
+  if (
+    typeof method !== "string" ||
+    !Object.hasOwn(METHOD_CONTRACTS, method)
+  ) {
+    return null;
+  }
+  return METHOD_CONTRACTS[method];
 }
-
 
 function validateMethodParams(
   method,
