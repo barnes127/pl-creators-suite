@@ -144,6 +144,10 @@ import { NAV_ITEMS } from "./config/navigation";
 import { RecoveryPanel } from "./components/recovery";
 import {CreatorContinuityPanel} from "./components/continuity";
 import {bindBuiltInSliceConsumers, platformRuntime} from "./platform/runtime";
+import {
+  createTaskNotificationBridge,
+  toSafeObservedTasks,
+} from "./platform/tasks";
 import type {RecoveryUiStatus} from "./components/recovery";
 import {HealthContextRail} from "./components/health";
 import {useHealthSnapshot} from "./platform/health";
@@ -177,6 +181,40 @@ export default function App() {
         setWorkspace,
       ],
     );
+
+  useEffect(
+    () => {
+      const bridge =
+        createTaskNotificationBridge({
+          readTasks:
+            async () => {
+              const result =
+                await rpc<{
+                  tasks?: unknown;
+                }>(
+                  "tasks.list",
+                  {},
+                );
+
+              return toSafeObservedTasks(
+                result.tasks,
+              );
+            },
+
+          platform:
+            platformRuntime,
+
+          intervalMs:
+            5000,
+        });
+
+      bridge.start();
+
+      return () =>
+        bridge.stop();
+    },
+    [],
+  );
 
     useEffect(
     () =>
