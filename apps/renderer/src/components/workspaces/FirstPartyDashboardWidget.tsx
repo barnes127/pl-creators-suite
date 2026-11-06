@@ -1,9 +1,14 @@
-import {useEffect, useState} from "react";
-import type {TaskRecord} from "@pl/platform";
+import {useEffect, useMemo, useState} from "react";
 import {rpc} from "../../rpc";
 import {platformRuntime} from "../../platform/runtime";
 import type {AppMetadata} from "../../types/app";
 import {useHealthSnapshot} from "../../platform/health";
+import {
+  filterNotifications,
+  sortOperationalTasks,
+  useNotifications,
+  useOperationalTasks,
+} from "../../platform/operations";
 
 type RecentProject = {
   projectRoot:
@@ -306,107 +311,22 @@ function TemplatesWidget() {
 
 
 function TasksWidget() {
-  const [
-    tasks,
-    setTasks,
-  ] =
-    useState<
-      readonly TaskRecord[]
-    >(
-      [],
+  const taskState =
+    useOperationalTasks();
+
+  const tasks =
+    useMemo(
+      () =>
+        sortOperationalTasks(
+          taskState.value.tasks,
+        ),
+      [taskState.value.tasks],
     );
-
-  const [
-    loading,
-    setLoading,
-  ] =
-    useState(
-      true,
-    );
-
-  const [
-    error,
-    setError,
-  ] =
-    useState(
-      "",
-    );
-
-
-  useEffect(
-    () => {
-      let cancelled =
-        false;
-
-      rpc<{
-        tasks:
-          TaskRecord[];
-      }>(
-        "tasks.list",
-      )
-        .then(
-          (
-            result,
-          ) => {
-            if (
-              cancelled
-            ) {
-              return;
-            }
-
-            setTasks(
-              result.tasks ??
-              [],
-            );
-
-            setError(
-              "",
-            );
-          },
-        )
-        .catch(
-          (
-            caught,
-          ) => {
-            if (
-              cancelled
-            ) {
-              return;
-            }
-
-            setError(
-              caught instanceof
-                Error
-                ? caught.message
-                : String(
-                    caught,
-                  ),
-            );
-          },
-        )
-        .finally(
-          () => {
-            if (
-              !cancelled
-            ) {
-              setLoading(
-                false,
-              );
-            }
-          },
-        );
-
-      return () => {
-        cancelled =
-          true;
-      };
-    },
-    [],
-  );
 
 
   if (
-    loading
+    taskState.loading &&
+    tasks.length === 0
   ) {
     return (
       <WidgetLoading
@@ -416,11 +336,12 @@ function TasksWidget() {
   }
 
   if (
-    error
+    taskState.error &&
+    tasks.length === 0
   ) {
     return (
       <WidgetError
-        message={`Task activity unavailable: ${error}`}
+        message={taskState.error}
       />
     );
   }
@@ -456,7 +377,8 @@ function TasksWidget() {
             >
               <div className="commandCenterWidgetItemRow">
                 <strong>
-                  {task.title}
+                  {task.title ||
+                    "Background task"}
                 </strong>
 
                 <span className="commandCenterWidgetStatus">
@@ -465,10 +387,14 @@ function TasksWidget() {
               </div>
 
               <span>
-                {task.kind}
+                {task.kind || "other"}
                 {" · "}
-                {task.progress.message ||
-                  task.progress.phase}
+                {task.source === "history"
+                  ? "history only"
+                  : "live"}
+                {typeof task.progressPercent ===
+                  "number" &&
+                  ` · ${Math.round(task.progressPercent)}%`}
               </span>
             </div>
           ),
@@ -489,10 +415,32 @@ function MilestonesWidget() {
 
 
 function NotificationsWidget() {
+  const notificationState =
+    useNotifications();
+
   const notifications =
-    platformRuntime
-      .notifications
-      .list();
+    useMemo(
+      () =>
+        filterNotifications(
+          notificationState.notifications,
+          "",
+          "all",
+          "all",
+          false,
+        ),
+      [notificationState.notifications],
+    );
+
+  if (
+    notificationState.error &&
+    notifications.length === 0
+  ) {
+    return (
+      <WidgetError
+        message={notificationState.error}
+      />
+    );
+  }
 
   if (
     notifications.length ===

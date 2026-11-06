@@ -35,6 +35,9 @@ function createOperationalMethods(
     listTasks() {
       return {tasks: taskManager.list(),};
     },
+    async listTaskOverview() {
+      return runtime.listUnifiedTaskStates();
+    },
     cancelTask(params = {}) {
       return {
         task:

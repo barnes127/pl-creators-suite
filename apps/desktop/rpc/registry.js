@@ -43,6 +43,10 @@ function createRpcMethods({
       async () =>
         operationalMethods
           .listTasks(),
+    "tasks.overview":
+      async () =>
+        operationalMethods
+          .listTaskOverview(),
     "tasks.cancel":
       async (params) =>
         operationalMethods
@@ -502,6 +506,9 @@ const METHOD_POLICIES =
       timeoutMs: 5000,
     },
     "tasks.list": {
+      timeoutMs: 5000,
+    },
+    "tasks.overview": {
       timeoutMs: 5000,
     },
     "tasks.cancel": {

@@ -1,0 +1,238 @@
+.operationsPanel {
+  display: grid;
+  min-width: 0;
+  min-height: 0;
+  gap: 14px;
+  padding: 18px;
+  border: 1px solid rgba(127, 127, 127, 0.2);
+  border-radius: 12px;
+  background: rgba(127, 127, 127, 0.04);
+}
+
+.operationsPanelToolbar,
+.operationsSectionHeading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.operationsPanelToolbar h2,
+.operationsSectionHeading h2 {
+  margin: 3px 0 0;
+}
+
+.operationsSectionHeading p {
+  max-width: 720px;
+  margin: 4px 0 0;
+  font-size: 12px;
+  opacity: 0.68;
+}
+
+.operationsTabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  padding: 3px;
+  border: 1px solid rgba(127, 127, 127, 0.25);
+  border-radius: 8px;
+}
+
+.operationsTabs button {
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+  padding: 7px 12px;
+}
+
+.operationsTabs button:hover,
+.operationsTabs .operationsTabActive {
+  background: rgba(127, 127, 127, 0.18);
+}
+
+.operationalTasks,
+.notificationInbox,
+.notificationGroups {
+  display: grid;
+  min-width: 0;
+  gap: 12px;
+}
+
+.operationalTaskList,
+.notificationList {
+  display: grid;
+  min-width: 0;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.operationalTaskRow,
+.notificationRow {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px;
+  overflow: hidden;
+  border: 1px solid rgba(127, 127, 127, 0.2);
+  border-radius: 8px;
+}
+
+.operationalTaskSummary,
+.notificationSummary {
+  display: grid;
+  min-width: 0;
+  gap: 3px;
+  overflow-wrap: anywhere;
+}
+
+.operationalTaskSummary span,
+.notificationSummary > span {
+  font-size: 11px;
+  opacity: 0.68;
+}
+
+.operationalTaskControls,
+.notificationActions {
+  display: flex;
+  flex: 0 0 auto;
+  align-items: center;
+  gap: 8px;
+}
+
+.operationalTaskProgress {
+  display: grid;
+  min-width: 140px;
+  gap: 4px;
+  font-size: 11px;
+}
+
+.operationalTaskProgress progress {
+  width: 100%;
+}
+
+.notificationInboxFilters {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 10px;
+}
+
+.notificationInboxFilters label:not(.notificationInboxToggle) {
+  display: grid;
+  gap: 4px;
+  font-size: 11px;
+}
+
+.notificationInboxFilters input[type="search"],
+.notificationInboxFilters select {
+  box-sizing: border-box;
+  min-height: 34px;
+  border: 1px solid rgba(127, 127, 127, 0.25);
+  border-radius: 6px;
+  background: transparent;
+  color: inherit;
+  padding: 6px 8px;
+}
+
+.notificationInboxFilters input[type="search"] {
+  width: min(300px, 70vw);
+}
+
+.notificationInboxToggle {
+  display: flex;
+  min-height: 34px;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+}
+
+.notificationGroup {
+  display: grid;
+  min-width: 0;
+  gap: 8px;
+}
+
+.notificationGroup h3 {
+  margin: 4px 0 0;
+  font-size: 13px;
+  text-transform: capitalize;
+}
+
+.notificationSummary > div {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  gap: 8px;
+}
+
+.notificationSummary p {
+  max-width: 100%;
+  margin: 2px 0;
+  overflow-wrap: anywhere;
+}
+
+.notificationSeverity {
+  flex: 0 0 auto;
+  padding: 2px 6px;
+  border-radius: 999px;
+  background: rgba(127, 127, 127, 0.14);
+  font-size: 10px;
+  text-transform: capitalize;
+}
+
+.operationsMessage,
+.operationsEmptyState {
+  margin: 0;
+  padding: 9px 10px;
+  border: 1px solid rgba(127, 127, 127, 0.2);
+  border-radius: 8px;
+  font-size: 12px;
+}
+
+.operationsMessageWarning {
+  border-style: dashed;
+}
+
+.operationsMessageError {
+  border-color: currentColor;
+}
+
+.operationsTabs button:focus-visible,
+.operationsPanel button:focus-visible,
+.operationsPanel input:focus-visible,
+.operationsPanel select:focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: 2px;
+}
+
+@media (max-width: 800px) {
+  .operationsPanelToolbar,
+  .operationsSectionHeading,
+  .operationalTaskRow,
+  .notificationRow {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .operationsTabs,
+  .operationalTaskControls,
+  .notificationActions {
+    align-self: stretch;
+  }
+
+  .operationalTaskControls,
+  .notificationActions {
+    flex-wrap: wrap;
+  }
+
+  .operationalTaskProgress {
+    min-width: min(240px, 100%);
+  }
+}
+

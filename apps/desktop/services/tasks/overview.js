@@ -8,12 +8,27 @@ const TASK_STATUSES = new Set([
   "interrupted",
 ]);
 
+const CANCELLABLE_STATUSES = new Set([
+  "queued",
+  "running",
+]);
+
+const MAX_OVERVIEW_ROWS = 250;
+const MAX_TASK_ID_LENGTH = 200;
+
+function boundedString(value, maximumLength) {
+  return typeof value === "string" && value
+    ? value.slice(0, maximumLength)
+    : undefined;
+}
+
 function summarizeTask(record, source) {
   if (
     !record ||
     typeof record !== "object" ||
     typeof record.id !== "string" ||
     !record.id ||
+    record.id.length > MAX_TASK_ID_LENGTH ||
     !TASK_STATUSES.has(record.status)
   ) {
     return null;
@@ -25,16 +40,20 @@ function summarizeTask(record, source) {
     source,
   };
 
-  if (typeof record.kind === "string") summary.kind = record.kind;
-  if (typeof record.title === "string") summary.title = record.title;
+  const kind = boundedString(record.kind, 80);
+  const title = boundedString(record.title, 240);
+  if (kind) summary.kind = kind;
+  if (title) summary.title = title;
   if (Number.isFinite(record.progress?.percent)) {
     summary.progressPercent = record.progress.percent;
   }
   for (const field of ["createdAt", "startedAt", "finishedAt"]) {
-    if (typeof record[field] === "string") summary[field] = record[field];
+    const value = boundedString(record[field], 80);
+    if (value) summary[field] = value;
   }
-  if (typeof record.failure?.code === "string") {
-    summary.failureCode = record.failure.code;
+  const failureCode = boundedString(record.failure?.code, 120);
+  if (failureCode) {
+    summary.failureCode = failureCode;
   }
   if (Array.isArray(record.warnings)) {
     summary.warningCount = record.warnings.length;
@@ -43,11 +62,37 @@ function summarizeTask(record, source) {
   return summary;
 }
 
+function supportsLiveCancellation(taskManager, record) {
+  if (
+    !CANCELLABLE_STATUSES.has(record.status) ||
+    !(taskManager.tasks instanceof Map)
+  ) {
+    return false;
+  }
+
+  const ownedTask = taskManager.tasks.get(record.id);
+
+  return (
+    ownedTask === record ||
+    ownedTask?.id === record.id
+  ) && ownedTask?.supportsCancellation === true;
+}
+
+function boundedRows(byId) {
+  return Array.from(byId.values())
+    .slice(0, MAX_OVERVIEW_ROWS);
+}
+
 async function listUnifiedTaskStates(taskManager, diagnostics) {
   const byId = new Map();
   for (const record of taskManager.list()) {
     const summary = summarizeTask(record, "live");
-    if (summary) byId.set(summary.id, summary);
+    if (summary) {
+      if (supportsLiveCancellation(taskManager, record)) {
+        summary.supportsCancellation = true;
+      }
+      byId.set(summary.id, summary);
+    }
   }
 
   try {
@@ -58,9 +103,9 @@ async function listUnifiedTaskStates(taskManager, diagnostics) {
         byId.set(summary.id, summary);
       }
     }
-    return {tasks: Array.from(byId.values()), historyAvailable: true};
+    return {tasks: boundedRows(byId), historyAvailable: true};
   } catch (_error) {
-    return {tasks: Array.from(byId.values()), historyAvailable: false};
+    return {tasks: boundedRows(byId), historyAvailable: false};
   }
 }
 
