@@ -86,6 +86,34 @@ test(
   },
 );
 
+test(
+  "authenticated renderer task overview needs no privileged capability",
+  () => {
+    const authorizer =
+      createRpcAuthorizer({
+        allowedPermissions: [],
+      });
+
+    const result =
+      authorizer.authorize(
+        "tasks.overview",
+        getMethodContract(
+          "tasks.overview",
+        ),
+      );
+
+    assert.strictEqual(
+      result.allowed,
+      true,
+    );
+
+    assert.deepStrictEqual(
+      result.requiredPermissions,
+      [],
+    );
+  },
+);
+
 
 test(
   "filesystem read call is denied without permission",

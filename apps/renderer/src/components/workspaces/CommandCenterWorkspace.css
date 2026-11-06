@@ -6,6 +6,12 @@
   padding: 24px;
 }
 
+.commandCenterWorkspace > .operationsPanel {
+  width: 100%;
+  max-width: 100%;
+  overflow: hidden;
+}
+
 .commandCenterHeader {
   display: flex;
   align-items: flex-start;

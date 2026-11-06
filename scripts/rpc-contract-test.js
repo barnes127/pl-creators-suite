@@ -441,13 +441,55 @@ async function main() {
   );
 
   await test(
-    "all active contract entries total 73",
+    "all active contract entries total 74",
     () => {
       assert.equal(
         Object.keys(
           METHOD_CONTRACTS,
         ).length,
-        73,
+        74,
+      );
+    },
+  );
+
+  await test(
+    "task overview is a precise read-only contract",
+    () => {
+      const contract =
+        getMethodContract(
+          "tasks.overview",
+        );
+
+      assert.equal(
+        contract.mutates,
+        false,
+      );
+
+      assert.equal(
+        contract.retryable,
+        true,
+      );
+
+      assert.deepEqual(
+        contract.trust,
+        ["none"],
+      );
+
+      assert.deepEqual(
+        validateMethodParams(
+          "tasks.overview",
+          {},
+        ),
+        {},
+      );
+
+      assert.throws(
+        () =>
+          validateMethodParams(
+            "tasks.overview",
+            {includePrivate: true},
+          ),
+        /does not accept parameters/,
       );
     },
   );

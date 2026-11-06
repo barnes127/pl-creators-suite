@@ -87,6 +87,11 @@ const renderer =
     "apps/renderer/src/components/workspaces/FirstPartyDashboardWidget.tsx",
   );
 
+const healthHook =
+  read(
+    "apps/renderer/src/platform/health/useHealthSnapshot.ts",
+  );
+
 const app =
   read(
     "apps/renderer/src/App.tsx",
@@ -189,9 +194,12 @@ check(
 
 check(
   renderer.includes(
+    "useOperationalTasks",
+  ) &&
+  !renderer.includes(
     '"tasks.list"',
   ),
-  "tasks widget uses real task RPC",
+  "tasks widget uses shared sanitized operational task state",
 );
 
 
@@ -210,9 +218,12 @@ check(
 
 check(
   renderer.includes(
-    ".notifications",
+    "useNotifications",
+  ) &&
+  !renderer.includes(
+    ".notifications.list",
   ),
-  "notifications widget uses shared Notification API",
+  "notifications widget uses shared reactive notification state",
 );
 
 
@@ -226,25 +237,40 @@ check(
 
 check(
   renderer.includes(
+    "useHealthSnapshot",
+  ) &&
+  renderer.includes(
+    "useHealthSnapshot(projectRoot)",
+  ),
+  "project health widget uses the shared health snapshot hook with project context",
+);
+
+
+check(
+  healthHook.includes(
+    '"health.snapshot"',
+  ) &&
+  healthHook.includes(
+    "projectRoot",
+  ),
+  "shared health hook reads the unified health snapshot RPC with project context",
+);
+
+
+check(
+  !renderer.includes(
     '"diagnostics.health"',
-  ),
-  "project health uses diagnostics service",
-);
-
-
-check(
-  renderer.includes(
+  ) &&
+  !renderer.includes(
     '"ai.local.status"',
-  ),
-  "project health includes local AI state",
-);
-
-
-check(
-  renderer.includes(
+  ) &&
+  !renderer.includes(
     '"plugins.list"',
+  ) &&
+  !renderer.includes(
+    "setInterval",
   ),
-  "project health includes plugin state without mutating discovery",
+  "project health widget avoids direct health RPCs and independent polling",
 );
 
 

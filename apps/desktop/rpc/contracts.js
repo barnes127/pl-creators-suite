@@ -756,6 +756,18 @@ const METHOD_CONTRACTS = {
       ],
     },
 
+    "tasks.overview": {
+      validate:
+        noParams,
+
+      mutates: false,
+      retryable: true,
+
+      trust: [
+        TRUST.NONE,
+      ],
+    },
+
     "tasks.cancel": {
       validate:
         taskIdParams,

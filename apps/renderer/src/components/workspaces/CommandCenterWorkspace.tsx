@@ -44,6 +44,10 @@ import {
   DashboardWidgetHost,
 } from "./DashboardWidgetHost";
 
+import {
+  OperationsPanel,
+} from "../operations";
+
 
 export type CommandCenterWorkspaceProps = {
   profileId:
@@ -59,6 +63,7 @@ export function CommandCenterWorkspace({
   projectRoot
 }: CommandCenterWorkspaceProps) {
   const [customizing, setCustomizing] = useState(false);
+  const [operationsOpen, setOperationsOpen] = useState(false);
   const [plugins, setPlugins] = useState< PluginInfo[] >([]);
   const {state, setState, reset} = useDashboardState(profileId);
 
@@ -505,7 +510,8 @@ export function CommandCenterWorkspace({
   return (
     <section
       className={`commandCenterWorkspace ${
-        customizing
+        customizing &&
+        !operationsOpen
           ? "commandCenterWorkspaceCustomizing"
           : ""
       }`}
@@ -526,10 +532,11 @@ export function CommandCenterWorkspace({
         </div>
 
         <div className="commandCenterHeaderActions">
-          <div
-            className="commandCenterLayoutToggle"
-            aria-label="Dashboard layout"
-          >
+          {!operationsOpen && (
+            <div
+              className="commandCenterLayoutToggle"
+              aria-label="Dashboard layout"
+            >
             <button
               type="button"
               className={
@@ -573,44 +580,66 @@ export function CommandCenterWorkspace({
             >
               List
             </button>
-          </div>
+            </div>
+          )}
 
-          <button
-            type="button"
-            className={
-              customizing
-                ? "btn commandCenterToggleActive"
-                : "btn btn-subtle"
-            }
-            aria-pressed={customizing}
-            aria-label={
-              customizing
-                ? "Finish dashboard customization"
-                : "Customize dashboard"
-            }
-            onClick={
-              () =>
-                setCustomizing(
-                  (
-                    current,
-                  ) =>
-                    !current,
-                )
-            }
-          >
-            {customizing
-              ? "Done"
-              : "Customize"}
-          </button>
+          {!operationsOpen && (
+            <button
+              type="button"
+              className={
+                customizing
+                  ? "btn commandCenterToggleActive"
+                  : "btn btn-subtle"
+              }
+              aria-pressed={customizing}
+              aria-label={
+                customizing
+                  ? "Finish dashboard customization"
+                  : "Customize dashboard"
+              }
+              onClick={
+                () =>
+                  setCustomizing(
+                    (
+                      current,
+                    ) =>
+                      !current,
+                  )
+              }
+            >
+              {customizing
+                ? "Done"
+                : "Customize"}
+            </button>
+          )}
+
+          {!operationsOpen && (
+            <button
+              type="button"
+              className="btn btn-subtle"
+              onClick={
+                reset
+              }
+            >
+              Reset Dashboard
+            </button>
+          )}
 
           <button
             type="button"
             className="btn btn-subtle"
+            aria-pressed={operationsOpen}
             onClick={
-              reset
+              () =>
+                setOperationsOpen(
+                  (current) =>
+                    !current,
+                )
             }
           >
-            Reset Dashboard
+            {operationsOpen
+              ? "Back to dashboard"
+              : "Operations"}
           </button>
         </div>
       </header>
@@ -639,21 +668,25 @@ export function CommandCenterWorkspace({
         </span>
       </div>
 
-      {customizing && (
-        <DashboardCustomizationPanel
-          widgets={state.widgets}
-          definitions={registry.list()}
-          issues={registryResult.issues}
-          unavailable={registryResult.unavailable}
-          onShow={(instanceId) => updateHidden(instanceId,false)}
-          onAdd={addWidget}
-          onMove={moveWidget}
-          onRemove={removeWidget}
-        />
-      )}
+      {operationsOpen ? (
+        <OperationsPanel />
+      ) : (
+        <>
+          {customizing && (
+            <DashboardCustomizationPanel
+              widgets={state.widgets}
+              definitions={registry.list()}
+              issues={registryResult.issues}
+              unavailable={registryResult.unavailable}
+              onShow={(instanceId) => updateHidden(instanceId,false)}
+              onAdd={addWidget}
+              onMove={moveWidget}
+              onRemove={removeWidget}
+            />
+          )}
 
-      {visibleWidgets.length ===
-      0 ? (
+          {visibleWidgets.length ===
+          0 ? (
         <div className="commandCenterEmpty">
           <div className="commandCenterEmptyIcon">
             PL
@@ -696,7 +729,7 @@ export function CommandCenterWorkspace({
             <span />
           </div>
         </div>
-      ) : (
+          ) : (
         <div className="commandCenterGroups">
           {widgetGroups.map(
             (
@@ -766,6 +799,8 @@ export function CommandCenterWorkspace({
             ),
           )}
         </div>
+          )}
+        </>
       )}
     </section>
   );
