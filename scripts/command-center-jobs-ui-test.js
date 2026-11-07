@@ -637,6 +637,20 @@ async function main() {
           "apps/renderer/src/components/operations/OperationsPanel.tsx",
         );
 
+      const app =
+        read(
+          "apps/renderer/src/App.tsx",
+        );
+
+      assert.ok(
+        app.includes(
+          '"tasks.overview"',
+        ) &&
+        !app.includes(
+          '"tasks.list"',
+        ),
+      );
+
       assert.ok(
         taskHook.includes(
           '"tasks.overview"',

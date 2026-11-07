@@ -804,6 +804,86 @@ async function main() {
   );
 
   await check(
+    "unsupported cancellation leaves running task unchanged",
+    async () => {
+      const manager = new TaskManager({
+        maxConcurrentTasks: 1,
+      });
+
+      const started = gate();
+      const finish = gate();
+      let signal;
+
+      manager.registerHandler(
+        "test.non-cancellable",
+        async (_input, context) => {
+          signal = context.signal;
+          started.release();
+          await finish.promise;
+          return "completed normally";
+        },
+      );
+
+      const submitted = manager.submit({
+        handlerId:
+          "test.non-cancellable",
+        kind: "other",
+        title:
+          "Non-cancellable task",
+        input: null,
+        supportsCancellation: false,
+      });
+
+      try {
+        await started.promise;
+
+        const cancellation =
+          manager.cancel(
+            submitted.taskId,
+          );
+
+        assert.equal(
+          cancellation.status,
+          "running",
+        );
+
+        assert.equal(
+          manager.get(
+            submitted.taskId,
+          ).status,
+          "running",
+        );
+
+        assert.equal(
+          signal.aborted,
+          false,
+        );
+
+        finish.release();
+
+        assert.equal(
+          await submitted.promise,
+          "completed normally",
+        );
+
+        assert.equal(
+          manager.get(
+            submitted.taskId,
+          ).status,
+          "completed",
+        );
+
+        assert.equal(
+          manager.activeCount,
+          0,
+        );
+      } finally {
+        finish.release();
+      }
+    },
+  );
+
+  await check(
     "handler failures do not stop later scheduling",
     async () => {
       const manager = new TaskManager({
@@ -872,6 +952,90 @@ async function main() {
 
       assert.equal(manager.activeCount, 0);
       assert.equal(manager.pending.length, 0);
+    },
+  );
+
+  await check(
+    "synchronous handler failure releases scheduler slot",
+    async () => {
+      const manager = new TaskManager({
+        maxConcurrentTasks: 1,
+      });
+
+      const started = [];
+
+      manager.registerHandler(
+        "test.sync-failure",
+        (input) => {
+          started.push(input.id);
+
+          if (input.fail) {
+            const error =
+              new Error(
+                "Synchronous failure",
+              );
+
+            error.code =
+              "SYNC_FAILURE";
+
+            throw error;
+          }
+
+          return input.id;
+        },
+      );
+
+      const failedTask = manager.submit({
+        handlerId: "test.sync-failure",
+        kind: "other",
+        title: "Synchronous failure",
+        input: {
+          id: "failure",
+          fail: true,
+        },
+      });
+
+      const successfulTask = manager.submit({
+        handlerId: "test.sync-failure",
+        kind: "other",
+        title: "Success after sync failure",
+        input: {
+          id: "success",
+          fail: false,
+        },
+      });
+
+      await assert.rejects(
+        failedTask.promise,
+        /Synchronous failure/,
+      );
+
+      assert.equal(
+        await successfulTask.promise,
+        "success",
+      );
+
+      assert.equal(
+        manager.get(
+          failedTask.taskId,
+        ).failure.code,
+        "SYNC_FAILURE",
+      );
+
+      assert.deepEqual(
+        started,
+        ["failure", "success"],
+      );
+
+      assert.equal(
+        manager.activeCount,
+        0,
+      );
+
+      assert.equal(
+        manager.pending.length,
+        0,
+      );
     },
   );
 

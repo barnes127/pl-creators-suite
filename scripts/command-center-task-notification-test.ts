@@ -440,6 +440,8 @@ async function testProgressAndPrivacy() {
       {
         id:
           "privacy-task",
+        source:
+          "live",
         kind:
           "fixture",
         status:
@@ -460,14 +462,39 @@ async function testProgressAndPrivacy() {
           message:
             secret,
         },
+        progressPercent:
+          150,
         progress: {
           percent:
-            150,
+            25,
           message:
             secret,
         },
       },
+      {
+        id:
+          "history-private",
+        source:
+          "history",
+        status:
+          "completed",
+        input: {
+          token:
+            secret,
+        },
+        result:
+          secret,
+        metadata: {
+          path:
+            secret,
+        },
+      },
     ]);
+
+  assert.equal(
+    projected.length,
+    1,
+  );
 
   assert.equal(
     projected[0]?.progress?.percent,
@@ -899,6 +926,8 @@ function testProjectionBound() {
       (_, index) => ({
         id:
           `terminal-${index}`,
+        source:
+          "live",
         status:
           "completed",
       }),
@@ -908,12 +937,16 @@ function testProjectionBound() {
     {
       id:
         "active-one",
+      source:
+        "live",
       status:
         "queued",
     },
     {
       id:
         "active-two",
+      source:
+        "live",
       status:
         "running",
     },
@@ -949,6 +982,8 @@ function testProjectionBound() {
         (_, index) => ({
           id:
             `active-${index}`,
+          source:
+            "live",
           status:
             "queued",
         }),

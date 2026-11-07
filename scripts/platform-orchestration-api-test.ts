@@ -130,6 +130,73 @@ async function main() {
     "PASS    EventApi delegates shared event bus operations",
   );
 
+  const listenerOrder:
+    string[] = [];
+
+  eventApi.subscribe(
+    "test.event",
+    () => {
+      listenerOrder.push(
+        "failing",
+      );
+
+      throw new Error(
+        "Expected listener failure",
+      );
+    },
+  );
+
+  eventApi.subscribe(
+    "test.event",
+    () => {
+      listenerOrder.push(
+        "later",
+      );
+    },
+  );
+
+  let listenerError:
+    unknown;
+
+  try {
+    await eventApi.emit(
+      "test.event",
+      {
+        value:
+          "isolated-listener-result",
+      },
+      {
+        source:
+          "engine",
+      },
+    );
+  } catch (
+    error
+  ) {
+    listenerError =
+      error;
+  }
+
+  assertEqual(
+    listenerOrder.join(
+      ",",
+    ),
+    "failing,later",
+    "EventApi preserves listener order after a listener failure",
+  );
+
+  assertEqual(
+    listenerError instanceof Error
+      ? listenerError.message
+      : "",
+    "Expected listener failure",
+    "EventApi retains listener failure diagnostics",
+  );
+
+  console.log(
+    "PASS    EventApi isolates listener failures without hiding rejection",
+  );
+
   const searchRegistry =
     new SearchProviderRegistry();
 
@@ -384,7 +451,7 @@ async function main() {
   );
 
   console.log(
-    "\nPlatform orchestration API test complete: 5/5 PASS",
+    "\nPlatform orchestration API test complete: 6/6 PASS",
   );
 }
 

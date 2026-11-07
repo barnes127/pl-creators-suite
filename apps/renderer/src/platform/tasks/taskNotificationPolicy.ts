@@ -76,6 +76,7 @@ export function toSafeObservedTask(
   if (
     typeof task.id !== "string" ||
     !task.id ||
+    task.source !== "live" ||
     typeof task.status !== "string" ||
     (!active.has(
       task.status as ObservedTaskStatus,
@@ -87,15 +88,8 @@ export function toSafeObservedTask(
     return null;
   }
 
-  const progress =
-    task.progress &&
-    typeof task.progress === "object" &&
-    !Array.isArray(task.progress)
-      ? task.progress as Record<string, unknown>
-      : null;
-
   const percent =
-    progress?.percent;
+    task.progressPercent;
 
   return {
     id:

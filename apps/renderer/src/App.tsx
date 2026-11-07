@@ -192,7 +192,7 @@ export default function App() {
                 await rpc<{
                   tasks?: unknown;
                 }>(
-                  "tasks.list",
+                  "tasks.overview",
                   {},
                 );
 

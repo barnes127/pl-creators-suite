@@ -188,14 +188,42 @@ export class EventBus<
       );
 
 
+    let firstListenerError:
+      unknown;
+
+    let listenerFailed =
+      false;
+
+
     for (
       const listener
       of listeners
     ) {
-      await listener(
-        event as
-          PlatformEventEnvelope<unknown>,
-      );
+      try {
+        await listener(
+          event as
+            PlatformEventEnvelope<unknown>,
+        );
+      } catch (
+        error
+      ) {
+        if (
+          !listenerFailed
+        ) {
+          listenerFailed =
+            true;
+
+          firstListenerError =
+            error;
+        }
+      }
+    }
+
+
+    if (
+      listenerFailed
+    ) {
+      throw firstListenerError;
     }
 
 
