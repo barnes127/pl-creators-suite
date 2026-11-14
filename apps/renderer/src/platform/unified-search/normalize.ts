@@ -7,13 +7,18 @@ import type {
   PaletteResult,
 } from "./types";
 
-const CONTROL_CHARACTERS = /[\u0000-\u001f\u007f]/g;
-const HAS_CONTROL_CHARACTER = /[\u0000-\u001f\u007f]/;
+function isControlCharacter(character: string): boolean {
+  const code = character.charCodeAt(0);
+  return code <= 0x1f || code === 0x7f;
+}
 
 function displayText(value: unknown, fallback: string): string {
   if (typeof value !== "string") return fallback;
 
-  const normalized = value.replace(CONTROL_CHARACTERS, " ").trim();
+  const normalized = Array.from(
+    value,
+    (character) => isControlCharacter(character) ? " " : character,
+  ).join("").trim();
 
   return normalized.slice(0, 240) || fallback;
 }
@@ -25,7 +30,7 @@ function safeProjectRelativePath(value: unknown): string | undefined {
 
   if (
     !candidate ||
-    HAS_CONTROL_CHARACTER.test(candidate) ||
+    Array.from(candidate).some(isControlCharacter) ||
     candidate.startsWith("/") ||
     /^[a-zA-Z]:/.test(candidate)
   ) {
